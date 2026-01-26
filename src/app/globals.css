@@ -199,12 +199,12 @@
 
 	--font-inter: "Inter", var(--font-sans);
 	--font-manrope: "Manrope", var(--font-sans);
-	--font-misans: "MiSans", var(--font-sans);
-	--font-harmonyos-sans-sc: "HarmonyOS Sans SC", var(--font-sans);
-	--font-pingfang-sc: "PingFang SC", var(--font-sans);
-	--font-microsoft-yahei: "Microsoft YaHei", var(--font-sans);
-	--font-sans-serif: var(--font-sans);
-	--font-system: var(--font-sans);
+	--font-misans: "MiSans", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", var(--font-sans);
+	--font-harmonyos-sans-sc:
+		"HarmonyOS Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", var(--font-sans);
+	--font-pingfang-sc: "PingFang SC", "Source Han Sans SC", "Microsoft YaHei", var(--font-sans);
+	--font-microsoft-yahei: "Microsoft YaHei", "Source Han Sans SC", var(--font-sans);
+	--font-system-ui: var(--font-sans);
 
 	--radius-2xl: var(--radius);
 	--radius-3xl: calc(var(--radius) * 1.5);
@@ -212,6 +212,30 @@
 	--radius-lg: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.4);
 	--radius-sm: calc(var(--radius) * 0.2);
+}
+
+@layer base {
+	.font-inter {
+		font-family: var(--font-inter), serif;
+	}
+	.font-manrope {
+		font-family: var(--font-manrope), serif;
+	}
+	.font-misans {
+		font-family: var(--font-misans), system-ui;
+	}
+	.font-harmonyos-sans-sc {
+		font-family: var(--font-harmonyos-sans-sc), system-ui;
+	}
+	.font-pingfang-sc {
+		font-family: var(--font-pingfang-sc), system-ui;
+	}
+	.font-microsoft-yahei {
+		font-family: var(--font-microsoft-yahei), system-ui;
+	}
+	.font-system-ui {
+		font-family: var(--font-system-ui), system-ui;
+	}
 }
 
 :root[data-theme="tide"] {

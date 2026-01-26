@@ -10,11 +10,7 @@
  * Example:
  * fonts.ts           → Add 'roboto' to this array.
  * index.html         → Add Google Fonts link for Roboto.
- * index.css          → Add the new font in the CSS, e.g.:
- *   @theme inline {
- *      // ... other font families
- *      --font-roboto: 'Roboto', var(--font-sans);
- *   }
+ * globals.css        → Add the new font in the @theme block and @layer base.
  */
 export const fonts = [
 	"inter",
@@ -23,5 +19,5 @@ export const fonts = [
 	"HarmonyOS Sans SC",
 	"PingFang SC",
 	"Microsoft YaHei",
-	"sans-serif",
+	"system-ui",
 ] as const

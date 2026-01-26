@@ -20,6 +20,7 @@ export function useThemeEffects() {
 		}
 		const currentFontClass = `font-${fontFamily.replace(/\s+/g, "-").toLowerCase()}`
 		root.classList.add(currentFontClass)
+		root.style.fontFamily = `var(--${currentFontClass})`
 
 		// 根据暗色模式调整默认主色
 		let primaryColor = themeColors.primary
