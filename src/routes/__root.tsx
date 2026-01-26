@@ -14,10 +14,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   return (
     <div className="relative min-h-screen">
-      <div
-        className="ambient-grid pointer-events-none absolute inset-0 opacity-40"
-        aria-hidden="true"
-      />
       <div className="relative">
         <DashboardShell>
           <Outlet />

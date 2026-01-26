@@ -164,7 +164,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-white/60 bg-white/70 px-4 py-4 backdrop-blur-xl sm:px-6">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <nav
@@ -251,7 +251,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           role="presentation"
         >
           <div
-            className="w-full max-w-2xl rounded-3xl border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.25)]"
+            className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.25)]"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -334,7 +334,7 @@ function SidebarBrand() {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-3xl border border-white/70 bg-white/80 px-3 py-3",
+        "flex items-center gap-3 rounded-3xl border border-slate-200 bg-white px-3 py-3",
         collapsed && "justify-center px-2",
       )}
     >
@@ -364,11 +364,11 @@ function SidebarProfile() {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-3xl border border-white/70 bg-white/80 px-3 py-3",
+        "flex items-center gap-3 rounded-3xl border border-slate-200 bg-white px-3 py-3",
         collapsed && "justify-center px-2",
       )}
     >
-      <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-slate-900 via-slate-700 to-slate-500 text-xs font-semibold uppercase text-white">
+      <div className="flex size-10 items-center justify-center rounded-full bg-linear-to-br from-slate-900 via-slate-700 to-slate-500 text-xs font-semibold uppercase text-white">
         ak
       </div>
       <div className={cn("flex-1", collapsed && "sr-only")}>

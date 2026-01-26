@@ -19,7 +19,7 @@ function AutomationPage() {
     <PageContainer className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
             Automation
           </span>
           <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
@@ -52,7 +52,7 @@ function AutomationPage() {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/80 px-4 py-3"
+                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3"
               >
                 <div>
                   <p className="text-sm font-semibold text-slate-900">{item}</p>

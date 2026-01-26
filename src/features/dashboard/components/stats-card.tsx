@@ -32,7 +32,7 @@ export function StatsCard({
         </div>
         <div
           className={cn(
-            "rounded-2xl border border-white/80 bg-white/80 p-3 text-slate-900 shadow-sm",
+            "rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-sm",
             accentClass,
           )}
         >

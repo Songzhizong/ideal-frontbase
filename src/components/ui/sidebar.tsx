@@ -203,7 +203,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           >
             <div
               ref={ref}
-              className="flex h-full flex-col bg-white/95 px-4 py-6"
+              className="flex h-full flex-col bg-white px-4 py-6"
               data-state={state}
               {...props}
             >
@@ -220,7 +220,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         data-state={state}
         data-collapsible={collapsible}
         className={cn(
-          "relative hidden min-h-screen shrink-0 flex-col border-r border-white/70 bg-white/70 px-3 py-6 shadow-[0_0_30px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-[width] duration-300 lg:flex",
+          "relative hidden min-h-screen shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-6 shadow-[0_0_30px_rgba(15,23,42,0.04)] transition-[width] duration-300 lg:flex",
           state === "collapsed" ? "w-20" : "w-72",
           className,
         )}
