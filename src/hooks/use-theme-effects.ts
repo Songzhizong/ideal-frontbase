@@ -1,8 +1,9 @@
 import * as React from "react"
+import { fonts } from "@/app/fonts"
 import { useUiStore } from "@/hooks/use-ui-store"
 
 export function useThemeEffects() {
-	const { borderRadius, themeColors, theme } = useUiStore()
+	const { borderRadius, themeColors, theme, fontFamily } = useUiStore()
 
 	React.useEffect(() => {
 		if (typeof document === "undefined") {
@@ -11,6 +12,14 @@ export function useThemeEffects() {
 
 		const root = document.documentElement
 		root.style.setProperty("--radius", `${borderRadius}px`)
+
+		// 应用字体
+		for (const font of fonts) {
+			const fontClass = `font-${font.replace(/\s+/g, "-").toLowerCase()}`
+			root.classList.remove(fontClass)
+		}
+		const currentFontClass = `font-${fontFamily.replace(/\s+/g, "-").toLowerCase()}`
+		root.classList.add(currentFontClass)
 
 		// 根据暗色模式调整默认主色
 		let primaryColor = themeColors.primary
@@ -43,5 +52,5 @@ export function useThemeEffects() {
 		root.style.setProperty("--color-success", themeColors.success)
 		root.style.setProperty("--color-warning", themeColors.warning)
 		root.style.setProperty("--color-error", themeColors.error)
-	}, [borderRadius, themeColors, theme])
+	}, [borderRadius, themeColors, theme, fontFamily])
 }

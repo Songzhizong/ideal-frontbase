@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @layer base {
@@ -198,6 +197,15 @@
 	--color-paper-100: var(--paper-100);
 	--color-paper-200: var(--paper-200);
 
+	--font-inter: "Inter", var(--font-sans);
+	--font-manrope: "Manrope", var(--font-sans);
+	--font-misans: "MiSans", var(--font-sans);
+	--font-harmonyos-sans-sc: "HarmonyOS Sans SC", var(--font-sans);
+	--font-pingfang-sc: "PingFang SC", var(--font-sans);
+	--font-microsoft-yahei: "Microsoft YaHei", var(--font-sans);
+	--font-sans-serif: var(--font-sans);
+	--font-system: var(--font-sans);
+
 	--radius-2xl: var(--radius);
 	--radius-3xl: calc(var(--radius) * 1.5);
 	--radius-xl: calc(var(--radius) * 0.8);
@@ -227,7 +235,6 @@
 	body {
 		min-height: 100vh;
 		margin: 0;
-		font-family: "Space Grotesk", system-ui, sans-serif;
 		color: hsl(var(--foreground));
 		background: hsl(var(--background));
 	}
@@ -236,7 +243,6 @@
 	h2,
 	h3,
 	h4 {
-		font-family: "Newsreader", "Times New Roman", serif;
 		letter-spacing: -0.02em;
 	}
 

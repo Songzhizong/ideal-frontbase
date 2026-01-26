@@ -10,7 +10,8 @@ type UiState = {
 	// Theme & Layout Settings
 	theme: ThemeConfig["theme"]
 	setTheme: (theme: ThemeConfig["theme"]) => void
-
+	fontFamily: ThemeConfig["fontFamily"]
+	setFontFamily: (font: ThemeConfig["fontFamily"]) => void
 	menuLayout: ThemeConfig["menuLayout"]
 	setMenuLayout: (layout: ThemeConfig["menuLayout"]) => void
 
@@ -63,6 +64,8 @@ export const useUiStore = create<UiState>()(
 
 			setTheme: (theme) => set({ theme }),
 
+			setFontFamily: (fontFamily) => set({ fontFamily }),
+
 			setMenuLayout: (menuLayout) => set({ menuLayout }),
 
 			setThemeColor: (key, color) =>
@@ -95,6 +98,7 @@ export const useUiStore = create<UiState>()(
 			getThemeConfig: () => {
 				const {
 					theme,
+					fontFamily,
 					menuLayout,
 					themeColors,
 					containerWidth,
@@ -108,6 +112,7 @@ export const useUiStore = create<UiState>()(
 				} = get()
 				return {
 					theme,
+					fontFamily,
 					menuLayout,
 					themeColors,
 					containerWidth,

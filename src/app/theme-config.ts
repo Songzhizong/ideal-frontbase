@@ -1,5 +1,8 @@
+import type { fonts } from "./fonts"
+
 export interface ThemeConfig {
 	theme: "light" | "dark" | "system"
+	fontFamily: (typeof fonts)[number]
 	menuLayout: "single" | "dual"
 	themeColors: {
 		primary: string
@@ -19,6 +22,7 @@ export interface ThemeConfig {
 
 export const defaultThemeConfig: ThemeConfig = {
 	theme: "system",
+	fontFamily: "inter",
 	menuLayout: "single",
 	themeColors: {
 		primary: "#0f172a",
