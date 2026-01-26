@@ -133,7 +133,7 @@ Your mindset maps Backend concepts (DTO, Controller, Service) to Frontend patter
 - Interface/Type Names: `PascalCase` (No `I` prefix)
 
 ## Example: API & Hook Definition
-```typescript
+```TypeScript
 // features/users/api/get-user.ts
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
@@ -269,15 +269,6 @@ export const Route = createFileRoute('/_authenticated')({
 ### 包管理器规范 (Package Management)
 
 - **Engine Locking**: 在 package.json 中强制锁定 pnpm 和 Node 版本，防止版本不一致导致的构建错误。
-
-  ```json
-  // package.json
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
-  },
-  "packageManager": "pnpm@9.x.x"
-  ```
 
 - **Setup (初始化)**: 推荐使用 Node.js 内置的 Corepack 启用 pnpm，无需全局安装。
   `corepack enable && corepack prepare pnpm@latest --activate`

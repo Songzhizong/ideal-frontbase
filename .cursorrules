@@ -9,10 +9,11 @@ Your mindset maps Backend concepts (DTO, Controller, Service) to Frontend patter
 - **Shadcn UI**: Always use components from `@/components/ui`. Do not invent new UI styles unless necessary.
 - **Tailwind**: Use utility classes. No CSS modules. Use `clsx` and `tailwind-merge` for conditional classes.
 - **HTTP Client**: Use `ky` exclusively. Do not use `axios` or native `fetch`.
+- **Dark Mode Compatibility**: When defining colors, ALWAYS use Shadcn's semantic variables (e.g., `bg-background`, `text-muted-foreground`, `border-border`) instead of hardcoded colors (e.g., `bg-white`, `text-gray-500`). This ensures automatic dark mode support.
 
 ## Tooling & Package Management
 - **Package Manager**: Exclusively use **pnpm**.
-- **Commands**: 
+- **Commands**:
   - Install: `pnpm install`
   - Add: `pnpm add <package>` (or `pnpm add -D <package>` for devDeps)
   - Run: `pnpm dev`, `pnpm build`, `pnpm test`
@@ -69,7 +70,7 @@ export type User = z.infer<typeof UserSchema>;
 // 2. Define Fetcher (Using Ky)
 const getUser = async (id: string) => {
   // Use .json<T>() isn't enough, we must validate with Zod
-  const json = await api.get(`users/${id}`).json(); 
+  const json = await api.get(`users/${id}`).json();
   return UserSchema.parse(json); // Runtime Validation (Fail Fast)
 };
 

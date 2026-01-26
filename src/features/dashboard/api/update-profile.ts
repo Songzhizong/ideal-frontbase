@@ -11,7 +11,7 @@ export const ProfileSchema = z.object({
 export type ProfileInput = z.infer<typeof ProfileSchema>;
 
 export const UpdateProfileResponseSchema = ProfileSchema.extend({
-  updatedAt: z.string().datetime(),
+  updatedAt: z.iso.datetime()
 });
 
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponseSchema>;

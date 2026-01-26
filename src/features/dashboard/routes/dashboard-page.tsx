@@ -30,28 +30,28 @@ export function DashboardPage() {
       value: data ? data.totalUsers.toLocaleString() : "—",
       hint: "All-time cohort strength",
       icon: Users,
-      accentClass: "text-slate-900",
+      accentClass: "text-primary",
     },
     {
       title: "Active Today",
       value: data ? data.activeToday.toLocaleString() : "—",
       hint: "Recent active sessions",
       icon: Activity,
-      accentClass: "text-sky-600",
+      accentClass: "text-primary",
     },
     {
       title: "Conversion Rate",
       value: data ? `${data.conversionRate.toFixed(1)}%` : "—",
       hint: "Trial to paid flow",
       icon: Sparkles,
-      accentClass: "text-amber-600",
+      accentClass: "text-warning",
     },
     {
       title: "Monthly Revenue",
       value: data ? `$${data.revenue.toLocaleString()}` : "—",
       hint: "Projected MRR",
       icon: BadgeDollarSign,
-      accentClass: "text-emerald-600",
+      accentClass: "text-success",
     },
   ];
 
@@ -66,13 +66,13 @@ export function DashboardPage() {
         <section className="flex flex-col gap-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl space-y-3">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
                 Signal Studio
               </span>
-              <h1 className="text-4xl font-semibold text-slate-900 sm:text-5xl">
+              <h1 className="text-4xl font-semibold text-foreground sm:text-5xl">
                 Calm dashboards for fast-moving teams.
               </h1>
-              <p className="text-base text-slate-600 sm:text-lg">
+              <p className="text-base text-muted-foreground sm:text-lg">
                 Every metric is Zod-validated, query-cached, and ready for
                 AI-friendly iteration.{" "}
                 {isLoading
@@ -134,18 +134,18 @@ export function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5">
-                <p className="text-sm font-semibold text-slate-700">
+              <div className="rounded-2xl border border-dashed border-border bg-muted/50 px-4 py-5">
+                <p className="text-sm font-semibold text-foreground">
                   Sidebar layout
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {isCollapsed
                     ? "Collapsed: icon-only mode keeps the workspace open."
                     : "Expanded: full navigation labels are available."}
                 </p>
               </div>
-              <div className="rounded-2xl bg-slate-900 p-4 text-white">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-300">
+              <div className="rounded-2xl bg-primary p-4 text-primary-foreground">
+                <p className="text-xs uppercase tracking-[0.3em] opacity-70">
                   Next
                 </p>
                 <p className="mt-2 text-lg font-semibold">

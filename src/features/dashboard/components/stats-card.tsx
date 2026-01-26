@@ -27,12 +27,12 @@ export function StatsCard({
     <Card className="flex h-full flex-col justify-between">
       <CardHeader className="flex-row items-start justify-between">
         <div>
-          <CardTitle className="text-lg text-slate-900">{title}</CardTitle>
+          <CardTitle className="text-lg">{title}</CardTitle>
           <CardDescription>{hint}</CardDescription>
         </div>
         <div
           className={cn(
-            "rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-sm",
+            "rounded-2xl border border-border bg-muted/50 p-3 text-foreground shadow-sm",
             accentClass,
           )}
         >
@@ -40,7 +40,7 @@ export function StatsCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+        <div className="text-3xl font-semibold text-foreground sm:text-4xl">
           {value}
         </div>
       </CardContent>

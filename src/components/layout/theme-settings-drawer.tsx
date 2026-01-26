@@ -1,0 +1,426 @@
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useUiStore } from "@/hooks/use-ui-store";
+import { cn } from "@/lib/utils";
+import { presetColors } from "@/app/theme-config";
+import lightThemeImg from "@/assets/images/theme_styles/light.png";
+import darkThemeImg from "@/assets/images/theme_styles/dark.png";
+import systemThemeImg from "@/assets/images/theme_styles/system.png";
+import {
+  Columns2,
+  Copy,
+  Layout,
+  Palette,
+  RotateCcw,
+} from "lucide-react";
+import { toast } from "sonner";
+
+export function ThemeSettingsDrawer() {
+  const {
+    theme,
+    setTheme,
+    menuLayout,
+    setMenuLayout,
+    themeColors,
+    setThemeColor,
+    setThemeColors,
+    containerWidth,
+    setContainerWidth,
+    sidebarWidth,
+    setSidebarWidth,
+    sidebarCollapsedWidth,
+    setSidebarCollapsedWidth,
+    headerHeight,
+    setHeaderHeight,
+    showBreadcrumb,
+    setShowBreadcrumb,
+    showBreadcrumbIcon,
+    setShowBreadcrumbIcon,
+    pageAnimation,
+    setPageAnimation,
+    borderRadius,
+    setBorderRadius,
+    resetConfig,
+    getThemeConfig,
+  } = useUiStore();
+
+  const handleCopyConfig = () => {
+    const config = getThemeConfig();
+    const configStr = JSON.stringify(config, null, 2);
+    navigator.clipboard.writeText(configStr).then(() => {
+      toast.success("配置已复制到剪贴板", {
+        description: "请将其粘贴到 src/app/theme-config.ts 文件中的 defaultThemeConfig 常量中。",
+      });
+    });
+  };
+
+  const handleResetConfig = () => {
+    resetConfig();
+    toast.success("主题配置已重置");
+  };
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-10 w-10 rounded-full p-0"
+          aria-label="Open theme settings"
+        >
+          <Palette className="size-4" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-87.5 p-0 sm:w-100">
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between border-b border-border px-6 py-4">
+            <SheetTitle className="text-lg font-semibold">项目配置</SheetTitle>
+            <SheetDescription className="sr-only">
+              调整系统的主题、颜色、布局等设置。
+            </SheetDescription>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            {/* 主题风格 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">主题风格</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { id: "light", label: "浅色", image: lightThemeImg },
+                  { id: "dark", label: "深色", image: darkThemeImg },
+                  { id: "system", label: "系统", image: systemThemeImg },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setTheme(item.id as any)}
+                    className="group flex flex-col items-center gap-2"
+                  >
+                    <div
+                      className={cn(
+                        "relative flex aspect-4/3 w-full items-center justify-center overflow-hidden rounded-xl border-2 transition-all",
+                        theme === item.id
+                          ? "border-primary bg-primary/5"
+                          : "border-transparent bg-muted hover:bg-muted/80",
+                      )}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.label}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span
+                      className={cn(
+                        "text-sm font-medium transition-colors",
+                        theme === item.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* 菜单布局 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">菜单布局</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { id: "single", label: "垂直单列", icon: Layout },
+                  { id: "dual", label: "垂直双列", icon: Columns2 },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setMenuLayout(item.id as any)}
+                    className={cn(
+                      "flex flex-col items-center gap-3 rounded-xl border-2 p-4 transition-all",
+                      menuLayout === item.id
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-transparent bg-muted hover:bg-muted/80",
+                    )}
+                  >
+                    <item.icon className="h-6 w-6" />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* 系统主题色 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">系统主题色</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
+              <div className="flex flex-wrap gap-3 justify-center">
+                {presetColors.map((preset) => (
+                  <button
+                    key={preset.name}
+                    onClick={() => setThemeColors(preset.colors)}
+                    className={cn(
+                      "group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all hover:scale-110",
+                      themeColors.primary === preset.colors.primary
+                        ? "border-border ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        : "border-transparent"
+                    )}
+                    title={preset.name}
+                  >
+                    <div
+                      className="h-full w-full rounded-full"
+                      style={{ backgroundColor: preset.colors.primary }}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4 pt-2">
+                {[
+                  { key: "primary", label: "主色" },
+                  { key: "success", label: "成功色" },
+                  { key: "warning", label: "警告色" },
+                  { key: "error", label: "错误色" },
+                ].map((item) => (
+                  <div key={item.key} className="flex items-center justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      {item.label}
+                    </Label>
+                    <input
+                      type="color"
+                      value={themeColors[item.key as keyof typeof themeColors]}
+                      onChange={(e) =>
+                        setThemeColor(item.key as any, e.target.value)
+                      }
+                      className="h-6 w-10 cursor-pointer overflow-hidden rounded-md border-none p-0"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 盒子样式 & 容器宽度 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">界面展示</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-normal text-muted-foreground">
+                    容器宽度
+                  </Label>
+                  <div className="flex rounded-lg bg-muted p-1">
+                    <button
+                      onClick={() => setContainerWidth("full")}
+                      className={cn(
+                        "rounded-md px-3 py-1 text-xs transition-all",
+                        containerWidth === "full"
+                          ? "bg-background font-medium shadow-sm text-foreground"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      铺满
+                    </button>
+                    <button
+                      onClick={() => setContainerWidth("fixed")}
+                      className={cn(
+                        "rounded-md px-3 py-1 text-xs transition-all",
+                        containerWidth === "fixed"
+                          ? "bg-background font-medium shadow-sm text-foreground"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      固定
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* 侧边栏设置 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">侧边栏设置</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      侧边栏宽度
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {sidebarWidth}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="160"
+                    max="320"
+                    value={sidebarWidth}
+                    onChange={(e) => setSidebarWidth(Number(e.target.value))}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      折叠宽度
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {sidebarCollapsedWidth}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="48"
+                    max="96"
+                    value={sidebarCollapsedWidth}
+                    onChange={(e) => setSidebarCollapsedWidth(Number(e.target.value))}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* 头部设置 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">头部设置</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="space-y-5">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      头部高度
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {headerHeight}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="48"
+                    max="80"
+                    value={headerHeight}
+                    onChange={(e) => setHeaderHeight(Number(e.target.value))}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-normal text-muted-foreground">
+                    显示面包屑
+                  </Label>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={showBreadcrumb}
+                      onChange={(e) => setShowBreadcrumb(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <div className="peer h-5 w-9 rounded-full bg-muted after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:border after:border-border after:bg-background after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-primary peer-focus:outline-none"></div>
+                  </label>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-normal text-muted-foreground">
+                    显示面包屑图标
+                  </Label>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={showBreadcrumbIcon}
+                      onChange={(e) => setShowBreadcrumbIcon(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <div className="peer h-5 w-9 rounded-full bg-muted after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:border after:border-border after:bg-background after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-primary peer-focus:outline-none"></div>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            {/* 基础配置 */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <h3 className="text-sm font-medium text-foreground">基础配置</h3>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-sm font-normal text-muted-foreground">
+                    页面切换动画
+                  </Label>
+                  <select
+                    value={pageAnimation}
+                    onChange={(e) => setPageAnimation(e.target.value as any)}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10"
+                  >
+                    <option value="none" className="bg-background">无动画</option>
+                    <option value="fade" className="bg-background">淡入淡出</option>
+                    <option value="slide-left" className="bg-background">左侧划入</option>
+                    <option value="slide-bottom" className="bg-background">下方划入</option>
+                    <option value="slide-top" className="bg-background">上方划入</option>
+                  </select>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <Label className="text-sm font-normal text-muted-foreground">
+                      自定义圆角
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {borderRadius}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    value={borderRadius}
+                    onChange={(e) => setBorderRadius(Number(e.target.value))}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div className="flex gap-3 border-t border-border p-6">
+            <Button className="flex-1 gap-2" onClick={handleCopyConfig}>
+              <Copy className="h-4 w-4" />
+              复制配置
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1 gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleResetConfig}
+            >
+              <RotateCcw className="h-4 w-4" />
+              重置配置
+            </Button>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

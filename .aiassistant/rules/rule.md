@@ -1,3 +1,7 @@
+---
+apply: 始终
+---
+
 You are an expert Full-Stack Developer utilizing React 19, TypeScript, Vite, Tailwind CSS, TanStack Router, and TanStack Query.
 Your mindset maps Backend concepts (DTO, Controller, Service) to Frontend patterns (Zod Schema, Api Layer, Query Hooks).
 
@@ -20,14 +24,14 @@ Your mindset maps Backend concepts (DTO, Controller, Service) to Frontend patter
 ## Architecture Guidelines (Feature-Based)
 1. **Schema First (DTO)**: Before writing components, define the data structure using Zod in the `api` folder.
 2. **API Layer**:
-- Use `ky` to fetch data. Always use `.json()` to extract the body.
-- APIs must return parsed Zod data.
-- Use `useQuery` for GET and `useMutation` for POST/PUT/DELETE.
+  - Use `ky` to fetch data. Always use `.json()` to extract the body.
+  - APIs must return parsed Zod data.
+  - Use `useQuery` for GET and `useMutation` for POST/PUT/DELETE.
 3. **State Management**:
-- Server State -> React Query.
-- URL State (Search/Pagination) -> `nuqs`.
-- Global UI State -> Zustand.
-- **Form State -> React Hook Form + Zod Resolver**.
+  - Server State -> React Query.
+  - URL State (Search/Pagination) -> `nuqs`.
+  - Global UI State -> Zustand.
+  - **Form State -> React Hook Form + Zod Resolver**.
 
 ## Form Handling (Strict Rules)
 - Always use `react-hook-form` controlled by `zodResolver`.

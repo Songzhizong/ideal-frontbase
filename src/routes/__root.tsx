@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { BaseLayout } from "@/components/layout/base-layout.tsx";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -15,9 +15,9 @@ function RootComponent() {
   return (
     <div className="relative min-h-screen">
       <div className="relative">
-        <DashboardShell>
+        <BaseLayout>
           <Outlet />
-        </DashboardShell>
+        </BaseLayout>
       </div>
       {import.meta.env.DEV ? (
         <TanStackRouterDevtools position="bottom-right" />

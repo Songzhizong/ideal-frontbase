@@ -105,7 +105,7 @@ export function FormDescription({
   return (
     <p
       id={formDescriptionId}
-      className={cn("text-xs text-slate-500", className)}
+      className={cn("text-xs text-muted-foreground", className)}
       {...props}
     />
   );

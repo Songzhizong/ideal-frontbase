@@ -1,8 +1,8 @@
-# AI Frontend Starter
+# AI 前端起步模板
 
-Feature-based React 19 + Vite + TypeScript starter with TanStack Router, Query, and a Zod-first API layer.
+基于特性组织的 React 19 + Vite + TypeScript 起步模板，内置 TanStack Router、TanStack Query，并提供以 Zod 为优先的 API 层。
 
-## Quick start
+## 快速开始
 
 ```bash
 pnpm install
@@ -10,18 +10,22 @@ pnpm msw:init
 pnpm dev
 ```
 
-## Scripts
+## 脚本
 
-- `pnpm dev` - start dev server
-- `pnpm build` - production build
-- `pnpm preview` - preview build
-- `pnpm test` - run unit tests
-- `pnpm lint` - biome check
-- `pnpm typecheck` - tsc no-emit
-- `pnpm routes:generate` - generate TanStack Router route tree
+- `pnpm dev` - 启动开发服务器
+- `pnpm build` - 生产构建
+- `pnpm preview` - 预览构建产物
+- `pnpm test` - 运行单元测试
+- `pnpm lint` - 运行 biome 检查
+- `pnpm typecheck` - 运行 tsc no-emit
+- `pnpm routes:generate` - 生成 TanStack Router 路由树
 
-## Notes
+## 说明
 
-- API base URL is configured via `.env` (default is `http://localhost:5173/api`).
-- MSW is enabled only in development. Run `pnpm msw:init` once to generate `public/mockServiceWorker.js`.
-- File-based routes live under `src/routes`.
+- API 基础地址通过 `.env` 配置（默认是 `http://localhost:5173/api`）。
+- MSW 仅在开发环境启用。运行一次 `pnpm msw:init` 以生成 `public/mockServiceWorker.js`。
+- 基于文件的路由位于 `src/routes`。
+
+## 技术规范
+
+详见 [Specifications.md](Specifications.md)。

@@ -5,7 +5,7 @@ import { PanelLeft } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
@@ -69,6 +69,8 @@ interface SidebarProviderProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  sidebarWidth?: number;
+  sidebarCollapsedWidth?: number;
 }
 
 export const SidebarProvider = React.forwardRef<
@@ -76,111 +78,122 @@ export const SidebarProvider = React.forwardRef<
   SidebarProviderProps
 >(
   (
-    { defaultOpen = true, open: openProp, onOpenChange, className, children, ...props },
+    { defaultOpen = true, open: openProp, onOpenChange, sidebarWidth = 240, sidebarCollapsedWidth = 74, className, children, ...props },
     ref,
   ) => {
-  const isMobile = useIsMobile();
-  const [openState, setOpenState] = React.useState(defaultOpen);
-  const [openMobile, setOpenMobile] = React.useState(false);
+    const isMobile = useIsMobile();
+    
+    // Synchronously read stored state to prevent flash
+    const getInitialState = React.useCallback(() => {
+      if (typeof window === "undefined") {
+        return defaultOpen;
+      }
+      
+      const stored =
+        window.localStorage.getItem(SIDEBAR_STORAGE_KEY) ??
+        getCookieValue(SIDEBAR_COOKIE_NAME);
+      
+      if (stored === "expanded" || stored === "collapsed") {
+        return stored === "expanded";
+      }
+      
+      return defaultOpen;
+    }, [defaultOpen]);
+    
+    const [openState, setOpenState] = React.useState(getInitialState);
+    const [openMobile, setOpenMobile] = React.useState(false);
+    const [isInitialized, setIsInitialized] = React.useState(false);
 
-  const open = openProp ?? openState;
+    const open = openProp ?? openState;
 
-  const setOpen = React.useCallback(
-    (value: boolean) => {
-      if (onOpenChange) {
-        onOpenChange(value);
+    const setOpen = React.useCallback(
+      (value: boolean) => {
+        if (onOpenChange) {
+          onOpenChange(value);
+        } else {
+          setOpenState(value);
+        }
+
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            SIDEBAR_STORAGE_KEY,
+            value ? "expanded" : "collapsed",
+          );
+        }
+
+        setSidebarCookie(value ? "expanded" : "collapsed");
+      },
+      [onOpenChange],
+    );
+
+    React.useEffect(() => {
+      // Mark as initialized after first render to enable transitions
+      setIsInitialized(true);
+    }, []);
+
+    React.useEffect(() => {
+      if (!isMobile) {
+        setOpenMobile(false);
+      }
+    }, [isMobile]);
+
+    const toggleSidebar = React.useCallback(() => {
+      if (isMobile) {
+        setOpenMobile((current) => !current);
       } else {
-        setOpenState(value);
+        setOpen(!open);
       }
+    }, [isMobile, open, setOpen]);
 
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(
-          SIDEBAR_STORAGE_KEY,
-          value ? "expanded" : "collapsed",
-        );
-      }
+    React.useEffect(() => {
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (!(event.metaKey || event.ctrlKey)) {
+          return;
+        }
 
-      setSidebarCookie(value ? "expanded" : "collapsed");
-    },
-    [onOpenChange],
-  );
+        if (event.key.toLowerCase() !== SIDEBAR_KEYBOARD_SHORTCUT) {
+          return;
+        }
 
-  React.useEffect(() => {
-    if (openProp !== undefined) {
-      return;
-    }
+        event.preventDefault();
+        toggleSidebar();
+      };
 
-    if (typeof window === "undefined") {
-      return;
-    }
+      window.addEventListener("keydown", onKeyDown);
+      return () => window.removeEventListener("keydown", onKeyDown);
+    }, [toggleSidebar]);
 
-    const stored =
-      window.localStorage.getItem(SIDEBAR_STORAGE_KEY) ??
-      getCookieValue(SIDEBAR_COOKIE_NAME);
+    const state: SidebarState = open ? "expanded" : "collapsed";
 
-    if (stored === "expanded" || stored === "collapsed") {
-      setOpenState(stored === "expanded");
-    }
-  }, [openProp]);
+    const value = React.useMemo(
+      () => ({
+        state,
+        open,
+        setOpen,
+        openMobile,
+        setOpenMobile,
+        isMobile,
+        toggleSidebar,
+      }),
+      [state, open, setOpen, openMobile, isMobile, toggleSidebar],
+    );
 
-  React.useEffect(() => {
-    if (!isMobile) {
-      setOpenMobile(false);
-    }
-  }, [isMobile]);
-
-  const toggleSidebar = React.useCallback(() => {
-    if (isMobile) {
-      setOpenMobile((current) => !current);
-    } else {
-      setOpen(!open);
-    }
-  }, [isMobile, open, setOpen]);
-
-  React.useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey)) {
-        return;
-      }
-
-      if (event.key.toLowerCase() !== SIDEBAR_KEYBOARD_SHORTCUT) {
-        return;
-      }
-
-      event.preventDefault();
-      toggleSidebar();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [toggleSidebar]);
-
-  const state: SidebarState = open ? "expanded" : "collapsed";
-
-  const value = React.useMemo(
-    () => ({
-      state,
-      open,
-      setOpen,
-      openMobile,
-      setOpenMobile,
-      isMobile,
-      toggleSidebar,
-    }),
-    [state, open, setOpen, openMobile, isMobile, toggleSidebar],
-  );
-
-  return (
-    <SidebarContext.Provider value={value}>
-      <div
-        ref={ref}
-        className={cn("flex min-h-screen w-full", className)}
-        {...props}
-      >
-        {children}
-      </div>
-    </SidebarContext.Provider>
-  );
+    return (
+      <SidebarContext.Provider value={value}>
+        <div
+          ref={ref}
+          className={cn("flex min-h-screen w-full", className)}
+          style={{
+            "--sidebar-width": `${sidebarWidth}px`,
+            "--sidebar-width-collapsed": `${sidebarCollapsedWidth}px`,
+          } as React.CSSProperties}
+          data-sidebar-initialized={isInitialized}
+          {...props}
+        >
+          {children}
+        </div>
+      </SidebarContext.Provider>
+    );
   },
 );
 
@@ -199,11 +212,16 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent
             side="left"
-            className={cn("w-[18rem] p-0", className)}
+            className={cn("p-0", className)}
+            style={{ width: "var(--sidebar-width)" }}
           >
+            <SheetTitle className="sr-only">Sidebar</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigation menu
+            </SheetDescription>
             <div
               ref={ref}
-              className="flex h-full flex-col bg-white px-4 py-6"
+              className="flex h-full flex-col bg-background px-4 py-6"
               data-state={state}
               {...props}
             >
@@ -214,16 +232,21 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
       );
     }
 
+    const isCollapsed = state === "collapsed" || collapsible === "none";
+
     return (
       <aside
         ref={ref}
         data-state={state}
         data-collapsible={collapsible}
         className={cn(
-          "relative hidden min-h-screen shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-6 shadow-[0_0_30px_rgba(15,23,42,0.04)] transition-[width] duration-300 lg:flex",
-          state === "collapsed" ? "w-20" : "w-72",
+          "relative hidden min-h-screen shrink-0 flex-col border-r border-border bg-background px-3 py-6 shadow-[0_0_30px_rgba(0,0,0,0.04)] lg:flex",
+          "[div[data-sidebar-initialized='true']_&]:transition-[width] [div[data-sidebar-initialized='true']_&]:duration-300",
           className,
         )}
+        style={{
+          width: isCollapsed ? "var(--sidebar-width-collapsed)" : "var(--sidebar-width)",
+        }}
         {...props}
       >
         {children}
@@ -323,7 +346,7 @@ export const SidebarGroupLabel = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      "text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-400",
+      "text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-muted-foreground",
       className,
     )}
     {...props}
@@ -379,10 +402,10 @@ export const SidebarMenuButton = React.forwardRef<
       <Comp
         ref={ref}
         className={cn(
-          "flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-semibold transition",
+          "flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-semibold transition cursor-pointer",
           isActive
-            ? "bg-slate-900 text-white shadow-sm"
-            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
           collapsed && "justify-center px-2",
           className,
         )}

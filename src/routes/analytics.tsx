@@ -19,13 +19,13 @@ function AnalyticsPage() {
     <PageContainer className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
             Insights
           </span>
-          <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+          <h1 className="text-3xl font-semibold text-primary sm:text-4xl">
             Performance signals in one view.
           </h1>
-          <p className="max-w-2xl text-sm text-slate-600 sm:text-base">
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
             Monitor revenue movement, activation trends, and retention cohorts
             with live context.
           </p>
@@ -42,12 +42,12 @@ function AnalyticsPage() {
             </CardTitle>
             <CardDescription>Last 30 days of signal lift.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm text-slate-600">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-              <p className="text-sm font-semibold text-slate-700">
+          <CardContent className="space-y-4 text-sm text-muted-foreground">
+            <div className="rounded-3xl border border-border bg-background p-6 text-sm text-muted-foreground">
+              <p className="text-sm font-semibold text-foreground">
                 Visualization placeholder
               </p>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Connect your charts or embed real-time monitoring here.
               </p>
             </div>
@@ -60,12 +60,12 @@ function AnalyticsPage() {
               ].map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                  className="rounded-2xl border border-border bg-background px-4 py-3"
                 >
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     {label}
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">
+                  <p className="mt-2 text-lg font-semibold text-primary">
                     {value}
                   </p>
                 </div>
@@ -81,15 +81,15 @@ function AnalyticsPage() {
             </CardTitle>
             <CardDescription>Weekly targets</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm text-slate-600">
+          <CardContent className="space-y-4 text-sm text-muted-foreground">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 Objectives
               </p>
-              <p className="text-sm font-semibold text-slate-800">
+              <p className="text-sm font-semibold text-foreground">
                 Improve trial activation to 70%
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Keep the focus on guided tours and lifecycle nudges.
               </p>
             </div>
