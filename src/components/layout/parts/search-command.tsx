@@ -46,7 +46,7 @@ export function SearchCommand({ open, onOpenChange }: SearchCommandProps) {
 	return (
 		<button
 			type="button"
-			className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-4 py-12 backdrop-blur-sm"
+			className="sheet-overlay fixed inset-0 z-50 flex items-start justify-center px-4 py-12"
 			onClick={() => onOpenChange(false)}
 			aria-label="Close search"
 		>

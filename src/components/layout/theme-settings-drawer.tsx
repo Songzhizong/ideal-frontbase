@@ -106,7 +106,7 @@ export function ThemeSettingsDrawer() {
 										key={item.id}
 										type="button"
 										onClick={() => setTheme(item.id as "light" | "dark" | "system")}
-										className="group flex flex-col items-center gap-2"
+										className="group flex flex-col items-center gap-2 focus:outline-none focus-visible:outline-none"
 									>
 										<div
 											className={cn(

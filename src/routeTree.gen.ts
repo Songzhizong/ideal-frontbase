@@ -14,6 +14,9 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AutomationRouteImport } from './routes/automation'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Errors500RouteImport } from './routes/errors/500'
+import { Route as Errors404RouteImport } from './routes/errors/404'
+import { Route as Errors403RouteImport } from './routes/errors/403'
 
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
@@ -40,6 +43,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Errors500Route = Errors500RouteImport.update({
+  id: '/errors/500',
+  path: '/errors/500',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Errors404Route = Errors404RouteImport.update({
+  id: '/errors/404',
+  path: '/errors/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Errors403Route = Errors403RouteImport.update({
+  id: '/errors/403',
+  path: '/errors/403',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +65,9 @@ export interface FileRoutesByFullPath {
   '/automation': typeof AutomationRoute
   '/settings': typeof SettingsRoute
   '/team': typeof TeamRoute
+  '/errors/403': typeof Errors403Route
+  '/errors/404': typeof Errors404Route
+  '/errors/500': typeof Errors500Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +75,9 @@ export interface FileRoutesByTo {
   '/automation': typeof AutomationRoute
   '/settings': typeof SettingsRoute
   '/team': typeof TeamRoute
+  '/errors/403': typeof Errors403Route
+  '/errors/404': typeof Errors404Route
+  '/errors/500': typeof Errors500Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +86,41 @@ export interface FileRoutesById {
   '/automation': typeof AutomationRoute
   '/settings': typeof SettingsRoute
   '/team': typeof TeamRoute
+  '/errors/403': typeof Errors403Route
+  '/errors/404': typeof Errors404Route
+  '/errors/500': typeof Errors500Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analytics' | '/automation' | '/settings' | '/team'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/automation'
+    | '/settings'
+    | '/team'
+    | '/errors/403'
+    | '/errors/404'
+    | '/errors/500'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analytics' | '/automation' | '/settings' | '/team'
-  id: '__root__' | '/' | '/analytics' | '/automation' | '/settings' | '/team'
+  to:
+    | '/'
+    | '/analytics'
+    | '/automation'
+    | '/settings'
+    | '/team'
+    | '/errors/403'
+    | '/errors/404'
+    | '/errors/500'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/automation'
+    | '/settings'
+    | '/team'
+    | '/errors/403'
+    | '/errors/404'
+    | '/errors/500'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +129,9 @@ export interface RootRouteChildren {
   AutomationRoute: typeof AutomationRoute
   SettingsRoute: typeof SettingsRoute
   TeamRoute: typeof TeamRoute
+  Errors403Route: typeof Errors403Route
+  Errors404Route: typeof Errors404Route
+  Errors500Route: typeof Errors500Route
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +171,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/errors/500': {
+      id: '/errors/500'
+      path: '/errors/500'
+      fullPath: '/errors/500'
+      preLoaderRoute: typeof Errors500RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/errors/404': {
+      id: '/errors/404'
+      path: '/errors/404'
+      fullPath: '/errors/404'
+      preLoaderRoute: typeof Errors404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/errors/403': {
+      id: '/errors/403'
+      path: '/errors/403'
+      fullPath: '/errors/403'
+      preLoaderRoute: typeof Errors403RouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +201,9 @@ const rootRouteChildren: RootRouteChildren = {
   AutomationRoute: AutomationRoute,
   SettingsRoute: SettingsRoute,
   TeamRoute: TeamRoute,
+  Errors403Route: Errors403Route,
+  Errors404Route: Errors404Route,
+  Errors500Route: Errors500Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -207,7 +207,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 				data-collapsible={collapsible}
 				className={cn(
 					"relative hidden min-h-screen shrink-0 flex-col border-r border-border bg-background px-3 py-6 shadow-[0_0_30px_rgba(0,0,0,0.04)] lg:flex",
-					"[div[data-sidebar-initialized='true']_&]:transition-[width] [div[data-sidebar-initialized='true']_&]:duration-300",
+					"[div[data-sidebar-initialized='true']_&]:transition-[width] [div[data-sidebar-initialized='true']_&]:duration-500",
 					className,
 				)}
 				style={{

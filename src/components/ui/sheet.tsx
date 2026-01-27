@@ -15,7 +15,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
 	<DialogPrimitive.Overlay
 		ref={ref}
-		className={cn("sheet-overlay fixed inset-0 z-50 bg-black/80 backdrop-blur-sm", className)}
+		className={cn("sheet-overlay fixed inset-0 z-50", className)}
 		{...props}
 	/>
 ))

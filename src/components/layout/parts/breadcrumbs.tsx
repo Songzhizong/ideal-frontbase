@@ -1,11 +1,24 @@
 import { Link, useRouterState } from "@tanstack/react-router"
-import { ChevronRight, LayoutGrid, type LucideIcon } from "lucide-react"
+import {
+	AlertTriangle,
+	ChevronRight,
+	LayoutGrid,
+	ShieldAlert,
+	type LucideIcon,
+} from "lucide-react"
 import * as React from "react"
 import { useUiStore } from "@/hooks/use-ui-store"
 
 interface BreadcrumbsProps {
 	navItems: readonly { title: string; to: string; icon: LucideIcon }[]
 }
+
+// Error page configurations
+const ERROR_PAGES = [
+	{ to: "/errors/403", title: "Forbidden", icon: ShieldAlert },
+	{ to: "/errors/404", title: "Not Found", icon: AlertTriangle },
+	{ to: "/errors/500", title: "Server Error", icon: AlertTriangle },
+] as const
 
 export function Breadcrumbs({ navItems }: BreadcrumbsProps) {
 	const { showBreadcrumb, showBreadcrumbIcon } = useUiStore()
@@ -15,7 +28,20 @@ export function Breadcrumbs({ navItems }: BreadcrumbsProps) {
 
 	const routeLabels = React.useMemo(() => {
 		const entries: Array<[string, string]> = navItems.map((item) => [item.to, item.title])
+		// Add error page labels
+		for (const errorPage of ERROR_PAGES) {
+			entries.push([errorPage.to, errorPage.title])
+		}
 		return new Map<string, string>(entries)
+	}, [navItems])
+
+	const routeIcons = React.useMemo(() => {
+		const entries: Array<[string, LucideIcon]> = navItems.map((item) => [item.to, item.icon])
+		// Add error page icons
+		for (const errorPage of ERROR_PAGES) {
+			entries.push([errorPage.to, errorPage.icon])
+		}
+		return new Map<string, LucideIcon>(entries)
 	}, [navItems])
 
 	const breadcrumbLabel = routeLabels.get(pathname) ?? "Overview"
@@ -49,7 +75,7 @@ export function Breadcrumbs({ navItems }: BreadcrumbsProps) {
 								{showBreadcrumbIcon &&
 									crumb.to === pathname &&
 									(() => {
-										const icon = navItems.find((n) => n.to === pathname)?.icon
+										const icon = routeIcons.get(pathname)
 										return icon ? React.createElement(icon, { className: "size-3" }) : null
 									})()}
 								{crumb.label}

@@ -37,6 +37,14 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 		select: (state) => state.location.pathname,
 	})
 	const [searchOpen, setSearchOpen] = React.useState(false)
+	const [animationKey, setAnimationKey] = React.useState(0)
+
+	// Trigger animation on route change
+	React.useEffect(() => {
+		if (pageAnimation !== "none") {
+			setAnimationKey((prev) => prev + 1)
+		}
+	}, [pathname, pageAnimation])
 
 	return (
 		<SidebarProvider
@@ -75,16 +83,13 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 			<div className="flex min-h-screen flex-1 flex-col">
 				<Header navItems={ALL_NAV} onSearchOpen={() => setSearchOpen(true)} />
 
-				<main
-					className={cn(
-						"flex-1 overflow-x-hidden",
-						pageAnimation !== "none" && `animate-${pageAnimation}`,
-					)}
-				>
+				<main className="flex-1 overflow-hidden relative">
 					<div
+						key={animationKey}
 						className={cn(
-							"h-full transition-all duration-300",
-							containerWidth === "fixed" ? "mx-auto max-w-7xl" : "w-full",
+							"h-full w-full",
+							containerWidth === "fixed" ? "mx-auto max-w-7xl" : "",
+							pageAnimation !== "none" && `animate-${pageAnimation}`,
 						)}
 					>
 						{children}

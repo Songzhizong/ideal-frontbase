@@ -12,7 +12,7 @@
 		background-position: right 0.75rem center;
 		background-size: 1rem;
 		padding-right: 2.5rem;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 		cursor: pointer;
 		border: 1px solid hsl(var(--border));
 		border-radius: var(--radius);
@@ -213,6 +213,9 @@
 	--radius-lg: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.4);
 	--radius-sm: calc(var(--radius) * 0.2);
+
+	--default-transition-duration: 400ms;
+	--default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /*noinspection ALL*/
@@ -306,19 +309,23 @@
 
 @layer utilities {
 	.animate-fade {
-		animation: fade 0.3s ease-out;
+		animation: fade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: opacity;
 	}
 
 	.animate-slide-left {
-		animation: slide-left 0.3s ease-out;
+		animation: slide-left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: transform, opacity;
 	}
 
 	.animate-slide-bottom {
-		animation: slide-bottom 0.3s ease-out;
+		animation: slide-bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: transform, opacity;
 	}
 
 	.animate-slide-top {
-		animation: slide-top 0.3s ease-out;
+		animation: slide-top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: transform, opacity;
 	}
 }
 
@@ -334,7 +341,7 @@
 
 @keyframes slide-left {
 	from {
-		transform: translateX(-20px);
+		transform: translateX(-100px);
 		opacity: 0;
 	}
 
@@ -346,7 +353,7 @@
 
 @keyframes slide-bottom {
 	from {
-		transform: translateY(20px);
+		transform: translateY(100px);
 		opacity: 0;
 	}
 
@@ -358,7 +365,7 @@
 
 @keyframes slide-top {
 	from {
-		transform: translateY(-20px);
+		transform: translateY(-100px);
 		opacity: 0;
 	}
 
@@ -370,49 +377,50 @@
 
 @layer base {
 	.sheet-overlay {
-    background-color: hsl(var(--background) / 0.3) !important;
-    backdrop-filter: blur(2px);
-		transition: opacity 0.22s ease-out, backdrop-filter 0.22s ease-out;
+		background-color: hsl(240 10% 10% / 0.25) !important;
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.sheet-overlay[data-state="open"] {
-		animation: sheet-fade-in 0.22s ease-out both;
+		animation: sheet-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-overlay[data-state="closed"] {
-		animation: sheet-fade-out 0.22s ease-out both;
+		animation: sheet-fade-out 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="open"][data-side="left"] {
-		animation: sheet-in-left 0.28s ease-out both;
+		animation: sheet-in-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="closed"][data-side="left"] {
-		animation: sheet-out-left 0.22s ease-in both;
+		animation: sheet-out-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="open"][data-side="right"] {
-		animation: sheet-in-right 0.28s ease-out both;
+		animation: sheet-in-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="closed"][data-side="right"] {
-		animation: sheet-out-right 0.22s ease-in both;
+		animation: sheet-out-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="open"][data-side="top"] {
-		animation: sheet-in-top 0.28s ease-out both;
+		animation: sheet-in-top 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="closed"][data-side="top"] {
-		animation: sheet-out-top 0.22s ease-in both;
+		animation: sheet-out-top 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="open"][data-side="bottom"] {
-		animation: sheet-in-bottom 0.28s ease-out both;
+		animation: sheet-in-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	.sheet-content[data-state="closed"][data-side="bottom"] {
-		animation: sheet-out-bottom 0.22s ease-in both;
+		animation: sheet-out-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 }
 
@@ -420,25 +428,27 @@
 	from {
 		opacity: 0;
 		backdrop-filter: blur(0px);
+		-webkit-backdrop-filter: blur(0px);
 	}
 
 	to {
 		opacity: 1;
-    /* 背景模糊程度设置 */
-		backdrop-filter: blur(4px);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 	}
 }
 
 @keyframes sheet-fade-out {
 	from {
 		opacity: 1;
-    /* 背景模糊程度设置 */
-		backdrop-filter: blur(4px);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 	}
 
 	to {
 		opacity: 0;
 		backdrop-filter: blur(0px);
+		-webkit-backdrop-filter: blur(0px);
 	}
 }
 
