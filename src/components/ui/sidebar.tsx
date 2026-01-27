@@ -187,7 +187,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 						<SheetDescription className="sr-only">Navigation menu</SheetDescription>
 						<div
 							ref={ref}
-							className="flex h-full flex-col bg-background px-4 py-6"
+							className="flex h-full flex-col bg-sidebar px-4 py-6"
 							data-state={state}
 							{...props}
 						>
@@ -206,7 +206,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 				data-state={state}
 				data-collapsible={collapsible}
 				className={cn(
-					"relative hidden min-h-screen shrink-0 flex-col border-r border-border bg-background px-3 py-6 shadow-[0_0_30px_rgba(0,0,0,0.04)] lg:flex",
+					"relative hidden min-h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-6 shadow-[0_0_30px_rgba(0,0,0,0.04)] lg:flex",
 					"[div[data-sidebar-initialized='true']_&]:transition-[width] [div[data-sidebar-initialized='true']_&]:duration-500",
 					className,
 				)}
@@ -293,7 +293,7 @@ export const SidebarGroupLabel = React.forwardRef<
 	<p
 		ref={ref}
 		className={cn(
-			"text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-muted-foreground",
+			"text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-sidebar-foreground/60",
 			className,
 		)}
 		{...props}
@@ -346,8 +346,8 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
 				className={cn(
 					"flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer",
 					isActive
-						? "bg-primary/20 text-primary shadow-sm"
-						: "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+						? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+						: "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
 					collapsed && "justify-center px-2",
 					className,
 				)}

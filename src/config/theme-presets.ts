@@ -12,676 +12,474 @@ export const themePresets: ThemePreset[] = [
     "description": "热情且极具冲击力的红色主题，适用于品牌感强烈的专业界面",
     "schemes": {
       "light": {
-        "brand": {
-          "primary": "#df0428",
-          "primaryHover": "#f43f5e",
-          "primaryActive": "#be123c",
-          "primaryBg": "#fff1f2",
-          "text": "#ffffff"
-        },
-        "functional": {
-          "success": "#10b981",
-          "successBg": "#ecfdf5",
-          "warning": "#f59e0b",
-          "warningBg": "#fffbeb",
-          "error": "#e11d48",
-          "errorBg": "#fff1f2",
-          "info": "#3b82f6",
-          "infoBg": "#eff6ff"
-        },
-        "text": {
-          "primary": "#111827",
-          "secondary": "#4b5563",
-          "tertiary": "#9ca3af",
-          "inverse": "#ffffff",
-          "link": "#df0428",
-          "linkHover": "#f43f5e"
-        },
-        "background": {
-          "canvas": "#f9fafb",
-          "container": "#ffffff",
-          "elevated": "#ffffff",
-          "layout": "#ffffff",
-          "hover": "#f3f4f6",
-          "active": "#fff1f2"
-        },
-        "border": {
-          "base": "#e5e7eb",
-          "strong": "#d1d5db",
-          "subtle": "#f3f4f6"
-        },
-        "shadow": {
-          "sm": "0 1px 2px 0 rgba(223, 4, 40, 0.05)",
-          "md": "0 4px 6px -1px rgba(223, 4, 40, 0.1)",
-          "lg": "0 10px 15px -3px rgba(223, 4, 40, 0.1)"
-        }
-      },
-      "dark": {
-        "brand": {
-          "primary": "#f43f5e",
-          "primaryHover": "#fb7185",
-          "primaryActive": "#e11d48",
-          "primaryBg": "#4c0519",
-          "text": "#ffffff"
-        },
-        "functional": {
-          "success": "#34d399",
-          "successBg": "#064e3b",
-          "warning": "#fbbf24",
-          "warningBg": "#451a03",
-          "error": "#fb7185",
-          "errorBg": "#4c0519",
-          "info": "#60a5fa",
-          "infoBg": "#1e3a8a"
-        },
-        "text": {
-          "primary": "#f9fafb",
-          "secondary": "#d1d5db",
-          "tertiary": "#9ca3af",
-          "inverse": "#111827",
-          "link": "#fb7185",
-          "linkHover": "#fda4af"
-        },
-        "background": {
-          "canvas": "#0f172a",
-          "container": "#1e293b",
-          "elevated": "#334155",
-          "layout": "#1e293b",
-          "hover": "#334155",
-          "active": "#4c0519"
-        },
-        "border": {
-          "base": "#334155",
-          "strong": "#475569",
-          "subtle": "#1e293b"
-        },
-        "shadow": {
-          "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.4)",
-          "md": "0 4px 6px -1px rgba(0, 0, 0, 0.5)",
-          "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.6)"
-        }
-      }
-    }
-  },
-  {
-    "key": "distant-mountain-blue",
-    "name": "远山黛",
-    "description": "优化了对比度与视觉层级的企业级主题，增强了暗色模式的易读性",
-    "schemes": {
-      "light": {
-        "brand": {
-          "primary": "#0f172a",
-          "primaryHover": "#1e293b",
-          "primaryActive": "#334155",
-          "primaryBg": "#f1f5f9",
-          "text": "#ffffff"
-        },
-        "functional": {
-          "success": "#059669",
-          "successBg": "#ecfdf5",
-          "warning": "#d97706",
-          "warningBg": "#fffbeb",
-          "error": "#dc2626",
-          "errorBg": "#fef2f2",
-          "info": "#0284c7",
-          "infoBg": "#f0f9ff"
-        },
-        "text": {
-          "primary": "#0f172a",
-          "secondary": "#475569",
-          "tertiary": "#94a3b8",
-          "inverse": "#ffffff",
-          "link": "#0f172a",
-          "linkHover": "#2563eb"  // 修改: 链接悬停建议带点颜色，不仅是变浅，提示交互性
-        },
-        "background": {
-          "canvas": "#f8fafc",
-          "container": "#ffffff",
-          "elevated": "#ffffff",
-          "layout": "#f1f5f9",
-          "hover": "#f8fafc",     // 修改: 悬停背景稍微亮一点，避免显得脏
-          "active": "#e2e8f0"
-        },
-        "border": {
-          "base": "#e2e8f0",      // 建议: 变浅，减少网格视觉噪音 (原 #cbd5e1)
-          "strong": "#cbd5e1",    // 原 base 下移至 strong
-          "subtle": "#f1f5f9"
-        },
-        "shadow": {
-          "sm": "0 1px 2px 0 rgba(15, 23, 42, 0.06)", // 微调透明度
-          "md": "0 4px 6px -1px rgba(15, 23, 42, 0.08)",
-          "lg": "0 10px 15px -3px rgba(15, 23, 42, 0.08)"
-        }
-      },
-      "dark": {
-        "brand": {
-          "primary": "#60a5fa",
-          "primaryHover": "#93c5fd",
-          "primaryActive": "#3b82f6",
-          "primaryBg": "#1e293b",
-          "text": "#0f172a"       // 关键修改: 暗色模式下，亮色按钮配深色文字，提升可读性和高级感
-        },
-        "functional": {
-          "success": "#34d399",
-          "successBg": "rgba(6, 78, 59, 0.4)", // 建议: 使用透明度增加背景融合感
-          "warning": "#fbbf24",
-          "warningBg": "rgba(69, 26, 3, 0.4)",
-          "error": "#f87171",
-          "errorBg": "rgba(69, 10, 10, 0.4)",
-          "info": "#38bdf8",
-          "infoBg": "rgba(12, 74, 110, 0.4)"
-        },
-        "text": {
-          "primary": "#f1f5f9",   // 稍微降低纯白亮度，护眼
-          "secondary": "#cbd5e1", // 提亮二级文字，增加对比度
-          "tertiary": "#64748b",
-          "inverse": "#0f172a",
-          "link": "#60a5fa",
-          "linkHover": "#93c5fd"
-        },
-        "background": {
-          "canvas": "#020617",
-          "container": "#0f172a", // 保持板岩色
-          "elevated": "#1e293b",
-          "layout": "#020617",
-          "hover": "#1e293b",
-          "active": "#334155"
-        },
-        "border": {
-          "base": "#1e293b",      // 这种深色边框在暗色模式更自然
-          "strong": "#334155",
-          "subtle": "#0f172a"
-        },
-        "shadow": {
-          "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.5)",
-          "md": "0 4px 6px -1px rgba(0, 0, 0, 0.6)",
-          "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.7)"
-        }
-      }
-    }
-  },
-  {
-    key: "deep-blue",
-    name: "深邃蓝",
-    description: "沉稳内敛的深蓝色调，专为高密度数据与企业级管理系统打造，强调权威与清晰。",
-    schemes: {
-      light: {
+        // 1. 品牌与破坏性操作：以 #df0428 为核心衍生
         brand: {
-          primary: "#1d4ed8",
-          primaryHover: "#1e40af",
-          primaryActive: "#172554",
-          primaryBg: "#eff6ff",
-          text: "#ffffff"
+          primary: {
+            default: "#df0428",         // 核心品牌色
+            hover: "#c20323",           // 悬浮：加深
+            active: "#a3031d",          // 激活
+            pressed: "#8a0218",         // 点击
+            fg: "#ffffff",              // 纯白文字
+            subtle: "#fff1f2",          // 极淡背景：用于选中态/Badge
+            onSubtle: "#df0428",        // 浅背景上的深色字
+            border: "#fecdd3",          // 弱化的红色边框
+            subtleBorder: "#fff1f2",
+          },
+          secondary: {
+            default: "#18181b",         // 深色次要，参考截图中的深色文字/图标
+            hover: "#27272a",
+            active: "#3f3f46",
+            pressed: "#09090b",
+            fg: "#ffffff",
+            subtle: "#f4f4f5",
+            onSubtle: "#18181b",
+            border: "#e4e4e7",
+            subtleBorder: "#f4f4f5",
+          }
         },
-        functional: {
-          success: "#059669",
-          successBg: "#ecfdf5",
-          warning: "#d97706",
-          warningBg: "#fffbeb",
-          error: "#dc2626",
-          errorBg: "#fef2f2",
-          info: "#0284c7",
-          infoBg: "#f0f9ff"
+        destructive: {
+          default: "#e11d48",           // 更加鲜明的正红色，用于区分品牌色
+          hover: "#be123c",
+          active: "#9f1239",
+          pressed: "#881337",
+          fg: "#ffffff",
+          subtle: "#fff1f2",
+          onSubtle: "#e11d48",
+          border: "#fda4af",
+          subtleBorder: "#fff1f2",
         },
+
+        // 2. 语义状态 (遵循标准 B 端设计规范)
+        status: {
+          success: {
+            default: "#10b981",         // 翡翠绿
+            hover: "#059669",
+            active: "#047857",
+            pressed: "#064e3b",
+            fg: "#ffffff",
+            subtle: "#ecfdf5",
+            onSubtle: "#065f46",
+            border: "#a7f3d0",
+            subtleBorder: "#d1fae5",
+          },
+          warning: {
+            default: "#f59e0b",         // 琥珀黄
+            hover: "#d97706",
+            active: "#b45309",
+            pressed: "#78350f",
+            fg: "#ffffff",
+            subtle: "#fffbeb",
+            onSubtle: "#92400e",
+            border: "#fde68a",
+            subtleBorder: "#fef3c7",
+          },
+          error: {
+            default: "#ef4444",
+            hover: "#dc2626",
+            active: "#b91c1c",
+            pressed: "#7f1d1d",
+            fg: "#ffffff",
+            subtle: "#fef2f2",
+            onSubtle: "#991b1b",
+            border: "#fecaca",
+            subtleBorder: "#fee2e2",
+          },
+          info: {
+            default: "#3b82f6",         // 经典蓝
+            hover: "#2563eb",
+            active: "#1d4ed8",
+            pressed: "#1e3a8a",
+            fg: "#ffffff",
+            subtle: "#eff6ff",
+            onSubtle: "#1e40af",
+            border: "#bfdbfe",
+            subtleBorder: "#dbeafe",
+          }
+        },
+
+        // 3. 增强型文字系统 (Slate/Zinc 系)
         text: {
-          primary: "#0f172a",
-          secondary: "#334155",
-          tertiary: "#64748b",
+          primary: "#09090b",           // 标题 & 正文：高对比度
+          secondary: "#52525b",         // 次要：描述性文字
+          tertiary: "#a1a1aa",          // 提示：页脚/禁态
+          placeholder: "#d4d4d8",       // 占位符
+          disabled: "#d4d4d8",
           inverse: "#ffffff",
-          link: "#1d4ed8",
-          linkHover: "#1e40af"
+          link: {
+            default: "#df0428",         // 链接使用品牌色
+            hover: "#c20323",
+            active: "#a3031d",
+          }
         },
+
+        // 4. 多级容器与海拔系统 (Clean & Airy)
         background: {
-          canvas: "#f8fafc",
-          container: "#ffffff",
-          elevated: "#ffffff",
-          layout: "#f1f5f9",
-          hover: "#f1f5f9",
-          active: "#e2e8f0"
+          canvas: "#f8fafc",            // Level 0: 页面底色，带一点点暖调的白
+          layout: "#ffffff",            // Level 1: 侧边栏/顶栏
+          container: "#ffffff",         // Level 2: 卡片背景
+          surface: "#f1f5f9",           // Level 3: 内部灰色区域
+          elevated: "#ffffff",          // Level 4: 弹窗/下拉菜单
+          muted: {
+            default: "#f4f4f5",
+            fg: "#71717a",
+          },
+          accent: {
+            default: "#f4f4f5",
+            fg: "#18181b",
+          },
+          glass: {
+            bg: "rgba(255, 255, 255, 0.8)",
+            border: "rgba(255, 255, 255, 0.4)",
+          },
+          mask: "rgba(0, 0, 0, 0.4)",
+          tooltip: "#18181b",
         },
-        border: {
-          base: "#e2e8f0",
-          strong: "#94a3b8",
-          subtle: "#f1f5f9"
+
+        // 5. 表单与输入系统 (Standard Shadcn Style)
+        form: {
+          input: "#ffffff",
+          border: "#e2e8f0",
+          borderHover: "#cbd5e1",
+          ring: "#df0428",              // Focus Ring 使用品牌色
+          label: "#0f172a",
+          description: "#64748b",
+          required: "#df0428",
+          addon: "#f8fafc",
+          readonly: "#f1f5f9",
         },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(29, 78, 216, 0.05)",
-          md: "0 4px 6px -1px rgba(29, 78, 216, 0.08)",
-          lg: "0 10px 15px -3px rgba(29, 78, 216, 0.08)"
-        }
-      },
-      dark: {
-        brand: {
-          primary: "#3b82f6",
-          primaryHover: "#60a5fa",
-          primaryActive: "#2563eb",
-          primaryBg: "#172554",
-          text: "#ffffff"
-        },
-        functional: {
-          success: "#34d399",
-          successBg: "#064e3b",
-          warning: "#fbbf24",
-          warningBg: "#451a03",
-          error: "#f87171",
-          errorBg: "#450a0a",
-          info: "#38bdf8",
-          infoBg: "#082f49"
-        },
-        text: {
-          primary: "#f8fafc",
-          secondary: "#cbd5e1",
-          tertiary: "#64748b",
-          inverse: "#0f172a",
-          link: "#3b82f6",
-          linkHover: "#60a5fa"
-        },
-        background: {
-          canvas: "#020617",
-          container: "#0f172a",
-          elevated: "#1e293b",
-          layout: "#020617",
-          hover: "#1e293b",
-          active: "#1e3a8a"
-        },
-        border: {
-          base: "#1e293b",
-          strong: "#334155",
-          subtle: "#0f172a"
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.4)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.5)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.6)"
-        }
-      }
-    }
-  },
-  {
-    key: "sky-blue",
-    name: "天空蓝",
-    description: "优化后的现代化蓝色主题，更具呼吸感与专业度",
-    schemes: {
-      light: {
-        brand: {
-          primary: "#3b82f6",
-          primaryHover: "#2563eb",
-          primaryActive: "#1d4ed8",
-          primaryBg: "#eff6ff",
-          text: "#ffffff"
-        },
-        functional: {
-          success: "#10b981",
-          successBg: "#ecfdf5",
-          warning: "#f59e0b",
-          warningBg: "#fffbeb",
-          error: "#ef4444",
-          errorBg: "#fef2f2",
-          info: "#0ea5e9",
-          infoBg: "#f0f9ff"
-        },
-        text: {
-          primary: "#1e293b",
-          secondary: "#475569",
-          tertiary: "#94a3b8",
-          inverse: "#ffffff",
-          link: "#3b82f6",
-          linkHover: "#2563eb"
-        },
-        background: {
-          canvas: "#f1f5f9",
-          container: "#ffffff",
-          elevated: "#ffffff",
-          layout: "#f8fafc",
-          hover: "#f1f5f9",
-          active: "#eff6ff"
-        },
+
+        // 6. 边框与分割线
         border: {
           base: "#e2e8f0",
           strong: "#cbd5e1",
-          subtle: "#f1f5f9"
+          subtle: "#f1f5f9",
+          focus: "#df0428",
         },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(59, 130, 246, 0.05)",
-          md: "0 4px 6px -1px rgba(59, 130, 246, 0.1)",
-          lg: "0 10px 15px -3px rgba(59, 130, 246, 0.1)"
+
+        // 7. 交互细节与反馈
+        action: {
+          selection: "#fecdd3",         // 拖选背景：淡淡的品牌红
+          disabled: {
+            bg: "#f4f4f5",
+            text: "#a1a1aa",
+            border: "#e4e4e7",
+          },
+          skeleton: {
+            base: "#f1f5f9",
+            shimmer: "#e2e8f0",
+          },
+          scrollbar: {
+            thumb: "#d4d4d8",
+            hover: "#a1a1aa",
+          }
+        },
+
+        // 8. 组件特定颜色 (Sidebar v2 规范)
+        component: {
+          table: {
+            headerBg: "#f8fafc",
+            rowHover: "#f1f5f9",
+            rowStriped: "#fbfcfd",
+            border: "#e2e8f0",
+          },
+          tabs: {
+            listBg: "#f1f5f9",
+            triggerBg: "#ffffff",
+            indicator: "#df0428",
+          },
+          sidebar: {
+            bg: "#ffffff",              // 采用白色侧边栏，通过边框区分
+            fg: "#3f3f46",
+            border: "#e2e8f0",
+            ring: "#df0428",
+            accent: "rgba(223, 4, 40, 0.25)",
+            onAccent: "#df0428",        // 侧边栏选中态使用品牌色
+          }
+        },
+
+        // 9. 阴影与深度 (微小深度，符合截图中的高级感)
+        effects: {
+          shadow: {
+            sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+            md: "0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05)",
+            lg: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05)",
+          },
+          glow: "0 0 15px rgba(223, 4, 40, 0.15)",
+        },
+
+        // 10. 数据可视化 (Data Viz)
+        charts: {
+          categorical: [
+            "#df0428", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6",
+            "#ec4899", "#06b6d4", "#f43f5e", "#14b8a6", "#f97316",
+            "#6366f1", "#44403c"
+          ],
+          semantic: {
+            positive: "#10b981",
+            negative: "#df0428",
+            neutral: "#64748b",
+            warning: "#f59e0b",
+          }
         }
       },
-      dark: {
+      "dark": {
+        /* ----------------------------------
+         * 1. Brand & Destructive
+         * ---------------------------------- */
         brand: {
-          primary: "#60a5fa",
-          primaryHover: "#93c5fd",
-          primaryActive: "#3b82f6",
-          primaryBg: "#172554",
-          text: "#ffffff"
+          primary: {
+            default: "#df0428",
+            hover: "#c70324",
+            active: "#b10220",
+            pressed: "#9b021c",
+            fg: "#ffffff",
+
+            subtle: "rgba(223, 4, 40, 0.14)",
+            onSubtle: "#ff6b81",
+
+            border: "rgba(223, 4, 40, 0.45)",
+            subtleBorder: "rgba(223, 4, 40, 0.25)",
+            contrastText: "#ffffff",
+          },
+          secondary: {
+            default: "#3f1b22",
+            hover: "#4a1f28",
+            active: "#5a2530",
+            pressed: "#34161c",
+            fg: "#f5c6cf",
+
+            subtle: "rgba(223, 4, 40, 0.08)",
+            onSubtle: "#f0a3af",
+
+            border: "#5a2530",
+            subtleBorder: "#3a1920",
+          },
         },
-        functional: {
-          success: "#34d399",
-          successBg: "#064e3b",
-          warning: "#fbbf24",
-          warningBg: "#451a03",
-          error: "#f87171",
-          errorBg: "#450a0a",
-          info: "#38bdf8",
-          infoBg: "#082f49"
+
+        destructive: {
+          default: "#df0428",
+          hover: "#c70324",
+          active: "#b10220",
+          pressed: "#9b021c",
+          fg: "#ffffff",
+
+          subtle: "rgba(223, 4, 40, 0.16)",
+          onSubtle: "#ff7a8e",
+
+          border: "rgba(223, 4, 40, 0.5)",
+          subtleBorder: "rgba(223, 4, 40, 0.3)",
         },
-        text: {
-          primary: "#f1f5f9",
-          secondary: "#94a3b8",
-          tertiary: "#64748b",
-          inverse: "#0f172a",
-          link: "#60a5fa",
-          linkHover: "#93c5fd"
+
+        /* ----------------------------------
+         * 2. Status
+         * ---------------------------------- */
+        status: {
+          success: {
+            default: "#22c55e",
+            hover: "#16a34a",
+            active: "#15803d",
+            pressed: "#166534",
+            fg: "#052e16",
+
+            subtle: "rgba(34,197,94,0.14)",
+            onSubtle: "#4ade80",
+
+            border: "rgba(34,197,94,0.45)",
+            subtleBorder: "rgba(34,197,94,0.25)",
+          },
+          warning: {
+            default: "#f59e0b",
+            hover: "#d97706",
+            active: "#b45309",
+            pressed: "#92400e",
+            fg: "#451a03",
+
+            subtle: "rgba(245,158,11,0.16)",
+            onSubtle: "#fbbf24",
+
+            border: "rgba(245,158,11,0.45)",
+            subtleBorder: "rgba(245,158,11,0.25)",
+          },
+          error: {
+            default: "#ef4444",
+            hover: "#dc2626",
+            active: "#b91c1c",
+            pressed: "#991b1b",
+            fg: "#ffffff",
+
+            subtle: "rgba(239,68,68,0.16)",
+            onSubtle: "#f87171",
+
+            border: "rgba(239,68,68,0.45)",
+            subtleBorder: "rgba(239,68,68,0.25)",
+          },
+          info: {
+            default: "#38bdf8",
+            hover: "#0ea5e9",
+            active: "#0284c7",
+            pressed: "#0369a1",
+            fg: "#082f49",
+
+            subtle: "rgba(56,189,248,0.16)",
+            onSubtle: "#7dd3fc",
+
+            border: "rgba(56,189,248,0.45)",
+            subtleBorder: "rgba(56,189,248,0.25)",
+          },
         },
-        background: {
-          canvas: "#0f172a",
-          container: "#1e293b",
-          elevated: "#1e293b",
-          layout: "#020617",
-          hover: "#334155",
-          active: "#1e3a8a"
-        },
-        border: {
-          base: "#334155",
-          strong: "#475569",
-          subtle: "#1e293b"
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.5)"
-        }
-      }
-    }
-  },
-  {
-    key: "emerald-green",
-    name: "翡翠绿",
-    description: "沉稳自然的绿色主题，专业且护眼",
-    schemes: {
-      light: {
-        brand: {
-          primary: "#059669",
-          primaryHover: "#047857",
-          primaryActive: "#064e3b",
-          primaryBg: "#ecfdf5",
-          text: "#ffffff"
-        },
-        functional: {
-          success: "#52c41a",
-          successBg: "#f6ffed",
-          warning: "#faad14",
-          warningBg: "#fffbe6",
-          error: "#ef4444",
-          errorBg: "#fef2f2",
-          info: "#0ea5e9",
-          infoBg: "#f0f9ff"
-        },
-        text: {
-          primary: "#1f2937",
-          secondary: "#4b5563",
-          tertiary: "#9ca3af",
-          inverse: "#ffffff",
-          link: "#059669",
-          linkHover: "#047857"
-        },
-        background: {
-          canvas: "#f3f4f6",
-          container: "#ffffff",
-          elevated: "#ffffff",
-          layout: "#ffffff",
-          hover: "#f9fafb",
-          active: "#ecfdf5"
-        },
-        border: {
-          base: "#e5e7eb",
-          strong: "#d1d5db",
-          subtle: "#f3f4f6"
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
-        }
-      },
-      dark: {
-        brand: {
-          primary: "#10b981",
-          primaryHover: "#6ee7b7",
-          primaryActive: "#059669",
-          primaryBg: "#064e3b",
-          text: "#ffffff"
-        },
-        functional: {
-          success: "#4ade80",
-          successBg: "#14532d",
-          warning: "#fbbf24",
-          warningBg: "#451a03",
-          error: "#f87171",
-          errorBg: "#450a0a",
-          info: "#38bdf8",
-          infoBg: "#0c4a6e"
-        },
-        text: {
-          primary: "#f3f4f6",
-          secondary: "#9ca3af",
-          tertiary: "#6b7280",
-          inverse: "#111827",
-          link: "#34d399",
-          linkHover: "#6ee7b7"
-        },
-        background: {
-          canvas: "#0f172a",
-          container: "#1e293b",
-          elevated: "#334155",
-          layout: "#1e293b",
-          hover: "#334155",
-          active: "#064e3b"
-        },
-        border: {
-          base: "#374151",
-          strong: "#4b5563",
-          subtle: "#1e293b"
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.5)"
-        }
-      }
-    }
-  },
-  {
-    key: "sunset-orange",
-    name: "日落橘",
-    description: "温暖而克制的橙色主题，强调行动力与活力",
-    schemes: {
-      light: {
-        brand: {
-          primary: "#ea580c",        // 核心主色
-          primaryHover: "#c2410c",   // Hover 加深，增加稳重感
-          primaryActive: "#9a3412",  // Active 更深
-          primaryBg: "#fff7ed",      // 极浅的橙色背景，用于选中态或浅色标签
-          text: "#ffffff",           // 强制白色文字，确保在橙色背景上的可读性
-        },
-        functional: {
-          success: "#52c41a",
-          successBg: "#f6ffed",
-          warning: "#fab005",        // 调整为更偏黄的金色，防止与主色橙色混淆
-          warningBg: "#fff9db",
-          error: "#f03e3e",
-          errorBg: "#fff5f5",
-          info: "#1890ff",           // 保持蓝色作为信息提示，冷暖对比清晰
-          infoBg: "#e6f7ff",
-        },
-        text: {
-          primary: "#1f1f1f",        // 略微加深的黑色，提升锐度
-          secondary: "#6b7280",      // 中性灰
-          tertiary: "#9ca3af",
-          inverse: "#ffffff",
-          link: "#ea580c",
-          linkHover: "#c2410c",
-        },
-        background: {
-          canvas: "#f8f9fa",         // 极为中性的浅灰背景
-          container: "#ffffff",
-          elevated: "#ffffff",
-          layout: "#ffffff",
-          hover: "#fdfdfd",
-          active: "#fff7ed",         // 与 primaryBg 呼应
-        },
-        border: {
-          base: "#e5e7eb",
-          strong: "#d1d5db",
-          subtle: "#f3f4f6",
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(234, 88, 12, 0.05)",  // 阴影带有一点点主色倾向，但极淡
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.08)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
-        },
-      },
-      dark: {
-        brand: {
-          primary: "#f97316",        // 暗黑模式下稍微提亮，增加可读性
-          primaryHover: "#fb923c",
-          primaryActive: "#ea580c",
-          primaryBg: "#431407",      // 深褐/深橙色背景
-          text: "#ffffff",           // 强制白色文字，解决暗色模式下橙色按钮文字不清晰的问题
-        },
-        functional: {
-          success: "#73d13d",
-          successBg: "#162312",
-          warning: "#ffd43b",
-          warningBg: "#352e0e",
-          error: "#ff6b6b",
-          errorBg: "#2f1616",
-          info: "#40a9ff",
-          infoBg: "#111d2c",
-        },
+
+        /* ----------------------------------
+         * 3. Typography
+         * ---------------------------------- */
         text: {
           primary: "#e5e7eb",
-          secondary: "#9ca3af",
-          tertiary: "#6b7280",
-          inverse: "#1a1a1a",
-          link: "#f97316",
-          linkHover: "#fb923c",
-        },
-        background: {
-          canvas: "#0c0c0c",         // 接近纯黑的深灰
-          container: "#171717",      // 常用容器色
-          elevated: "#262626",
-          layout: "#121212",
-          hover: "#262626",
-          active: "#431407",
-        },
-        border: {
-          base: "#2e2e2e",
-          strong: "#404040",
-          subtle: "#1f1f1f",
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.4)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.5)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.6)",
-        },
-      },
-    },
-  },
-  {
-    key: "royal-purple",
-    name: "优雅紫",
-    description: "专业、神秘且现代的紫色主题",
-    schemes: {
-      light: {
-        brand: {
-          primary: "#6c5dd3",
-          primaryHover: "#594bb0",
-          primaryActive: "#4b3ea1",
-          primaryBg: "#f2f0fa",
-          text: "#ffffff"
-        },
-        functional: {
-          success: "#52c41a",
-          successBg: "#f6ffed",
-          warning: "#faad14",
-          warningBg: "#fffbe6",
-          error: "#f5222d",
-          errorBg: "#fff1f0",
-          info: "#1890ff",
-          infoBg: "#e6f7ff"
-        },
-        text: {
-          primary: "#1a1a1a",
-          secondary: "#666666",
-          tertiary: "#999999",
+          secondary: "#cbd5e1",
+          tertiary: "#94a3b8",
+          placeholder: "#64748b",
+          disabled: "#475569",
           inverse: "#ffffff",
-          link: "#6c5dd3",
-          linkHover: "#594bb0"
+          link: {
+            default: "#ff6b81",
+            hover: "#ff8fa3",
+            active: "#df0428",
+          },
         },
+
+        /* ----------------------------------
+         * 4. Background & Elevation
+         * ---------------------------------- */
         background: {
-          canvas: "#f5f7fa",
-          container: "#ffffff",
-          elevated: "#ffffff",
-          layout: "#ffffff",
-          hover: "#f7f7fa",
-          active: "#f2f0fa"
+          canvas: "#0b0d10",
+          layout: "#0f1117",
+          container: "#151821",
+          surface: "#1b1f2b",
+          elevated: "#222634",
+
+          muted: {
+            default: "#1a1e2a",
+            fg: "#cbd5e1",
+          },
+          accent: {
+            default: "rgba(223,4,40,0.18)",
+            fg: "#ff9aa9",
+          },
+
+          glass: {
+            bg: "rgba(21,24,33,0.6)",
+            border: "rgba(255,255,255,0.08)",
+          },
+
+          mask: "rgba(0,0,0,0.6)",
+          tooltip: "#2a2f40",
         },
+
+        /* ----------------------------------
+         * 5. Forms
+         * ---------------------------------- */
+        form: {
+          input: "#151821",
+          border: "#2a3042",
+          borderHover: "#3a415a",
+          ring: "#df0428",
+          label: "#e5e7eb",
+          description: "#94a3b8",
+          required: "#df0428",
+          addon: "#1b1f2b",
+          readonly: "#11131a",
+        },
+
+        /* ----------------------------------
+         * 6. Borders
+         * ---------------------------------- */
         border: {
-          base: "#e0e0e0",
-          strong: "#bdbdbd",
-          subtle: "#f0f0f0"
+          base: "#2a3042",
+          strong: "#3a415a",
+          subtle: "#1e2230",
+          focus: "#df0428",
         },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(108, 93, 211, 0.05)",
-          md: "0 4px 6px -1px rgba(108, 93, 211, 0.1)",
-          lg: "0 10px 15px -3px rgba(108, 93, 211, 0.1)"
-        }
-      },
-      dark: {
-        brand: {
-          primary: "#8b79f8",
-          primaryHover: "#9e93e6",
-          primaryActive: "#6c5dd3",
-          primaryBg: "#1e1c2e",
-          text: "#ffffff"
+
+        /* ----------------------------------
+         * 7. Actions & Feedback
+         * ---------------------------------- */
+        action: {
+          selection: "rgba(223,4,40,0.35)",
+          disabled: {
+            bg: "#11131a",
+            text: "#475569",
+            border: "#1e2230",
+          },
+          skeleton: {
+            base: "#1a1e2a",
+            shimmer: "#2a3042",
+          },
+          scrollbar: {
+            thumb: "#3a415a",
+            hover: "#4a516d",
+          },
         },
-        functional: {
-          success: "#73d13d",
-          successBg: "#162312",
-          warning: "#ffc53d",
-          warningBg: "#2b2111",
-          error: "#ff4d4f",
-          errorBg: "#2a1215",
-          info: "#40a9ff",
-          infoBg: "#111d2c"
+
+        /* ----------------------------------
+         * 8. Component Overrides
+         * ---------------------------------- */
+        component: {
+          table: {
+            headerBg: "#151821",
+            rowHover: "#1b1f2b",
+            rowStriped: "#131722",
+            border: "#2a3042",
+          },
+          tabs: {
+            listBg: "#0f1117",
+            triggerBg: "#151821",
+            indicator: "#df0428",
+          },
+          sidebar: {
+            bg: "#0f1117",
+            fg: "#e5e7eb",
+            border: "#1e2230",
+            ring: "#df0428",
+            accent: "rgba(223, 4, 40, 0.25)",
+            onAccent: "#ff8fa3",
+          },
         },
-        text: {
-          primary: "#e8e8e8",
-          secondary: "#a0a0a0",
-          tertiary: "#707070",
-          inverse: "#1a1a1a",
-          link: "#8477d9",
-          linkHover: "#9e93e6"
+
+        /* ----------------------------------
+         * 9. Effects
+         * ---------------------------------- */
+        effects: {
+          shadow: {
+            sm: "0 1px 2px rgba(0,0,0,0.4)",
+            md: "0 4px 12px rgba(0,0,0,0.45)",
+            lg: "0 12px 32px rgba(0,0,0,0.6)",
+          },
+          glow: "0 0 0 1px rgba(223,4,40,0.35), 0 0 24px rgba(223,4,40,0.25)",
         },
-        background: {
-          canvas: "#0a0a0a",
-          container: "#1a1a1a",
-          elevated: "#242424",
-          layout: "#141414",
-          hover: "#242424",
-          active: "#1e1c2e"
+
+        /* ----------------------------------
+         * 10. Charts
+         * ---------------------------------- */
+        charts: {
+          categorical: [
+            "#df0428",
+            "#f97316",
+            "#facc15",
+            "#22c55e",
+            "#38bdf8",
+            "#818cf8",
+            "#a855f7",
+            "#ec4899",
+            "#14b8a6",
+            "#84cc16",
+            "#eab308",
+            "#fb7185",
+          ],
+          semantic: {
+            positive: "#22c55e",
+            negative: "#df0428",
+            neutral: "#64748b",
+            warning: "#f59e0b",
+          },
         },
-        border: {
-          base: "#303030",
-          strong: "#404040",
-          subtle: "#1f1f1f"
-        },
-        shadow: {
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.5)"
-        }
       }
     }
   },

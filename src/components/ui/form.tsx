@@ -112,7 +112,7 @@ export function FormMessage({ className, ...props }: React.HTMLAttributes<HTMLPa
 	}
 
 	return (
-		<p id={formMessageId} className={cn("text-xs text-rose-600", className)} {...props}>
+		<p id={formMessageId} className={cn("text-xs text-destructive", className)} {...props}>
 			{body}
 		</p>
 	)

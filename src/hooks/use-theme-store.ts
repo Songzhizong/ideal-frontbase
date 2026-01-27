@@ -125,8 +125,12 @@ function applyTheme(config: ThemeConfig) {
 	const effectiveMode = resolveThemeMode(config.mode)
 	updateThemeVariables(preset, effectiveMode)
 
-	// Apply border radius
-	document.documentElement.style.setProperty("--radius", `${config.ui.borderRadius}px`)
+	// Apply border radius and font family (handled by useThemeEffects if active, but good for initialization)
+	const root = document.documentElement
+	root.style.setProperty("--radius", `${config.ui.borderRadius}px`)
+
+	const currentFontClass = `font-${config.fontFamily.replace(/\s+/g, "-").toLowerCase()}`
+	root.style.fontFamily = `var(--${currentFontClass})`
 }
 
 /**

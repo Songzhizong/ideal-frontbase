@@ -1,32 +1,16 @@
 /**
  * Design Token System - Core Utilities
- * Handles CSS variable generation and color manipulation
+ * Simplified to use only shadcn/ui HSL variables
  */
 
 import type { ColorPalette, ThemeMode, ThemePreset } from "@/types/theme"
 
 /**
- * Generate color variants (hover, active) from base color
- * Uses simple HSL manipulation for lighter/darker shades
+ * Convert RGB to HSL format for CSS variables
  */
-export function generateColorVariants(baseColor: string): {
-	hover: string
-	active: string
-	bg: string
-} {
-	// Parse hex to RGB
-	const hex = baseColor.replace("#", "")
-	const r = Number.parseInt(hex.substring(0, 2), 16)
-	const g = Number.parseInt(hex.substring(2, 4), 16)
-	const b = Number.parseInt(hex.substring(4, 6), 16)
-
-	// Convert to HSL
-	const rNorm = r / 255
-	const gNorm = g / 255
-	const bNorm = b / 255
-
-	const max = Math.max(rNorm, gNorm, bNorm)
-	const min = Math.min(rNorm, gNorm, bNorm)
+function rgbToHSL(r: number, g: number, b: number): { h: number; s: number; l: number } {
+	const max = Math.max(r, g, b)
+	const min = Math.min(r, g, b)
 	let h = 0
 	let s = 0
 	const l = (max + min) / 2
@@ -36,110 +20,135 @@ export function generateColorVariants(baseColor: string): {
 		s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
 
 		switch (max) {
-			case rNorm:
-				h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) / 6
+			case r:
+				h = ((g - b) / d + (g < b ? 6 : 0)) / 6
 				break
-			case gNorm:
-				h = ((bNorm - rNorm) / d + 2) / 6
+			case g:
+				h = ((b - r) / d + 2) / 6
 				break
-			case bNorm:
-				h = ((rNorm - gNorm) / d + 4) / 6
+			case b:
+				h = ((r - g) / d + 4) / 6
 				break
 		}
 	}
-
-	// Generate variants
-	const hoverL = Math.max(0, Math.min(1, l - 0.08)) // 8% darker
-	const activeL = Math.max(0, Math.min(1, l - 0.12)) // 12% darker
-	const bgL = Math.max(0, Math.min(1, l + 0.4)) // Much lighter for backgrounds
-
-	return {
-		hover: hslToHex(h, s, hoverL),
-		active: hslToHex(h, s, activeL),
-		bg: hslToHex(h, s, bgL),
-	}
+	return { h, s, l }
 }
 
 /**
- * Convert HSL to Hex
+ * Format HSL values to shadcn string
  */
-function hslToHex(h: number, s: number, l: number): string {
-	const hueToRgb = (p: number, q: number, t: number) => {
-		if (t < 0) t += 1
-		if (t > 1) t -= 1
-		if (t < 1 / 6) return p + (q - p) * 6 * t
-		if (t < 1 / 2) return q
-		if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
-		return p
+function formatHSL(h: number, s: number, l: number, a?: number): string {
+	const hsl = `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
+	if (a !== undefined && a < 1) {
+		return `${hsl} / ${a}`
 	}
-
-	const q = l < 0.5 ? l * (1 + s) : l + s - l * s
-	const p = 2 * l - q
-
-	const r = Math.round(hueToRgb(p, q, h + 1 / 3) * 255)
-	const g = Math.round(hueToRgb(p, q, h) * 255)
-	const b = Math.round(hueToRgb(p, q, h - 1 / 3) * 255)
-
-	return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+	return hsl
 }
 
 /**
- * Flatten color palette to CSS variable map
+ * Convert hex color to HSL format for CSS variables
+ */
+export function hexToHSL(hex: string): string {
+	if (!hex) return "0 0% 0%"
+
+	// Handle rgba strings
+	if (hex?.startsWith("rgba") || hex?.startsWith("rgb")) {
+		const match = hex.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/)
+		if (match?.[1] && match?.[2] && match?.[3]) {
+			const r = Number.parseInt(match[1], 10) / 255
+			const g = Number.parseInt(match[2], 10) / 255
+			const b = Number.parseInt(match[3], 10) / 255
+			const a = match[4] !== undefined ? Number.parseFloat(match[4]) : 1
+
+			const { h, s, l } = rgbToHSL(r, g, b)
+			return formatHSL(h, s, l, a)
+		}
+	}
+
+	let cleanHex = hex.replace(/^#/, "")
+
+	// Handle 3-digit hex
+	if (cleanHex.length === 3) {
+		cleanHex = cleanHex
+			.split("")
+			.map((char) => char + char)
+			.join("")
+	}
+
+	// Validate hex length
+	if (cleanHex.length !== 6) {
+		return "0 0% 0%"
+	}
+
+	const r = Number.parseInt(cleanHex.substring(0, 2), 16) / 255
+	const g = Number.parseInt(cleanHex.substring(2, 4), 16) / 255
+	const b = Number.parseInt(cleanHex.substring(4, 6), 16) / 255
+
+	const { h, s, l } = rgbToHSL(r, g, b)
+	return formatHSL(h, s, l)
+}
+
+/**
+ * Flatten color palette to shadcn/ui HSL variables
  */
 export function flattenColorPalette(palette: ColorPalette): Record<string, string> {
 	const vars: Record<string, string> = {}
 
-	// Brand colors
-	vars["--color-primary"] = palette.brand.primary
-	vars["--color-primary-hover"] =
-		palette.brand.primaryHover || generateColorVariants(palette.brand.primary).hover
-	vars["--color-primary-active"] =
-		palette.brand.primaryActive || generateColorVariants(palette.brand.primary).active
-	vars["--color-primary-bg"] =
-		palette.brand.primaryBg || generateColorVariants(palette.brand.primary).bg
-	vars["--color-brand-text"] = palette.brand.text || "#ffffff"
+	// Core shadcn/ui variables
+	vars["--primary"] = hexToHSL(palette.brand.primary.default)
+	vars["--primary-foreground"] = hexToHSL(palette.brand.primary.fg)
+	vars["--primary-hover"] = hexToHSL(palette.brand.primary.hover)
+	vars["--primary-active"] = hexToHSL(palette.brand.primary.active)
+	vars["--secondary"] = hexToHSL(palette.brand.secondary.default)
+	vars["--secondary-foreground"] = hexToHSL(palette.brand.secondary.fg)
+	vars["--destructive"] = hexToHSL(palette.destructive.default)
+	vars["--destructive-foreground"] = hexToHSL(palette.destructive.fg)
+	vars["--brand-text"] = hexToHSL(palette.brand.primary.fg)
 
-	// Functional colors
-	vars["--color-success"] = palette.functional.success
-	vars["--color-success-bg"] =
-		palette.functional.successBg || generateColorVariants(palette.functional.success).bg
-	vars["--color-warning"] = palette.functional.warning
-	vars["--color-warning-bg"] =
-		palette.functional.warningBg || generateColorVariants(palette.functional.warning).bg
-	vars["--color-error"] = palette.functional.error
-	vars["--color-error-bg"] =
-		palette.functional.errorBg || generateColorVariants(palette.functional.error).bg
-	vars["--color-info"] = palette.functional.info
-	vars["--color-info-bg"] =
-		palette.functional.infoBg || generateColorVariants(palette.functional.info).bg
+	vars["--foreground"] = hexToHSL(palette.text.primary)
+	vars["--background"] = hexToHSL(palette.background.canvas)
 
-	// Typography
-	vars["--color-text-primary"] = palette.text.primary
-	vars["--color-text-secondary"] = palette.text.secondary
-	vars["--color-text-tertiary"] = palette.text.tertiary
-	vars["--color-text-inverse"] = palette.text.inverse
-	vars["--color-text-link"] = palette.text.link
-	vars["--color-text-link-hover"] = palette.text.linkHover || palette.text.link
+	vars["--card"] = hexToHSL(palette.background.container)
+	vars["--card-foreground"] = hexToHSL(palette.text.primary)
+	vars["--popover"] = hexToHSL(palette.background.elevated)
+	vars["--popover-foreground"] = hexToHSL(palette.text.primary)
 
-	// Backgrounds
-	vars["--color-bg-canvas"] = palette.background.canvas
-	vars["--color-bg-container"] = palette.background.container
-	vars["--color-bg-elevated"] = palette.background.elevated
-	vars["--color-bg-layout"] = palette.background.layout
-	vars["--color-bg-hover"] = palette.background.hover
-	vars["--color-bg-active"] = palette.background.active
+	vars["--muted"] = hexToHSL(palette.background.muted.default)
+	vars["--muted-foreground"] = hexToHSL(palette.background.muted.fg)
+	vars["--accent"] = hexToHSL(palette.background.accent.default)
+	vars["--accent-foreground"] = hexToHSL(palette.background.accent.fg)
 
-	// Borders
-	vars["--color-border-base"] = palette.border.base
-	vars["--color-border-strong"] = palette.border.strong
-	vars["--color-border-subtle"] = palette.border.subtle
+	vars["--border"] = hexToHSL(palette.border.base)
+	vars["--input"] = hexToHSL(palette.form.border)
+	vars["--form-input"] = hexToHSL(palette.form.input)
+	vars["--ring"] = hexToHSL(palette.form.ring)
+	vars["--form-ring"] = hexToHSL(palette.form.ring)
 
-	// Shadows (if provided)
-	if (palette.shadow) {
-		vars["--shadow-sm"] = palette.shadow.sm
-		vars["--shadow-md"] = palette.shadow.md
-		vars["--shadow-lg"] = palette.shadow.lg
-	}
+	// Custom semantic variables for direct CSS use
+	vars["--bg-container"] = hexToHSL(palette.background.container)
+	vars["--border-base"] = hexToHSL(palette.border.base)
+	vars["--text-primary"] = hexToHSL(palette.text.primary)
+	vars["--text-secondary"] = hexToHSL(palette.text.secondary)
+
+	// Sidebar variables
+	vars["--sidebar-background"] = hexToHSL(palette.component.sidebar.bg)
+	vars["--sidebar-foreground"] = hexToHSL(palette.component.sidebar.fg)
+	vars["--sidebar-primary"] = hexToHSL(palette.brand.primary.default)
+	vars["--sidebar-primary-foreground"] = hexToHSL(palette.brand.primary.fg)
+	vars["--sidebar-accent"] = hexToHSL(palette.component.sidebar.accent)
+	vars["--sidebar-accent-foreground"] = hexToHSL(palette.component.sidebar.onAccent)
+	vars["--sidebar-border"] = hexToHSL(palette.component.sidebar.border)
+	vars["--sidebar-ring"] = hexToHSL(palette.form.ring)
+
+	// Extended semantic colors
+	vars["--success"] = hexToHSL(palette.status.success.default)
+	vars["--success-foreground"] = hexToHSL(palette.status.success.fg)
+	vars["--warning"] = hexToHSL(palette.status.warning.default)
+	vars["--warning-foreground"] = hexToHSL(palette.status.warning.fg)
+	vars["--error"] = hexToHSL(palette.status.error.default)
+	vars["--error-foreground"] = hexToHSL(palette.status.error.fg)
+	vars["--info"] = hexToHSL(palette.status.info.default)
+	vars["--info-foreground"] = hexToHSL(palette.status.info.fg)
 
 	return vars
 }

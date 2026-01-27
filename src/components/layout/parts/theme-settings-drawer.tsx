@@ -177,7 +177,7 @@ export function ThemeSettingsDrawer() {
 
 							<div className="flex flex-wrap gap-3 justify-center">
 								{themePresets.map((preset) => {
-									const primaryColor = preset.schemes.light.brand.primary
+									const primaryColor = preset.schemes.light.brand.primary.default
 
 									return (
 										<button

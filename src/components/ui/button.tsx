@@ -8,11 +8,14 @@ export const buttonVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "bg-primary text-brand-text hover:opacity-90 focus-visible:ring-primary",
+				default:
+					"bg-primary text-primary-foreground hover:opacity-90 active:opacity-80 focus-visible:ring-primary",
 				ghost:
-					"bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-slate-400",
+					"bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
 				outline:
-					"border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-slate-400",
+					"border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
+				destructive:
+					"bg-destructive text-destructive-foreground hover:opacity-90 focus-visible:ring-destructive",
 			},
 			size: {
 				sm: "h-9 px-4",

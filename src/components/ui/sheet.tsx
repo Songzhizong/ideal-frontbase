@@ -23,7 +23,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
-	"sheet-content fixed z-50 flex flex-col bg-background shadow-2xl rounded-2xl border border-border/60 overflow-hidden",
+	"sheet-content fixed z-50 flex flex-col bg-popover shadow-2xl rounded-2xl border border-border/60 overflow-hidden",
 	{
 		variants: {
 			side: {
