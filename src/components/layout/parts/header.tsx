@@ -2,11 +2,12 @@ import { Bell, Search } from "lucide-react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 import { cn } from "@/lib/utils"
-import { ThemeSettingsDrawer } from "../theme-settings-drawer"
 import { Breadcrumbs } from "./breadcrumbs"
 import type { NavItem } from "./sidebar-nav-item"
+import { ThemeSettingsDrawer } from "./theme-settings-drawer.tsx"
+import { UserMenu } from "./user-menu"
 
 interface HeaderProps {
 	navItems: readonly NavItem[]
@@ -14,7 +15,7 @@ interface HeaderProps {
 }
 
 export function Header({ navItems, onSearchOpen }: HeaderProps) {
-	const { headerHeight } = useUiStore()
+	const headerHeight = useThemeStore((state) => state.layout.headerHeight)
 	const [isScrolled, setIsScrolled] = React.useState(false)
 
 	React.useEffect(() => {
@@ -69,6 +70,7 @@ export function Header({ navItems, onSearchOpen }: HeaderProps) {
 					<Bell className="size-4" />
 					<span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-amber-400" />
 				</Button>
+				<UserMenu />
 			</div>
 		</header>
 	)

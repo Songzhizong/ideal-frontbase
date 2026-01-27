@@ -1,70 +1,59 @@
 import { Columns2, Copy, Layout, Palette, RotateCcw } from "lucide-react"
 import { toast } from "sonner"
-import { presetColors } from "@/app/theme-config"
 import darkThemeImg from "@/assets/images/theme_styles/dark.png"
 import lightThemeImg from "@/assets/images/theme_styles/light.png"
 import systemThemeImg from "@/assets/images/theme_styles/system.png"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button.tsx"
+import { Label } from "@/components/ui/label.tsx"
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select.tsx"
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetTitle,
 	SheetTrigger,
-} from "@/components/ui/sheet"
-import { useUiStore } from "@/hooks/use-ui-store"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/sheet.tsx"
+import { themePresets } from "@/config/theme-presets"
+import { useThemeStore } from "@/hooks/use-theme-store"
+import { cn } from "@/lib/utils.ts"
 
 export function ThemeSettingsDrawer() {
-	const {
-		theme,
-		setTheme,
-		menuLayout,
-		setMenuLayout,
-		themeColors,
-		setThemeColor,
-		setThemeColors,
-		containerWidth,
-		setContainerWidth,
-		sidebarWidth,
-		setSidebarWidth,
-		sidebarCollapsedWidth,
-		setSidebarCollapsedWidth,
-		headerHeight,
-		setHeaderHeight,
-		showBreadcrumb,
-		setShowBreadcrumb,
-		showBreadcrumbIcon,
-		setShowBreadcrumbIcon,
-		pageAnimation,
-		setPageAnimation,
-		borderRadius,
-		setBorderRadius,
-		resetConfig,
-		getThemeConfig,
-	} = useUiStore()
+	const store = useThemeStore()
 
 	const handleCopyConfig = () => {
-		const config = getThemeConfig()
+		const config = {
+			mode: store.mode,
+			activePreset: store.activePreset,
+			fontFamily: store.fontFamily,
+			layout: store.layout,
+			ui: store.ui,
+		}
 		const configStr = JSON.stringify(config, null, 2)
 		navigator.clipboard.writeText(configStr).then(() => {
 			toast.success("配置已复制到剪贴板", {
-				description: "请将其粘贴到 src/app/theme-config.ts 文件中的 defaultThemeConfig 常量中。",
+				description:
+					"请将其粘贴到 src/config/theme-presets.ts 文件中的 defaultThemeSettings 常量中。",
 			})
 		})
 	}
 
 	const handleResetConfig = () => {
-		resetConfig()
-		toast.success("主题配置已重置")
+		if (confirm("确定要重置所有设置吗？")) {
+			store.setMode("system")
+			store.setPreset("sky-blue")
+			store.setFontFamily("inter")
+			store.setMenuLayout("single")
+			store.setContainerWidth("fixed")
+			store.setBorderRadius(12)
+			store.setPageAnimation("slide-left")
+			toast.success("主题配置已重置")
+		}
 	}
 
 	return (
@@ -82,7 +71,7 @@ export function ThemeSettingsDrawer() {
 			<SheetContent side="right" className="w-87.5 p-0 sm:w-100">
 				<div className="flex h-full flex-col">
 					<div className="flex items-center justify-between border-b border-border px-6 py-4">
-						<SheetTitle className="text-lg font-semibold">项目配置</SheetTitle>
+						<SheetTitle className="text-lg font-semibold">主题配置</SheetTitle>
 						<SheetDescription className="sr-only">
 							调整系统的主题、颜色、布局等设置。
 						</SheetDescription>
@@ -105,13 +94,13 @@ export function ThemeSettingsDrawer() {
 									<button
 										key={item.id}
 										type="button"
-										onClick={() => setTheme(item.id as "light" | "dark" | "system")}
+										onClick={() => store.setMode(item.id as "light" | "dark" | "system")}
 										className="group flex flex-col items-center gap-2 focus:outline-none focus-visible:outline-none"
 									>
 										<div
 											className={cn(
 												"relative flex aspect-4/3 w-full items-center justify-center overflow-hidden rounded-xl border-2 transition-all",
-												theme === item.id
+												store.mode === item.id
 													? "border-primary bg-primary/5"
 													: "border-transparent bg-muted hover:bg-muted/80",
 											)}
@@ -125,7 +114,7 @@ export function ThemeSettingsDrawer() {
 										<span
 											className={cn(
 												"text-sm font-medium transition-colors",
-												theme === item.id
+												store.mode === item.id
 													? "text-primary"
 													: "text-muted-foreground group-hover:text-foreground",
 											)}
@@ -152,10 +141,10 @@ export function ThemeSettingsDrawer() {
 									<button
 										key={item.id}
 										type="button"
-										onClick={() => setMenuLayout(item.id as "single" | "dual")}
+										onClick={() => store.setMenuLayout(item.id as "single" | "dual")}
 										className={cn(
 											"flex flex-col items-center gap-3 rounded-xl border-2 p-4 transition-all",
-											menuLayout === item.id
+											store.layout.menuLayout === item.id
 												? "border-primary bg-primary/5 text-primary"
 												: "border-transparent bg-muted hover:bg-muted/80",
 										)}
@@ -176,48 +165,29 @@ export function ThemeSettingsDrawer() {
 							</div>
 
 							<div className="flex flex-wrap gap-3 justify-center">
-								{presetColors.map((preset) => (
-									<button
-										key={preset.name}
-										type="button"
-										onClick={() => setThemeColors(preset.colors)}
-										className={cn(
-											"group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all hover:scale-110",
-											themeColors.primary === preset.colors.primary
-												? "border-border ring-2 ring-primary ring-offset-2 ring-offset-background"
-												: "border-transparent",
-										)}
-										title={preset.name}
-									>
-										<div
-											className="h-full w-full rounded-full"
-											style={{ backgroundColor: preset.colors.primary }}
-										/>
-									</button>
-								))}
-							</div>
+								{themePresets.map((preset) => {
+									const primaryColor = preset.schemes.light.brand.primary
 
-							<div className="grid grid-cols-2 gap-x-8 gap-y-4 pt-2">
-								{[
-									{ key: "primary", label: "主色" },
-									{ key: "success", label: "成功色" },
-									{ key: "warning", label: "警告色" },
-									{ key: "error", label: "错误色" },
-								].map((item) => (
-									<div key={item.key} className="flex items-center justify-between">
-										<Label className="text-sm font-normal text-muted-foreground">
-											{item.label}
-										</Label>
-										<input
-											type="color"
-											value={themeColors[item.key as keyof typeof themeColors]}
-											onChange={(e) =>
-												setThemeColor(item.key as keyof typeof themeColors, e.target.value)
-											}
-											className="h-6 w-10 cursor-pointer overflow-hidden rounded-md border-none p-0"
-										/>
-									</div>
-								))}
+									return (
+										<button
+											key={preset.key}
+											type="button"
+											onClick={() => store.setPreset(preset.key)}
+											className={cn(
+												"group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all hover:scale-110",
+												store.activePreset === preset.key
+													? "border-border ring-2 ring-primary ring-offset-2 ring-offset-background"
+													: "border-transparent",
+											)}
+											title={preset.name}
+										>
+											<div
+												className="h-full w-full rounded-full"
+												style={{ backgroundColor: primaryColor }}
+											/>
+										</button>
+									)
+								})}
 							</div>
 						</section>
 
@@ -234,10 +204,10 @@ export function ThemeSettingsDrawer() {
 									<div className="flex rounded-lg bg-muted p-1">
 										<button
 											type="button"
-											onClick={() => setContainerWidth("full")}
+											onClick={() => store.setContainerWidth("full")}
 											className={cn(
 												"rounded-md px-3 py-1 text-xs transition-all",
-												containerWidth === "full"
+												store.layout.containerWidth === "full"
 													? "bg-background font-medium shadow-sm text-foreground"
 													: "text-muted-foreground",
 											)}
@@ -246,10 +216,10 @@ export function ThemeSettingsDrawer() {
 										</button>
 										<button
 											type="button"
-											onClick={() => setContainerWidth("fixed")}
+											onClick={() => store.setContainerWidth("fixed")}
 											className={cn(
 												"rounded-md px-3 py-1 text-xs transition-all",
-												containerWidth === "fixed"
+												store.layout.containerWidth === "fixed"
 													? "bg-background font-medium shadow-sm text-foreground"
 													: "text-muted-foreground",
 											)}
@@ -272,28 +242,32 @@ export function ThemeSettingsDrawer() {
 								<div className="space-y-3">
 									<div className="flex justify-between">
 										<Label className="text-sm font-normal text-muted-foreground">侧边栏宽度</Label>
-										<span className="text-xs text-muted-foreground">{sidebarWidth}px</span>
+										<span className="text-xs text-muted-foreground">
+											{store.layout.sidebarWidth}px
+										</span>
 									</div>
 									<input
 										type="range"
 										min="160"
 										max="320"
-										value={sidebarWidth}
-										onChange={(e) => setSidebarWidth(Number(e.target.value))}
+										value={store.layout.sidebarWidth}
+										onChange={(e) => store.setSidebarWidth(Number(e.target.value))}
 										className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
 									/>
 								</div>
 								<div className="space-y-3">
 									<div className="flex justify-between">
 										<Label className="text-sm font-normal text-muted-foreground">折叠宽度</Label>
-										<span className="text-xs text-muted-foreground">{sidebarCollapsedWidth}px</span>
+										<span className="text-xs text-muted-foreground">
+											{store.layout.sidebarCollapsedWidth}px
+										</span>
 									</div>
 									<input
 										type="range"
 										min="48"
 										max="96"
-										value={sidebarCollapsedWidth}
-										onChange={(e) => setSidebarCollapsedWidth(Number(e.target.value))}
+										value={store.layout.sidebarCollapsedWidth}
+										onChange={(e) => store.setSidebarCollapsedWidth(Number(e.target.value))}
 										className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
 									/>
 								</div>
@@ -311,14 +285,16 @@ export function ThemeSettingsDrawer() {
 								<div className="space-y-3">
 									<div className="flex justify-between">
 										<Label className="text-sm font-normal text-muted-foreground">头部高度</Label>
-										<span className="text-xs text-muted-foreground">{headerHeight}px</span>
+										<span className="text-xs text-muted-foreground">
+											{store.layout.headerHeight}px
+										</span>
 									</div>
 									<input
 										type="range"
 										min="48"
 										max="80"
-										value={headerHeight}
-										onChange={(e) => setHeaderHeight(Number(e.target.value))}
+										value={store.layout.headerHeight}
+										onChange={(e) => store.setHeaderHeight(Number(e.target.value))}
 										className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
 									/>
 								</div>
@@ -327,8 +303,8 @@ export function ThemeSettingsDrawer() {
 									<label className="relative inline-flex cursor-pointer items-center">
 										<input
 											type="checkbox"
-											checked={showBreadcrumb}
-											onChange={(e) => setShowBreadcrumb(e.target.checked)}
+											checked={store.ui.showBreadcrumb}
+											onChange={(e) => store.setShowBreadcrumb(e.target.checked)}
 											className="peer sr-only"
 										/>
 										<div className="peer h-5 w-9 rounded-full bg-muted after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:border after:border-border after:bg-background after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-primary peer-focus:outline-none"></div>
@@ -341,8 +317,8 @@ export function ThemeSettingsDrawer() {
 									<label className="relative inline-flex cursor-pointer items-center">
 										<input
 											type="checkbox"
-											checked={showBreadcrumbIcon}
-											onChange={(e) => setShowBreadcrumbIcon(e.target.checked)}
+											checked={store.ui.showBreadcrumbIcon}
+											onChange={(e) => store.setShowBreadcrumbIcon(e.target.checked)}
 											className="peer sr-only"
 										/>
 										<div className="peer h-5 w-9 rounded-full bg-muted after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:border after:border-border after:bg-background after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-primary peer-focus:outline-none"></div>
@@ -362,9 +338,9 @@ export function ThemeSettingsDrawer() {
 								<div className="space-y-2">
 									<Label className="text-sm font-normal text-muted-foreground">页面切换动画</Label>
 									<Select
-										value={pageAnimation}
+										value={store.ui.pageAnimation}
 										onValueChange={(value) =>
-											setPageAnimation(
+											store.setPageAnimation(
 												value as "none" | "fade" | "slide-left" | "slide-bottom" | "slide-top",
 											)
 										}
@@ -384,14 +360,14 @@ export function ThemeSettingsDrawer() {
 								<div className="space-y-3">
 									<div className="flex justify-between">
 										<Label className="text-sm font-normal text-muted-foreground">自定义圆角</Label>
-										<span className="text-xs text-muted-foreground">{borderRadius}px</span>
+										<span className="text-xs text-muted-foreground">{store.ui.borderRadius}px</span>
 									</div>
 									<input
 										type="range"
 										min="0"
 										max="20"
-										value={borderRadius}
-										onChange={(e) => setBorderRadius(Number(e.target.value))}
+										value={store.ui.borderRadius}
+										onChange={(e) => store.setBorderRadius(Number(e.target.value))}
 										className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
 									/>
 								</div>

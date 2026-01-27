@@ -1,11 +1,11 @@
 import type * as React from "react"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 import { cn } from "@/lib/utils"
 
 export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function PageContainer({ className, ...props }: PageContainerProps) {
-	const containerWidth = useUiStore((state) => state.containerWidth)
+	const containerWidth = useThemeStore((state) => state.layout.containerWidth)
 
 	return (
 		<div

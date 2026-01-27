@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect } from "react"
+import type React from "react"
+import { createContext, useContext } from "react"
 import { useThemeEffects } from "@/hooks/use-theme-effects"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 
 type Theme = "dark" | "light" | "system"
 
@@ -23,31 +24,15 @@ const initialState: ThemeProviderState = {
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-	const { theme, setTheme } = useUiStore()
+	const { mode, setMode } = useThemeStore()
+	// useThemeEffects 现在处理所有主题相关的 DOM 更新（包括类名和 CSS 变量）
 	useThemeEffects()
 
-	useEffect(() => {
-		const root = window.document.documentElement
-		root.classList.remove("light", "dark")
-
-		if (theme === "system") {
-			const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-				? "dark"
-				: "light"
-
-			root.classList.add(systemTheme)
-			root.dataset.theme = systemTheme
-			return
-		}
-
-		root.classList.add(theme)
-		root.dataset.theme = theme
-	}, [theme])
-
+	// noinspection JSUnusedGlobalSymbols
 	const value = {
-		theme: theme as Theme,
+		theme: mode as Theme,
 		setTheme: (theme: Theme) => {
-			setTheme(theme)
+			setMode(theme)
 		},
 	}
 	return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>

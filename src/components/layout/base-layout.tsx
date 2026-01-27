@@ -1,5 +1,4 @@
 import { useRouterState } from "@tanstack/react-router"
-import { LayoutGrid, LineChart, Settings, Sparkles, Users } from "lucide-react"
 import * as React from "react"
 import {
 	Sidebar,
@@ -10,41 +9,25 @@ import {
 	SidebarMenu,
 	SidebarProvider,
 } from "@/components/ui/sidebar"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 import { cn } from "@/lib/utils"
+import { ALL_NAV, PRIMARY_NAV } from "./nav-config"
 import { Header } from "./parts/header"
 import { SearchCommand } from "./parts/search-command"
 import { SidebarBrand } from "./parts/sidebar-brand"
 import { SidebarNavItem } from "./parts/sidebar-nav-item"
 
-const PRIMARY_NAV = [
-	{ title: "Overview", to: "/", icon: LayoutGrid },
-	{ title: "Automation", to: "/automation", icon: Sparkles },
-	{ title: "Insights", to: "/analytics", icon: LineChart },
-	{ title: "Team", to: "/team", icon: Users },
-	{ title: "Settings", to: "/settings", icon: Settings },
-] as const
-
-const SECONDARY_NAV = [{ title: "Settings", to: "/settings", icon: Settings }] as const
-
-const ALL_NAV = [...PRIMARY_NAV, ...SECONDARY_NAV] as const
-
 export function BaseLayout({ children }: { children: React.ReactNode }) {
-	const { sidebarWidth, sidebarCollapsedWidth, containerWidth, pageAnimation, menuLayout } =
-		useUiStore()
+	const sidebarWidth = useThemeStore((state) => state.layout.sidebarWidth)
+	const sidebarCollapsedWidth = useThemeStore((state) => state.layout.sidebarCollapsedWidth)
+	const containerWidth = useThemeStore((state) => state.layout.containerWidth)
+	const pageAnimation = useThemeStore((state) => state.ui.pageAnimation)
+	const menuLayout = useThemeStore((state) => state.layout.menuLayout)
 
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	})
 	const [searchOpen, setSearchOpen] = React.useState(false)
-	const [animationKey, setAnimationKey] = React.useState(0)
-
-	// Trigger animation on route change
-	React.useEffect(() => {
-		if (pageAnimation !== "none") {
-			setAnimationKey((prev) => prev + 1)
-		}
-	}, [pathname, pageAnimation])
 
 	return (
 		<SidebarProvider
@@ -85,7 +68,7 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 
 				<main className="flex-1 overflow-hidden relative">
 					<div
-						key={animationKey}
+						key={pathname}
 						className={cn(
 							"h-full w-full",
 							containerWidth === "fixed" ? "mx-auto max-w-7xl" : "",

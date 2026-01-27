@@ -9,7 +9,7 @@ export interface LabelProps
 	extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>,
 		VariantProps<typeof labelVariants> {}
 
-export const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
+export const Label = React.forwardRef<React.ComponentRef<typeof LabelPrimitive.Root>, LabelProps>(
 	({ className, ...props }, ref) => (
 		<LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props} />
 	),

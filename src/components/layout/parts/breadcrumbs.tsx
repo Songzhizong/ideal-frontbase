@@ -1,13 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router"
-import {
-	AlertTriangle,
-	ChevronRight,
-	LayoutGrid,
-	ShieldAlert,
-	type LucideIcon,
-} from "lucide-react"
+import { AlertTriangle, ChevronRight, LayoutGrid, type LucideIcon, ShieldAlert } from "lucide-react"
 import * as React from "react"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 
 interface BreadcrumbsProps {
 	navItems: readonly { title: string; to: string; icon: LucideIcon }[]
@@ -21,7 +15,8 @@ const ERROR_PAGES = [
 ] as const
 
 export function Breadcrumbs({ navItems }: BreadcrumbsProps) {
-	const { showBreadcrumb, showBreadcrumbIcon } = useUiStore()
+	const showBreadcrumb = useThemeStore((state) => state.ui.showBreadcrumb)
+	const showBreadcrumbIcon = useThemeStore((state) => state.ui.showBreadcrumbIcon)
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	})

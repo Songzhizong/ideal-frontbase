@@ -1,12 +1,13 @@
 import * as React from "react"
 import AppLogo from "@/assets/logo.svg"
 import { useSidebar } from "@/components/ui/sidebar"
-import { useUiStore } from "@/hooks/use-ui-store"
+import { useThemeStore } from "@/hooks/use-theme-store"
 import { cn } from "@/lib/utils"
 
 export function SidebarBrand() {
 	const { state, isMobile } = useSidebar()
-	const { menuLayout, theme } = useUiStore()
+	const menuLayout = useThemeStore((state) => state.layout.menuLayout)
+	const mode = useThemeStore((state) => state.mode)
 	const collapsed = (state === "collapsed" && !isMobile) || menuLayout === "dual"
 	const appTitle = import.meta.env.VITE_APP_TITLE ?? "App"
 
@@ -16,17 +17,17 @@ export function SidebarBrand() {
 		const checkDark = () => {
 			if (typeof window === "undefined") return false
 			const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-			return theme === "dark" || (theme === "system" && isSystemDark)
+			return mode === "dark" || (mode === "system" && isSystemDark)
 		}
 		setIsSidebarDark(checkDark())
 
-		if (theme === "system") {
+		if (mode === "system") {
 			const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 			const handler = () => setIsSidebarDark(checkDark())
 			mediaQuery.addEventListener("change", handler)
 			return () => mediaQuery.removeEventListener("change", handler)
 		}
-	}, [theme])
+	}, [mode])
 
 	return (
 		<div className={cn("flex items-center gap-3 px-2", collapsed && "justify-center px-0")}>
