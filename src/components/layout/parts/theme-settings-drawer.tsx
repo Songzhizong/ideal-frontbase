@@ -57,7 +57,7 @@ export function ThemeSettingsDrawer() {
 
 	const handleResetConfig = () => {
 		store.setMode("system")
-		store.setPreset("sky-blue")
+		store.setPreset("crimson-flame")
 		store.setFontFamily("inter")
 		store.setMenuLayout("single")
 		store.setContainerWidth("fixed")
