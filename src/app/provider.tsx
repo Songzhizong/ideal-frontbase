@@ -4,7 +4,6 @@ import { RouterProvider } from "@tanstack/react-router"
 import { Toaster } from "sonner"
 import { queryClient } from "@/app/query-client"
 import { router } from "@/app/router"
-import { SettingsDrawer } from "@/components/settings"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export function AppProvider() {
@@ -12,7 +11,6 @@ export function AppProvider() {
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
 				<RouterProvider router={router} />
-				<SettingsDrawer />
 				<Toaster position="top-right" richColors />
 				{import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
 			</ThemeProvider>

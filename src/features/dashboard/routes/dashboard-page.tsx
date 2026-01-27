@@ -132,7 +132,7 @@ export function DashboardPage() {
 										: "Expanded: full navigation labels are available."}
 								</p>
 							</div>
-							<div className="rounded-2xl bg-primary p-4 text-primary-foreground">
+							<div className="rounded-2xl bg-primary p-4 text-brand-text">
 								<p className="text-xs uppercase tracking-[0.3em] opacity-70">Next</p>
 								<p className="mt-2 text-lg font-semibold">Ship the AI-driven sprint review.</p>
 							</div>

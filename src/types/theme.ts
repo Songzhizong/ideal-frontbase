@@ -10,6 +10,7 @@ export interface ColorPalette {
 		primaryHover?: string
 		primaryActive?: string
 		primaryBg?: string // Light background tint
+		text?: string // Text color on primary background (enforced white for readability)
 	}
 
 	// Functional Colors

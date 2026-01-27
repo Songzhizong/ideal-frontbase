@@ -95,6 +95,7 @@
 	--color-primary-hover: #4570e6;
 	--color-primary-active: #3d5fcc;
 	--color-primary-bg: #e8f0ff;
+	--color-brand-text: #ffffff;
 
 	--color-success: #52c41a;
 	--color-success-bg: #f6ffed;
@@ -227,6 +228,7 @@
 	--color-success: var(--color-success);
 	--color-warning: var(--color-warning);
 	--color-error: var(--color-error);
+	--color-brand-text: var(--color-brand-text);
 
 	--color-ink-900: var(--ink-900);
 	--color-ink-700: var(--ink-700);

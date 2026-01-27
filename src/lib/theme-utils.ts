@@ -97,6 +97,7 @@ export function flattenColorPalette(palette: ColorPalette): Record<string, strin
 		palette.brand.primaryActive || generateColorVariants(palette.brand.primary).active
 	vars["--color-primary-bg"] =
 		palette.brand.primaryBg || generateColorVariants(palette.brand.primary).bg
+	vars["--color-brand-text"] = palette.brand.text || "#ffffff"
 
 	// Functional colors
 	vars["--color-success"] = palette.functional.success

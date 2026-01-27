@@ -27,7 +27,7 @@ export function ThemedCardExample() {
 				<Button
 					style={{
 						backgroundColor: "var(--color-primary)",
-						color: "var(--color-text-inverse)",
+						color: "var(--color-brand-text)",
 					}}
 					onMouseEnter={(e) => {
 						e.currentTarget.style.backgroundColor = "var(--color-primary-hover)"
