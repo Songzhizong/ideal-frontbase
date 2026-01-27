@@ -25,10 +25,10 @@ export const defaultThemeConfig: ThemeConfig = {
 	fontFamily: "inter",
 	menuLayout: "single",
 	themeColors: {
-		primary: "#0f172a",
-		success: "#10b981",
-		warning: "#f59e0b",
-		error: "#ef4444",
+    primary: "#5d87ff",
+    success: "#52c41a",
+    warning: "#faad14",
+    error: "#f5222d",
 	},
 	containerWidth: "full",
 	sidebarWidth: 240,
@@ -42,12 +42,12 @@ export const defaultThemeConfig: ThemeConfig = {
 
 export const presetColors = [
 	{
-		name: "默认",
+		name: "天空蓝",
 		colors: {
-			primary: "#0f172a",
-			success: "#10b981",
-			warning: "#f59e0b",
-			error: "#ef4444",
+			primary: "#5d87ff",
+			success: "#52c41a",
+			warning: "#faad14",
+			error: "#f5222d",
 		},
 	},
 	{
@@ -95,4 +95,13 @@ export const presetColors = [
 			error: "#ef4444",
 		},
 	},
+  {
+    name: "曜石青",
+    colors: {
+      primary: "#0f172a",
+      success: "#10b981",
+      warning: "#f59e0b",
+      error: "#ef4444",
+    },
+  },
 ]
