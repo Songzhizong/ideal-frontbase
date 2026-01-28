@@ -60,6 +60,9 @@
 
 	--primary: 240 5.9% 10%;
 	--primary-foreground: 0 0% 98%;
+	--primary-hover: 240 5.9% 15%;
+	--primary-active: 240 5.9% 5%;
+	--brand-text: 0 0% 98%;
 
 	--secondary: 240 4.8% 95.9%;
 	--secondary-foreground: 240 5.9% 10%;
@@ -117,6 +120,12 @@
 	--mint-300: 142 71% 45%;
 	--paper-100: 210 40% 98%;
 	--paper-200: 214 32% 91%;
+
+	/* Animation Origin Tracking */
+	--last-click-x: 0px;
+	--last-click-y: 0px;
+	--last-click-offset-x: 0px;
+	--last-click-offset-y: 0px;
 }
 
 .dark {
@@ -131,6 +140,9 @@
 
 	--primary: 0 0% 98%;
 	--primary-foreground: 240 5.9% 10%;
+	--primary-hover: 0 0% 90%;
+	--primary-active: 0 0% 80%;
+	--brand-text: 240 5.9% 10%;
 
 	--secondary: 240 3.7% 15.9%;
 	--secondary-foreground: 0 0% 98%;
@@ -315,6 +327,10 @@
 	*::before,
 	*::after {
 		box-sizing: border-box;
+	}
+
+	html {
+		@apply overscroll-y-none;
 	}
 
 	body {
@@ -514,9 +530,9 @@
 	}
 
 	.alert-dialog-content {
-		left: 50% !important;
-		top: 50% !important;
-		translate: -50% -50% !important;
+		left: 50%;
+		top: 50%;
+		translate: -50% -50%;
 	}
 }
 

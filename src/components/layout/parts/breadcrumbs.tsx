@@ -41,10 +41,16 @@ export function Breadcrumbs({ navItems }: BreadcrumbsProps) {
 
 	const breadcrumbLabel = routeLabels.get(pathname) ?? "Overview"
 
-	const breadcrumbs = [
-		{ label: "Signal", to: "/" },
-		{ label: breadcrumbLabel, to: pathname },
-	]
+	const breadcrumbs = React.useMemo(() => {
+		const rootLabel = routeLabels.get("/") ?? "控制台"
+		if (pathname === "/") {
+			return [{ label: rootLabel, to: "/" }]
+		}
+		return [
+			{ label: rootLabel, to: "/" },
+			{ label: breadcrumbLabel, to: pathname },
+		]
+	}, [pathname, breadcrumbLabel, routeLabels])
 
 	if (!showBreadcrumb) return null
 

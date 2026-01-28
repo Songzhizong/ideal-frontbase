@@ -55,7 +55,7 @@ export function PasswordLoginForm() {
 				},
 			)
 		}
-	}, []) // eslint-disable-line react-hooks/exhaustive-deps
+	}, [checkCaptchaMutation.mutate, form.getValues])
 
 	// Load captcha when needed
 	useEffect(() => {

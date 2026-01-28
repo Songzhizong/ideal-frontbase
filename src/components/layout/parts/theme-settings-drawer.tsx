@@ -56,13 +56,7 @@ export function ThemeSettingsDrawer() {
 	}
 
 	const handleResetConfig = () => {
-		store.setMode("system")
-		store.setPreset("crimson-flame")
-		store.setFontFamily("inter")
-		store.setMenuLayout("single")
-		store.setContainerWidth("fixed")
-		store.setBorderRadius(12)
-		store.setPageAnimation("slide-left")
+		store.reset()
 		setShowResetDialog(false)
 		toast.success("主题配置已重置")
 	}

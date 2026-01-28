@@ -1,7 +1,15 @@
-import ky, { type KyInstance } from "ky"
+import ky, { type KyInstance, type Options } from "ky"
 import { toast } from "sonner"
 import { env } from "@/lib/env"
 import { ProblemDetailSchema } from "@/types/problem-detail"
+
+/**
+ * 扩展 Ky 请求配置，支持自定义业务标记
+ */
+interface ExtendedOptions extends Options {
+	useTenantId?: boolean
+	useAuthClientId?: boolean
+}
 
 // 扩展 KyInstance 类型，添加 withTenantId 和 withAuthClientId 方法
 interface ExtendedKyInstance extends KyInstance {
@@ -53,7 +61,7 @@ const apiInstance = ky.create({
 				}
 
 				// 处理租户 ID (通过 withTenantId 触发)
-				if ((options as any).useTenantId) {
+				if ((options as ExtendedOptions).useTenantId) {
 					const tenantId = getTenantId()
 					if (tenantId) {
 						console.debug("[API] Setting x-tenant-id:", tenantId)
@@ -64,7 +72,7 @@ const apiInstance = ky.create({
 				}
 
 				// 处理认证客户端 ID (通过 withAuthClientId 触发)
-				if ((options as any).useAuthClientId) {
+				if ((options as ExtendedOptions).useAuthClientId) {
 					const authClientId = env.VITE_AUTH_CLIENT_ID
 					if (authClientId) {
 						request.headers.set("x-auth-client-id", authClientId)
@@ -119,13 +127,13 @@ const apiInstance = ky.create({
 ;(apiInstance as ExtendedKyInstance).withTenantId = function () {
 	return this.extend({
 		useTenantId: true,
-	} as any)
+	} as ExtendedOptions)
 }
 
 ;(apiInstance as ExtendedKyInstance).withAuthClientId = function () {
 	return this.extend({
 		useAuthClientId: true,
-	} as any)
+	} as ExtendedOptions)
 }
 
 // 导出带类型的 api 实例

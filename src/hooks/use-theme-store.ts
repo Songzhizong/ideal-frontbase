@@ -24,6 +24,7 @@ interface ThemeStore extends ThemeConfig {
 	setPageAnimation: (
 		animation: "none" | "fade" | "slide-left" | "slide-bottom" | "slide-top",
 	) => void
+	reset: () => void
 
 	// Computed
 	getActivePreset: () => ThemePreset | undefined
@@ -92,6 +93,11 @@ export const useThemeStore = create<ThemeStore>()(
 					ui: { ...state.ui, pageAnimation },
 				})),
 
+			reset: () => {
+				set({ ...defaultThemeSettings })
+				applyTheme(defaultThemeSettings)
+			},
+
 			getActivePreset: () => {
 				const { activePreset } = get()
 				return themePresets.find((p) => p.key === activePreset)
@@ -144,8 +150,9 @@ export function initializeTheme() {
 	if (typeof window !== "undefined") {
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 		mediaQuery.addEventListener("change", () => {
-			if (config.mode === "system") {
-				applyTheme(config)
+			const currentConfig = useThemeStore.getState()
+			if (currentConfig.mode === "system") {
+				applyTheme(currentConfig)
 			}
 		})
 	}
