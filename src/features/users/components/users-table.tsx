@@ -109,7 +109,7 @@ const columns: ColumnDef<User>[] = [
 			const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
 
 			let displayText: string
-      if (diffDays === 0) {
+			if (diffDays === 0) {
 				displayText = "今天"
 			} else if (diffDays === 1) {
 				displayText = "昨天"

@@ -1,5 +1,3 @@
-export { PageContainer } from "./page-container"
-
 // Table components - re-export from @/components/table
 export type {
 	DataTableColumnToggleProps,
@@ -23,3 +21,4 @@ export {
 	TableProvider,
 	useTableContext,
 } from "@/components/table"
+export { PageContainer } from "./page-container"

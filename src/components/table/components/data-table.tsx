@@ -154,7 +154,7 @@ export function DataTable<TData>({
 	enableRowSelection,
 	getRowId,
 	className,
-	maxHeight,
+	maxHeight: _maxHeight,
 	sorting: controlledSorting,
 	onSortingChange,
 	columnVisibility: controlledColumnVisibility,
