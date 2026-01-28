@@ -370,7 +370,7 @@ export function ThemeSettingsDrawer() {
 									<input
 										type="range"
 										min="0"
-										max="20"
+										max="32"
 										value={store.ui.borderRadius}
 										onChange={(e) => store.setBorderRadius(Number(e.target.value))}
 										className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"

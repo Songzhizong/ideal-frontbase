@@ -31,6 +31,6 @@ export const defaultThemeSettings: ThemeConfig = {
     "showBreadcrumb": true,
     "showBreadcrumbIcon": true,
     "pageAnimation": "slide-left",
-    "borderRadius": 12
+    "borderRadius": 16
   }
 }
