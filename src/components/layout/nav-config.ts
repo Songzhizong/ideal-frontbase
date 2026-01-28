@@ -1,12 +1,6 @@
-import { LayoutGrid, LineChart, Settings, Sparkles, Users } from "lucide-react"
+import { LayoutGrid } from "lucide-react"
 
-export const PRIMARY_NAV = [
-	{ title: "Overview", to: "/", icon: LayoutGrid },
-	{ title: "Automation", to: "/automation", icon: Sparkles },
-	{ title: "Insights", to: "/analytics", icon: LineChart },
-	{ title: "Team", to: "/team", icon: Users },
-	{ title: "Settings", to: "/settings", icon: Settings },
-] as const
+export const PRIMARY_NAV = [{ title: "控制台", to: "/", icon: LayoutGrid }] as const
 
 export const SECONDARY_NAV = [] as const
 

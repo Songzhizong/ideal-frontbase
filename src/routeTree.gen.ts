@@ -9,39 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TeamRouteImport } from './routes/team'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as AutomationRouteImport } from './routes/automation'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlankRouteImport } from './routes/_blank'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
 import { Route as Errors500RouteImport } from './routes/errors/500'
 import { Route as Errors404RouteImport } from './routes/errors/404'
 import { Route as Errors403RouteImport } from './routes/errors/403'
+import { Route as BlankLoginRouteImport } from './routes/_blank.login'
 
-const TeamRoute = TeamRouteImport.update({
-  id: '/team',
-  path: '/team',
+const BlankRoute = BlankRouteImport.update({
+  id: '/_blank',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AutomationRoute = AutomationRouteImport.update({
-  id: '/automation',
-  path: '/automation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const Errors500Route = Errors500RouteImport.update({
   id: '/errors/500',
@@ -58,77 +45,55 @@ const Errors403Route = Errors403RouteImport.update({
   path: '/errors/403',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlankLoginRoute = BlankLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => BlankRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/automation': typeof AutomationRoute
-  '/settings': typeof SettingsRoute
-  '/team': typeof TeamRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/login': typeof BlankLoginRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/automation': typeof AutomationRoute
-  '/settings': typeof SettingsRoute
-  '/team': typeof TeamRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/login': typeof BlankLoginRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/automation': typeof AutomationRoute
-  '/settings': typeof SettingsRoute
-  '/team': typeof TeamRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_blank': typeof BlankRouteWithChildren
+  '/_blank/login': typeof BlankLoginRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/analytics'
-    | '/automation'
-    | '/settings'
-    | '/team'
-    | '/errors/403'
-    | '/errors/404'
-    | '/errors/500'
+  fullPaths: '/' | '/login' | '/errors/403' | '/errors/404' | '/errors/500'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/analytics'
-    | '/automation'
-    | '/settings'
-    | '/team'
-    | '/errors/403'
-    | '/errors/404'
-    | '/errors/500'
+  to: '/' | '/login' | '/errors/403' | '/errors/404' | '/errors/500'
   id:
     | '__root__'
-    | '/'
-    | '/analytics'
-    | '/automation'
-    | '/settings'
-    | '/team'
+    | '/_authenticated'
+    | '/_blank'
+    | '/_blank/login'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AnalyticsRoute: typeof AnalyticsRoute
-  AutomationRoute: typeof AutomationRoute
-  SettingsRoute: typeof SettingsRoute
-  TeamRoute: typeof TeamRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  BlankRoute: typeof BlankRouteWithChildren
   Errors403Route: typeof Errors403Route
   Errors404Route: typeof Errors404Route
   Errors500Route: typeof Errors500Route
@@ -136,40 +101,26 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/team': {
-      id: '/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof TeamRouteImport
+    '/_blank': {
+      id: '/_blank'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof BlankRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/automation': {
-      id: '/automation'
-      path: '/automation'
-      fullPath: '/automation'
-      preLoaderRoute: typeof AutomationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/errors/500': {
       id: '/errors/500'
@@ -192,15 +143,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Errors403RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_blank/login': {
+      id: '/_blank/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof BlankLoginRouteImport
+      parentRoute: typeof BlankRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
+interface BlankRouteChildren {
+  BlankLoginRoute: typeof BlankLoginRoute
+}
+
+const BlankRouteChildren: BlankRouteChildren = {
+  BlankLoginRoute: BlankLoginRoute,
+}
+
+const BlankRouteWithChildren = BlankRoute._addFileChildren(BlankRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AnalyticsRoute: AnalyticsRoute,
-  AutomationRoute: AutomationRoute,
-  SettingsRoute: SettingsRoute,
-  TeamRoute: TeamRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  BlankRoute: BlankRouteWithChildren,
   Errors403Route: Errors403Route,
   Errors404Route: Errors404Route,
   Errors500Route: Errors500Route,

@@ -41,12 +41,12 @@ export function Header({ navItems, onSearchOpen }: HeaderProps) {
 				<Button
 					variant="outline"
 					size="sm"
-					className="hidden items-center gap-3 rounded-full px-4 md:flex"
+					className="hidden items-center gap-2 rounded-full px-4 md:flex"
 					onClick={onSearchOpen}
 					aria-keyshortcuts="Meta+K Control+K"
 				>
 					<Search className="size-4" />
-					Search
+					搜索
 					<span className="rounded-full border border-border bg-muted px-2 py-1 text-[10px] font-semibold text-muted-foreground">
 						cmd k
 					</span>

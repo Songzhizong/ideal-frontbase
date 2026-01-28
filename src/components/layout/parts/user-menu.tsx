@@ -1,5 +1,15 @@
-import { LogOut, Monitor, Moon, Sun, User } from "lucide-react"
-import { useTheme } from "@/components/theme-provider"
+import { LogOut, User } from "lucide-react"
+import { useState } from "react"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,25 +20,16 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useLogoutHandler } from "@/features/auth"
 
 export function UserMenu() {
-	const { theme, setTheme } = useTheme()
-
-	const handleLogout = () => {
-		// TODO: 实现退出登录逻辑
-		console.log("退出登录")
-	}
+	const { handleLogout } = useLogoutHandler()
+	const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
 	const handleProfileClick = () => {
 		// TODO: 跳转到个人中心页面
 		console.log("跳转到个人中心")
 	}
-
-	const themeOptions = [
-		{ value: "light", label: "浅色模式", icon: Sun },
-		{ value: "dark", label: "深色模式", icon: Moon },
-		{ value: "system", label: "跟随系统", icon: Monitor },
-	] as const
 
 	return (
 		<DropdownMenu>
@@ -53,31 +54,27 @@ export function UserMenu() {
 					<span>个人中心</span>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-					主题模式
-				</DropdownMenuLabel>
-				{themeOptions.map((option) => {
-					const Icon = option.icon
-					return (
-						<DropdownMenuItem
-							key={option.value}
-							onClick={() => setTheme(option.value)}
-							className={theme === option.value ? "bg-accent" : ""}
-						>
-							<Icon className="mr-2 h-4 w-4" />
-							<span>{option.label}</span>
-						</DropdownMenuItem>
-					)
-				})}
-				<DropdownMenuSeparator />
 				<DropdownMenuItem
-					onClick={handleLogout}
+					onSelect={() => setIsLogoutDialogOpen(true)}
 					className="text-destructive focus:text-destructive"
 				>
 					<LogOut className="mr-2 h-4 w-4" />
 					<span>退出登录</span>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
+
+			<AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>确认退出 ?</AlertDialogTitle>
+						<AlertDialogDescription>您确定要退出登录吗？</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>取消</AlertDialogCancel>
+						<AlertDialogAction onClick={handleLogout}>确认退出</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</DropdownMenu>
 	)
 }
