@@ -56,10 +56,6 @@ export interface PaginatedTableProps<TData> {
 	 */
 	showTotal?: boolean
 	/**
-	 * Enable row selection
-	 */
-	enableRowSelection?: boolean
-	/**
 	 * Row selection state
 	 */
 	rowSelection?: RowSelectionState
@@ -142,7 +138,6 @@ export function PaginatedTable<TData>({
 	onPageSizeChange,
 	pageSizeOptions = [10, 20, 50, 100],
 	showTotal = true,
-	enableRowSelection = false,
 	rowSelection,
 	onRowSelectionChange,
 	getRowId,
@@ -183,7 +178,6 @@ export function PaginatedTable<TData>({
 						fetching={fetching}
 						empty={empty}
 						emptyText={emptyText}
-						enableRowSelection={enableRowSelection}
 						{...(rowSelection && { rowSelection })}
 						{...(onRowSelectionChange && { onRowSelectionChange })}
 						{...(columnVisibility && { columnVisibility })}

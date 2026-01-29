@@ -1,5 +1,5 @@
 import type { ColumnDef, VisibilityState } from "@tanstack/react-table"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useBoolean } from "@/hooks/use-boolean"
 
 export interface TableColumnCheck {
@@ -159,15 +159,29 @@ export function useBaseTable<TData>(options: UseBaseTableOptions<TData>) {
 		return merged
 	})
 
-	// Save settings when columnChecks change
+	// Save settings when columnChecks change with debounce
+	const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
 	useEffect(() => {
 		if (!tableId) return
 
-		const settings: TableSettings = {
-			columnChecks,
-			columnOrder: columnChecks.map((col) => col.key),
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current)
 		}
-		saveTableSettings(tableId, settings)
+
+		timeoutRef.current = setTimeout(() => {
+			const settings: TableSettings = {
+				columnChecks,
+				columnOrder: columnChecks.map((col) => col.key),
+			}
+			saveTableSettings(tableId, settings)
+		}, 500)
+
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current)
+			}
+		}
 	}, [columnChecks, tableId])
 
 	// Convert columnChecks to TanStack Table's VisibilityState format

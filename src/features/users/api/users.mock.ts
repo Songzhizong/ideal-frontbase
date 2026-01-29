@@ -1,135 +1,91 @@
 import { addMinutes } from "date-fns"
 import { delay, HttpResponse, http } from "msw"
-import { UserSchema } from "@/features/users/types"
+import type { User } from "@/features/users/types"
 import { mockRegistry } from "@/mocks/registry"
-import { createPageInfoSchema } from "@/types/pagination"
 
-const UserPageSchema = createPageInfoSchema(UserSchema)
+// 生成 50 个 mock 用户
+const allMockUsers: User[] = Array.from({ length: 50 }).map((_, index) => {
+	const id = (index + 1).toString()
+	const usernames = ["张伟", "李娜", "王强", "刘芳", "陈明", "杨静", "赵磊", "黄丽", "周涛", "吴敏"]
+	const groups = ["admin", "user", "guest", "developer", "analyst", "support"]
+	const statuses = ["active", "inactive"] as const
 
-// Mock 10 users with realistic data
-const mockUsers = UserPageSchema.parse({
-	content: [
-		{
-			id: "1",
-			username: "张伟",
-			email: "zhangwei@company.com",
-			phone: "138****2001",
-			userGroups: ["admin", "developer"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -5).toISOString(),
-		},
-		{
-			id: "2",
-			username: "李娜",
-			email: "lina@company.com",
-			phone: "139****3002",
-			userGroups: ["user"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -30).toISOString(),
-		},
-		{
-			id: "3",
-			username: "王强",
-			email: "wangqiang@company.com",
-			phone: "136****4003",
-			userGroups: ["user", "analyst"],
-			status: "active",
-			mfaEnabled: false,
-			lastVisit: addMinutes(new Date(), -120).toISOString(),
-		},
-		{
-			id: "4",
-			username: "刘芳",
-			email: "liufang@company.com",
-			phone: "137****5004",
-			userGroups: ["user"],
-			status: "inactive",
-			mfaEnabled: false,
-			lastVisit: addMinutes(new Date(), -1440).toISOString(),
-		},
-		{
-			id: "5",
-			username: "陈明",
-			email: "chenming@company.com",
-			phone: "135****6005",
-			userGroups: ["guest"],
-			status: "active",
-			mfaEnabled: false,
-			lastVisit: addMinutes(new Date(), -60).toISOString(),
-		},
-		{
-			id: "6",
-			username: "杨静",
-			email: "yangjing@company.com",
-			phone: "188****7006",
-			userGroups: ["user", "support"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -15).toISOString(),
-		},
-		{
-			id: "7",
-			username: "赵磊",
-			email: "zhaolei@company.com",
-			phone: "186****8007",
-			userGroups: ["admin"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -10).toISOString(),
-		},
-		{
-			id: "8",
-			username: "黄丽",
-			email: "huangli@company.com",
-			phone: "159****9008",
-			userGroups: ["user", "developer"],
-			status: "active",
-			mfaEnabled: false,
-			lastVisit: addMinutes(new Date(), -240).toISOString(),
-		},
-		{
-			id: "9",
-			username: "周涛",
-			email: "zhoutao@company.com",
-			phone: "158****1009",
-			userGroups: ["guest"],
-			status: "inactive",
-			mfaEnabled: false,
-			lastVisit: addMinutes(new Date(), -2880).toISOString(),
-		},
-		{
-			id: "10",
-			username: "吴敏",
-			email: "wumin@company.com",
-			phone: "157****2010",
-			userGroups: ["user", "analyst"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -45).toISOString(),
-		},
-		{
-			id: "11",
-			username: "李兰",
-			email: "lilan@company.com",
-			phone: "157****2013",
-			userGroups: ["support"],
-			status: "active",
-			mfaEnabled: true,
-			lastVisit: addMinutes(new Date(), -45).toISOString(),
-		},
-	],
-	pageNumber: 1,
-	pageSize: 1,
-	totalElements: 11,
-	totalPages: 2,
+	return {
+		id,
+		username: `${usernames[index % usernames.length]}${Math.floor(index / usernames.length) || ""}`,
+		email: `user${id}@company.com`,
+		phone: `13${Math.floor(Math.random() * 10)}****${1000 + index}`,
+		userGroups: [groups[index % groups.length], groups[(index + 2) % groups.length]].filter(
+			(v): v is string => true,
+		),
+		status: statuses[index % 2],
+		mfaEnabled: index % 3 === 0,
+		lastVisit: addMinutes(new Date(), -Math.floor(Math.random() * 10000)).toISOString(),
+	} as User
 })
 
 export const userHandlers = [
-	http.get("*/users", async () => {
+	http.get("*/users", async ({ request }) => {
 		await delay(300)
-		return HttpResponse.json(mockUsers)
+		const url = new URL(request.url)
+		const pageNumber = Number.parseInt(url.searchParams.get("pageNumber") || "1", 10)
+		const pageSize = Number.parseInt(url.searchParams.get("pageSize") || "10", 10)
+		const username = url.searchParams.get("username")
+		const status = url.searchParams.get("status")
+		const mfaEnabled = url.searchParams.get("mfaEnabled")
+		const email = url.searchParams.get("email")
+		const phone = url.searchParams.get("phone")
+		const userGroups = url.searchParams.get("userGroups")
+		const sortField = url.searchParams.get("sortField")
+		const sortOrder = url.searchParams.get("sortOrder")
+
+		let filteredUsers = [...allMockUsers]
+
+		// 过滤逻辑
+		if (username) {
+			filteredUsers = filteredUsers.filter((u) => u.username.includes(username))
+		}
+		if (status && status !== "all") {
+			filteredUsers = filteredUsers.filter((u) => u.status === status)
+		}
+		if (mfaEnabled && mfaEnabled !== "all") {
+			const isMfaEnabled = mfaEnabled === "true"
+			filteredUsers = filteredUsers.filter((u) => u.mfaEnabled === isMfaEnabled)
+		}
+		if (email) {
+			filteredUsers = filteredUsers.filter((u) => u.email.includes(email))
+		}
+		if (phone) {
+			filteredUsers = filteredUsers.filter((u) => u.phone.includes(phone))
+		}
+		if (userGroups && userGroups !== "all") {
+			filteredUsers = filteredUsers.filter((u) => u.userGroups.includes(userGroups))
+		}
+
+		// 排序逻辑
+		if (sortField && sortOrder) {
+			filteredUsers.sort((a, b) => {
+				const aValue = a[sortField as keyof User]
+				const bValue = b[sortField as keyof User]
+
+				if (typeof aValue === "string" && typeof bValue === "string") {
+					return sortOrder === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+				}
+				return 0
+			})
+		}
+
+		const totalElements = filteredUsers.length
+		const totalPages = Math.ceil(totalElements / pageSize)
+		const content = filteredUsers.slice((pageNumber - 1) * pageSize, pageNumber * pageSize)
+
+		return HttpResponse.json({
+			content,
+			pageNumber,
+			pageSize,
+			totalElements,
+			totalPages,
+		})
 	}),
 ]
 

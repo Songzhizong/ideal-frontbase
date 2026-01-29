@@ -67,7 +67,7 @@ export function DataTablePagination({ className, text }: DataTablePaginationProp
 			<div className="flex items-center gap-6 lg:gap-8">
 				<div className="flex items-center gap-2">
 					<Select value={`${pageSize}`} onValueChange={(value) => onPageSizeChange(Number(value))}>
-						<SelectTrigger className="h-8 w-25">
+						<SelectTrigger className="h-8 w-28">
 							<SelectValue placeholder={pageSize} />
 						</SelectTrigger>
 						<SelectContent side="top">

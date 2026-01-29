@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Plus, RefreshCw } from "lucide-react"
-import { TableCompound } from "@/components/table"
+import { getSelectColumn, TableCompound } from "@/components/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { TableColumnMeta } from "@/hooks"
@@ -60,6 +60,7 @@ async function fetchUsers() {
 export function TableCompoundExample() {
 	// Define columns with enhanced metadata
 	const columns: ColumnDef<User>[] = [
+		getSelectColumn<User>(),
 		{
 			accessorKey: "name",
 			header: "Name",
@@ -156,7 +157,6 @@ export function TableCompoundExample() {
 						loading={tableState.loading}
 						empty={tableState.empty}
 						emptyText="No users found"
-						enableRowSelection
 						rowSelection={tableState.rowSelection}
 						onRowSelectionChange={tableState.onRowSelectionChange}
 						columnVisibility={tableState.columnVisibility}
@@ -186,7 +186,7 @@ export function TableCompoundExample() {
 export function TableMetadataExample() {
 	const columns: ColumnDef<User>[] = [
 		{
-			id: "select",
+			...getSelectColumn<User>(),
 			// Selection column should be hidden from settings
 			meta: {
 				hideInSetting: true,

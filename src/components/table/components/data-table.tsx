@@ -3,6 +3,7 @@ import {
 	type ColumnOrderState,
 	flexRender,
 	getCoreRowModel,
+	getPaginationRowModel,
 	getSortedRowModel,
 	type RowSelectionState,
 	type SortingState,
@@ -12,10 +13,10 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
-import type { CSSProperties, ReactNode } from "react"
-import { useMemo, useState } from "react"
+import type { ReactNode } from "react"
+import { useState } from "react"
+import type { PaginationState } from "@/components/table"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
 	Table,
 	TableBody,
@@ -47,7 +48,7 @@ export interface DataTableProps<TData> {
 	/**
 	 * Fetching state (for refresh)
 	 */
-	fetching?: boolean
+	fetching?: boolean | undefined
 	/**
 	 * Empty state
 	 */
@@ -65,21 +66,17 @@ export interface DataTableProps<TData> {
 	 */
 	onRowSelectionChange?: (selection: RowSelectionState | Updater<RowSelectionState>) => void
 	/**
-	 * Enable row selection
-	 */
-	enableRowSelection: boolean
-	/**
 	 * Get row ID
 	 */
 	getRowId?: (row: TData) => string
 	/**
 	 * Additional class names
 	 */
-	className?: string
+	className?: string | undefined
 	/**
 	 * Max height for scrollable area
 	 */
-	maxHeight?: string
+	maxHeight?: string | undefined
 	/**
 	 * Sorting state (only used if table is not provided)
 	 */
@@ -105,111 +102,42 @@ export interface DataTableProps<TData> {
 	 */
 	onColumnOrderChange?: (order: ColumnOrderState | Updater<ColumnOrderState>) => void
 	/**
+	 * Pagination state (optional, for client-side pagination or controlled state)
+	 */
+	pagination?: PaginationState
+	/**
 	 * Custom empty state component
 	 */
-	emptyState?: ReactNode
+	emptyState?: ReactNode | undefined
 	/**
 	 * Custom loading state component
 	 */
-	loadingState?: ReactNode
+	loadingState?: ReactNode | undefined
 }
 
-/**
- * Helper function to create selection column
- * Extracted to allow flexibility in column composition
- */
-export function createSelectionColumn<TData>(): ColumnDef<TData> {
-	return {
-		id: "select",
-		header: ({ table }) => (
-			<Checkbox
-				checked={
-					table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
-				}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label="Select all"
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label="Select row"
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	}
+export interface DataTableContentProps<TData> {
+	table: TanStackTable<TData>
+	loading: boolean
+	fetching?: boolean | undefined
+	empty: boolean
+	emptyText: string
+	className?: string | undefined
+	maxHeight?: string | undefined
+	emptyState?: ReactNode | undefined
+	loadingState?: ReactNode | undefined
 }
 
-export function DataTable<TData>({
-	table: externalTable,
-	columns: propColumns,
-	data: propData,
+export function DataTableContent<TData>({
+	table,
 	loading,
 	fetching = false,
 	empty,
 	emptyText,
-	rowSelection: controlledRowSelection,
-	onRowSelectionChange,
-	enableRowSelection,
-	getRowId,
 	className,
-	maxHeight: _maxHeight,
-	sorting: controlledSorting,
-	onSortingChange,
-	columnVisibility: controlledColumnVisibility,
-	onColumnVisibilityChange,
-	columnOrder: controlledColumnOrder,
-	onColumnOrderChange,
+	maxHeight,
 	emptyState,
 	loadingState,
-}: DataTableProps<TData>) {
-	const [internalSorting, setInternalSorting] = useState<SortingState>([])
-	const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
-	const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
-	const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
-
-	const sorting = controlledSorting ?? internalSorting
-	const setSorting = onSortingChange ?? setInternalSorting
-	const rowSelection = controlledRowSelection ?? internalRowSelection
-	const setRowSelection = onRowSelectionChange ?? setInternalRowSelection
-	const columnVisibility = controlledColumnVisibility ?? internalColumnVisibility
-	const setColumnVisibility = onColumnVisibilityChange ?? setInternalColumnVisibility
-	const columnOrder = controlledColumnOrder ?? internalColumnOrder
-	const setColumnOrder = onColumnOrderChange ?? setInternalColumnOrder
-
-	const columns = propColumns || []
-	const data = propData || []
-
-	// Compose columns with selection column if enabled
-	const tableColumns = useMemo<ColumnDef<TData>[]>(() => {
-		if (enableRowSelection) {
-			return [createSelectionColumn<TData>(), ...columns]
-		}
-		return columns
-	}, [enableRowSelection, columns])
-
-	const internalTable = useReactTable({
-		data,
-		columns: tableColumns,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		onSortingChange: setSorting,
-		onRowSelectionChange: setRowSelection,
-		onColumnVisibilityChange: setColumnVisibility,
-		onColumnOrderChange: setColumnOrder,
-		...(getRowId && { getRowId }),
-		state: {
-			sorting,
-			rowSelection,
-			columnVisibility,
-			columnOrder,
-		},
-		enableRowSelection,
-	})
-
-	const table = externalTable || internalTable
+}: DataTableContentProps<TData>) {
 	const totalColumns = table.getAllColumns().length
 
 	// Default loading state
@@ -243,16 +171,19 @@ export function DataTable<TData>({
 					</div>
 				</div>
 			)}
-			{/* Fixed Header */}
-			<div className="shrink-0 overflow-hidden rounded-t-lg bg-card border-b border-[hsl(var(--table-border))] overflow-y-hidden">
-				<Table className="table-fixed">
-					<TableHeader>
+			{/* Scrollable Area */}
+			<div
+				className="flex-1 overflow-auto min-h-0 bg-card rounded-lg [scrollbar-gutter:stable]"
+				style={maxHeight ? { maxHeight } : undefined}
+			>
+				<Table>
+					<TableHeader className="sticky top-0 z-10 bg-card shadow-[0_1px_0_0_hsl(var(--table-border))]">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id} className="hover:bg-transparent border-b-0">
 								{headerGroup.headers.map((header) => {
 									const canSort = header.column.getCanSort()
 									const isSorted = header.column.getIsSorted()
-									const width = header.getSize()
+									const size = header.getSize()
 									const align = (
 										header.column.columnDef.meta as { align?: "left" | "center" | "right" }
 									)?.align
@@ -260,7 +191,10 @@ export function DataTable<TData>({
 									return (
 										<TableHead
 											key={header.id}
-											style={{ width: `${width}px` }}
+											style={{
+												width: size !== 150 ? `${size}px` : undefined,
+												minWidth: size !== 150 ? `${size}px` : undefined,
+											}}
 											className={cn(
 												align === "center" && "text-center",
 												align === "right" && "text-right",
@@ -291,14 +225,6 @@ export function DataTable<TData>({
 							</TableRow>
 						))}
 					</TableHeader>
-				</Table>
-			</div>
-			{/* Scrollable Body */}
-			<div
-				className="flex-1 overflow-y-auto min-h-0 bg-card rounded-b-lg [overflow:overlay]"
-				style={{ overflowY: "overlay" } as CSSProperties}
-			>
-				<Table className="table-fixed">
 					<TableBody>
 						{loading
 							? loadingState || defaultLoadingState
@@ -307,7 +233,7 @@ export function DataTable<TData>({
 								: table.getRowModel().rows.map((row) => (
 										<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
 											{row.getVisibleCells().map((cell) => {
-												const width = cell.column.getSize()
+												const size = cell.column.getSize()
 												const align = (
 													cell.column.columnDef.meta as {
 														align?: "left" | "center" | "right"
@@ -316,7 +242,10 @@ export function DataTable<TData>({
 												return (
 													<TableCell
 														key={cell.id}
-														style={{ width: `${width}px` }}
+														style={{
+															width: size !== 150 ? `${size}px` : undefined,
+															minWidth: size !== 150 ? `${size}px` : undefined,
+														}}
 														className={cn(
 															align === "center" && "text-center",
 															align === "right" && "text-right",
@@ -333,4 +262,131 @@ export function DataTable<TData>({
 			</div>
 		</div>
 	)
+}
+
+function InternalDataTable<TData>({
+	columns: propColumns,
+	data: propData,
+	loading,
+	fetching,
+	empty,
+	emptyText,
+	className,
+	maxHeight,
+	emptyState,
+	loadingState,
+	rowSelection: controlledRowSelection,
+	onRowSelectionChange,
+	getRowId,
+	sorting: controlledSorting,
+	onSortingChange,
+	columnVisibility: controlledColumnVisibility,
+	onColumnVisibilityChange,
+	columnOrder: controlledColumnOrder,
+	onColumnOrderChange,
+	pagination: controlledPagination,
+}: DataTableProps<TData>) {
+	const [internalSorting, setInternalSorting] = useState<SortingState>([])
+	const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
+	const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
+	const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
+
+	const sorting = controlledSorting ?? internalSorting
+	const handleSortingChange = (updater: Updater<SortingState>) => {
+		onSortingChange?.(updater)
+		if (!controlledSorting) {
+			setInternalSorting(updater)
+		}
+	}
+
+	const rowSelection = controlledRowSelection ?? internalRowSelection
+	const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
+		onRowSelectionChange?.(updater)
+		if (!controlledRowSelection) {
+			setInternalRowSelection(updater)
+		}
+	}
+
+	const columnVisibility = controlledColumnVisibility ?? internalColumnVisibility
+	const handleColumnVisibilityChange = (updater: Updater<VisibilityState>) => {
+		onColumnVisibilityChange?.(updater)
+		if (!controlledColumnVisibility) {
+			setInternalColumnVisibility(updater)
+		}
+	}
+
+	const columnOrder = controlledColumnOrder ?? internalColumnOrder
+	const handleColumnOrderChange = (updater: Updater<ColumnOrderState>) => {
+		onColumnOrderChange?.(updater)
+		if (!controlledColumnOrder) {
+			setInternalColumnOrder(updater)
+		}
+	}
+
+	const columns = propColumns || []
+	const data = propData || []
+
+	const table = useReactTable({
+		data,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		onSortingChange: handleSortingChange,
+		onRowSelectionChange: handleRowSelectionChange,
+		onColumnVisibilityChange: handleColumnVisibilityChange,
+		onColumnOrderChange: handleColumnOrderChange,
+		...(getRowId && { getRowId }),
+		state: {
+			sorting,
+			rowSelection,
+			columnVisibility,
+			columnOrder,
+			...(controlledPagination
+				? {
+						pagination: {
+							pageIndex: controlledPagination.pageNumber - 1,
+							pageSize: controlledPagination.pageSize,
+						},
+					}
+				: {}),
+		},
+		enableRowSelection: true,
+	})
+
+	return (
+		<DataTableContent
+			table={table}
+			loading={loading}
+			fetching={fetching}
+			empty={empty}
+			emptyText={emptyText}
+			className={className}
+			maxHeight={maxHeight}
+			emptyState={emptyState}
+			loadingState={loadingState}
+		/>
+	)
+}
+
+export function DataTable<TData>({ table, ...props }: DataTableProps<TData>) {
+	const { loading, fetching, empty, emptyText, className, maxHeight, emptyState, loadingState } =
+		props
+	if (table) {
+		return (
+			<DataTableContent
+				table={table}
+				loading={loading}
+				fetching={fetching}
+				empty={empty}
+				emptyText={emptyText}
+				className={className}
+				maxHeight={maxHeight}
+				emptyState={emptyState}
+				loadingState={loadingState}
+			/>
+		)
+	}
+
+	return <InternalDataTable {...props} />
 }

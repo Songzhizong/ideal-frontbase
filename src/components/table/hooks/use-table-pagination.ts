@@ -78,7 +78,15 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 	 */
 	onFetched?: (response: TResponse) => void | Promise<void>
 	/**
-	 * Callback when pagination params change
+	 * Controlled page number
+	 */
+	pageNumber?: number
+	/**
+	 * Controlled page size
+	 */
+	pageSize?: number
+	/**
+	 * Callback when pagination params change (for controlled mode)
 	 */
 	onPaginationChange?: (params: { pageNumber: number; pageSize: number }) => void | Promise<void>
 }
@@ -100,6 +108,8 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		tableId,
 		initialPage = 1,
 		initialPageSize = 10,
+		pageNumber: controlledPageNumber,
+		pageSize: controlledPageSize,
 		enableServerSorting = false,
 		enableServerFiltering = false,
 		onFetched,
@@ -112,13 +122,15 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		...(tableId && { tableId }),
 	})
 
-	// Pagination state
-	const [pagination, setPagination] = useState<PaginationState>({
+	// Internal pagination state (used if not controlled)
+	const [internalPagination, setInternalPagination] = useState({
 		pageNumber: initialPage,
 		pageSize: initialPageSize,
-		totalElements: 0,
-		totalPages: 0,
 	})
+
+	// Actual pageNumber and pageSize being used
+	const pageNumber = controlledPageNumber ?? internalPagination.pageNumber
+	const pageSize = controlledPageSize ?? internalPagination.pageSize
 
 	// Sorting state (for server-side sorting)
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -137,15 +149,15 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 	const query = useQuery({
 		queryKey: [
 			...queryKey,
-			pagination.pageNumber,
-			pagination.pageSize,
+			pageNumber,
+			pageSize,
 			...(enableServerSorting ? [sortingParams] : []),
 			...(enableServerFiltering ? [filters] : []),
 		],
 		queryFn: () =>
 			queryFn({
-				pageNumber: pagination.pageNumber,
-				pageSize: pagination.pageSize,
+				pageNumber,
+				pageSize,
 				...(enableServerSorting && sortingParams && { sorting: sortingParams }),
 				...(enableServerFiltering && Object.keys(filters).length > 0 && { filters }),
 			}),
@@ -172,52 +184,56 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		}
 	}, [query.data, transform, defaultTransform])
 
-	// Pagination controls
-	const setPage = useCallback((page: number) => {
-		setPagination((prev) => ({ ...prev, pageNumber: page }))
-	}, [])
+	// Derived pagination state
+	const pagination = useMemo<PaginationState>(
+		() => ({
+			pageNumber,
+			pageSize,
+			totalElements: pageData.pageInfo?.totalElements ?? 0,
+			totalPages: pageData.pageInfo?.totalPages ?? 0,
+		}),
+		[pageNumber, pageSize, pageData.pageInfo],
+	)
 
-	const setPageSize = useCallback((size: number) => {
-		setPagination((prev) => ({ ...prev, pageSize: size, pageNumber: 1 }))
-	}, [])
+	// Pagination controls
+	const setPage = useCallback(
+		(page: number) => {
+			if (onPaginationChange) {
+				onPaginationChange({ pageNumber: page, pageSize })
+			} else {
+				setInternalPagination((prev) => ({ ...prev, pageNumber: page }))
+			}
+		},
+		[onPaginationChange, pageSize],
+	)
+
+	const setPageSize = useCallback(
+		(size: number) => {
+			if (onPaginationChange) {
+				onPaginationChange({ pageNumber: 1, pageSize: size })
+			} else {
+				setInternalPagination({ pageSize: size, pageNumber: 1 })
+			}
+		},
+		[onPaginationChange],
+	)
 
 	const nextPage = useCallback(() => {
-		setPagination((prev) => {
-			if (prev.pageNumber < prev.totalPages) {
-				return { ...prev, pageNumber: prev.pageNumber + 1 }
-			}
-			return prev
-		})
-	}, [])
+		if (pagination.pageNumber < pagination.totalPages) {
+			setPage(pagination.pageNumber + 1)
+		}
+	}, [pagination.pageNumber, pagination.totalPages, setPage])
 
 	const previousPage = useCallback(() => {
-		setPagination((prev) => {
-			if (prev.pageNumber > 1) {
-				return { ...prev, pageNumber: prev.pageNumber - 1 }
-			}
-			return prev
-		})
-	}, [])
-
-	// Update pagination info when data changes
-	useEffect(() => {
-		if (pageData.pageInfo) {
-			setPagination((prev) => {
-				const newTotal = pageData.pageInfo?.totalElements ?? 0
-				const newPages = pageData.pageInfo?.totalPages ?? 0
-				// Only update if values actually changed
-				if (prev.totalElements !== newTotal || prev.totalPages !== newPages) {
-					return {
-						...prev,
-						totalElements: newTotal,
-						totalPages: newPages,
-					}
-				}
-				return prev
-			})
+		if (pagination.pageNumber > 1) {
+			setPage(pagination.pageNumber - 1)
 		}
+	}, [pagination.pageNumber, setPage])
+
+	// Update empty state when data changes
+	useEffect(() => {
 		baseTable.setEmpty(pageData.data.length === 0)
-	}, [pageData.pageInfo, pageData.data.length, baseTable.setEmpty])
+	}, [pageData.data.length, baseTable.setEmpty])
 
 	// Call onFetched when data is fetched
 	useEffect(() => {
@@ -225,11 +241,6 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 			onFetched?.(query.data)
 		}
 	}, [query.data, onFetched])
-
-	// Call onPaginationChange when pagination changes
-	useEffect(() => {
-		onPaginationChange?.({ pageNumber: pagination.pageNumber, pageSize: pagination.pageSize })
-	}, [pagination.pageNumber, pagination.pageSize, onPaginationChange])
 
 	// Row selection state
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({})

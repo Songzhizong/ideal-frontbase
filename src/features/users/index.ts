@@ -1,3 +1,7 @@
 export { getUsers } from "./api/get-users"
+export { UserGroupBadges } from "./components/user-group-badges"
+export { UsersPage } from "./components/users-page"
+export { type UsersFilters, useUsersFilters } from "./hooks/use-users-filters"
+export { useUsersQuery } from "./hooks/use-users-query"
 export type { User } from "./types"
 export { UserGroupEnum, UserSchema, UserStatusEnum } from "./types"

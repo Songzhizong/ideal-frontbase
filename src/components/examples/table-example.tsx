@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { DataTableToolbar, PaginatedTable } from "@/components/table"
+import { DataTableToolbar, getSelectColumn, PaginatedTable } from "@/components/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useTablePagination } from "@/hooks"
@@ -52,6 +52,7 @@ async function getUsers({
 
 // Column definitions
 const columns: ColumnDef<User>[] = [
+	getSelectColumn<User>(),
 	{
 		accessorKey: "name",
 		header: "Name",
@@ -149,7 +150,6 @@ export function TableExample() {
 				onPageSizeChange={table.setPageSize}
 				pageSizeOptions={[10, 20, 30, 50, 100]}
 				showTotal={true}
-				enableRowSelection={true}
 				rowSelection={table.rowSelection}
 				onRowSelectionChange={table.onRowSelectionChange}
 				columnChecks={table.columnChecks}

@@ -105,7 +105,6 @@ interface TableContentProps<TData> {
 	loading: boolean
 	empty: boolean
 	emptyText: string
-	enableRowSelection?: boolean
 	rowSelection?: RowSelectionState
 	onRowSelectionChange?: (selection: RowSelectionState | Updater<RowSelectionState>) => void
 	columnVisibility?: VisibilityState
@@ -122,7 +121,6 @@ function TableContent<TData>({
 	loading,
 	empty,
 	emptyText,
-	enableRowSelection = false,
 	rowSelection,
 	onRowSelectionChange,
 	columnVisibility,
@@ -138,7 +136,6 @@ function TableContent<TData>({
 		loading,
 		empty,
 		emptyText,
-		enableRowSelection,
 		...(rowSelection && { rowSelection }),
 		...(onRowSelectionChange && { onRowSelectionChange }),
 		...(columnVisibility && { columnVisibility }),
