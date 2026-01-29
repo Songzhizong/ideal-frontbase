@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { useTablePagination } from "@/components/table"
 import type { PageInfo } from "@/types/pagination"
@@ -195,7 +195,15 @@ export function useDataTable<TData>({
 		...(getRowId && { getRowId }),
 	})
 
-	// 7. Return simplified API
+	// 7. Auto-correct page number if it exceeds total pages
+	const { pagination, setPage } = tableQuery
+	useEffect(() => {
+		if (pagination.totalPages > 0 && pagination.pageNumber > pagination.totalPages) {
+			setPage(pagination.totalPages)
+		}
+	}, [pagination.pageNumber, pagination.totalPages, setPage])
+
+	// 8. Return simplified API
 	return {
 		...tableQuery,
 		/**
