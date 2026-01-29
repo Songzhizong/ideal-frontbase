@@ -1,0 +1,54 @@
+/* Sonner Toast 核心样式 - 满足自适应宽度、居中及药丸设计 */
+[data-sonner-toast] {
+	padding: 12px 20px;
+	border-radius: 9999px;
+  /* biome-ignore lint/complexity/noImportantStyles: 彻底移除边框 */
+  border: 0 none !important;
+  background: hsl(var(--card));
+	font-family: var(--font-inter), system-ui;
+	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	width: max-content !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	min-width: 0 !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	max-width: min(calc(100vw - 32px), 480px) !important;
+}
+
+/* 强制容器居中且宽度随内容变化 */
+[data-sonner-toaster][data-x-position="center"] {
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	left: 50% !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	transform: translateX(-50%) !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	width: max-content !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	display: flex !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	flex-direction: column !important;
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	align-items: center !important;
+}
+
+/* 状态颜色适配 */
+[data-sonner-toast][data-rich-colors="true"] {
+	/* biome-ignore lint/complexity/noImportantStyles: 强制覆盖 */
+	background: hsl(var(--card)) !important;
+}
+[data-sonner-toast][data-type="success"] [data-icon] {
+	color: hsl(var(--success));
+}
+[data-sonner-toast][data-type="error"] [data-icon] {
+	color: hsl(var(--error));
+}
+
+[data-sonner-toast] [data-title] {
+	font-weight: 500;
+	font-size: 14px;
+	color: hsl(var(--foreground));
+}

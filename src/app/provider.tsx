@@ -14,7 +14,7 @@ export function AppProvider() {
 				<NuqsAdapter>
 					<RouterProvider router={router} />
 				</NuqsAdapter>
-				<Toaster position="top-right" richColors />
+				<Toaster position="top-center" richColors />
 				{import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
 			</ThemeProvider>
 		</QueryClientProvider>
