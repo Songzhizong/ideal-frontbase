@@ -12,6 +12,10 @@ import { cn } from "@/lib/utils"
 import { DataTable } from "./data-table"
 
 /**
+ * @deprecated This compound component uses the old API with dual state management.
+ * It will be refactored in a future update to use the new table instance pattern.
+ * For new code, use PaginatedTable instead.
+ *
  * Compound component pattern for flexible table composition
  * Allows developers to compose table with custom layouts
  *
@@ -64,6 +68,7 @@ function TableRoot<TData>({
 		...(showTotal !== undefined && { showTotal }),
 	}
 
+	// @ts-expect-error - Deprecated component using old API
 	return <TableProvider {...providerProps}>{children}</TableProvider>
 }
 

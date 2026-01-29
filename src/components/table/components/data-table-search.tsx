@@ -1,4 +1,5 @@
 import { Search, X } from "lucide-react"
+import { parseAsInteger, useQueryState } from "nuqs"
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +12,7 @@ interface DataTableSearchProps {
 	className?: string
 	showSearchButton?: boolean // Optional search button for manual trigger
 	showClearButton?: boolean // Optional clear button
+	autoResetPageIndex?: boolean // Whether to reset page index on search
 }
 
 export function DataTableSearch({
@@ -19,10 +21,20 @@ export function DataTableSearch({
 	className,
 	showSearchButton = false,
 	showClearButton = true,
+	autoResetPageIndex = true,
 }: DataTableSearchProps) {
+	const [, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+
 	const { value, onValueChange, applyValue, resetValue, urlValue } = useDebouncedQueryState(
 		queryKey,
 		500,
+		{
+			onQueryChange: () => {
+				if (autoResetPageIndex) {
+					void setPage(1)
+				}
+			},
+		},
 	)
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {

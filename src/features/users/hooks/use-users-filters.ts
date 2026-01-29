@@ -1,4 +1,4 @@
-import { parseAsString, useQueryStates } from "nuqs"
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useCallback } from "react"
 
 export interface UsersFilters {
@@ -8,6 +8,8 @@ export interface UsersFilters {
 	status?: string
 	mfaEnabled?: string
 	userGroups?: string
+	page?: number
+	pageSize?: number
 }
 
 const filtersParser = {
@@ -17,6 +19,8 @@ const filtersParser = {
 	status: parseAsString.withDefault("all"),
 	mfaEnabled: parseAsString.withDefault("all"),
 	userGroups: parseAsString.withDefault("all"),
+	page: parseAsInteger.withDefault(1),
+	pageSize: parseAsInteger.withDefault(10),
 }
 
 export function useUsersFilters() {
@@ -28,7 +32,7 @@ export function useUsersFilters() {
 	// Update select filters immediately (no debounce needed)
 	const updateSelectFilter = useCallback(
 		(key: "status" | "mfaEnabled" | "userGroups", value: string) => {
-			setUrlFilters({ [key]: value })
+			setUrlFilters({ [key]: value, page: 1 })
 		},
 		[setUrlFilters],
 	)
@@ -41,6 +45,8 @@ export function useUsersFilters() {
 			status: "all",
 			mfaEnabled: "all",
 			userGroups: "all",
+			page: 1,
+			pageSize: 10,
 		}
 		setUrlFilters(resetValues)
 	}, [setUrlFilters])
@@ -63,6 +69,7 @@ export function useUsersFilters() {
 	return {
 		// URL state for selects and API
 		urlFilters,
+		setUrlFilters,
 		updateSelectFilter,
 		// Actions
 		resetFilters,

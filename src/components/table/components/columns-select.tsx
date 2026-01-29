@@ -25,8 +25,5 @@ export function getSelectColumn<TData>(): ColumnDef<TData> {
 		enableSorting: false,
 		enableHiding: false,
 		size: 48,
-		meta: {
-			align: "center",
-		},
 	}
 }

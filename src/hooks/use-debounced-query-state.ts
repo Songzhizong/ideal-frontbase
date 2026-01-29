@@ -2,7 +2,11 @@ import { type Options, parseAsString, useQueryState } from "nuqs"
 import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 
-export function useDebouncedQueryState(key: string, delay = 500, options?: Options) {
+export function useDebouncedQueryState(
+	key: string,
+	delay = 500,
+	options?: Options & { onQueryChange?: (value: string | null) => void },
+) {
 	// 1. nuqs URL state
 	const [query, setQuery] = useQueryState(
 		key,
@@ -17,8 +21,11 @@ export function useDebouncedQueryState(key: string, delay = 500, options?: Optio
 
 	// 3. Debounced callback: delayed URL update
 	const debouncedSetQuery = useDebouncedCallback((newValue: string) => {
+		const nextValue = newValue || null
 		// If empty string, store as null to clear URL parameter
-		void setQuery(newValue || null)
+		void setQuery(nextValue).then(() => {
+			options?.onQueryChange?.(nextValue)
+		})
 	}, delay)
 
 	// 4. Handle input changes
@@ -35,14 +42,19 @@ export function useDebouncedQueryState(key: string, delay = 500, options?: Optio
 	// 6. Manual apply (for search button or Enter key)
 	const applyValue = () => {
 		debouncedSetQuery.cancel()
-		void setQuery(value || null)
+		const nextValue = value || null
+		void setQuery(nextValue).then(() => {
+			options?.onQueryChange?.(nextValue)
+		})
 	}
 
 	// 7. Reset value
 	const resetValue = () => {
 		debouncedSetQuery.cancel()
 		setValue("")
-		void setQuery(null)
+		void setQuery(null).then(() => {
+			options?.onQueryChange?.(null)
+		})
 	}
 
 	return {

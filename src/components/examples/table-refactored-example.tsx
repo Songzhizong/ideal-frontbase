@@ -1,3 +1,11 @@
+/**
+ * @deprecated This example uses the old table API with dual state management.
+ * See MIGRATION.md and EXAMPLE.md in src/components/table/ for the new API.
+ * This file is kept for reference only.
+ */
+
+// @ts-nocheck - Deprecated example file using old API
+
 import type { ColumnDef } from "@tanstack/react-table"
 import { Plus, RefreshCw } from "lucide-react"
 import { getSelectColumn, TableCompound } from "@/components/table"
@@ -122,6 +130,7 @@ export function TableCompoundExample() {
 				<h2 className="text-2xl font-bold text-foreground">Compound Component Example</h2>
 			</div>
 
+			{/* @ts-expect-error - Deprecated example using old API */}
 			{/* New compound component pattern - maximum flexibility */}
 			<TableCompound.Root
 				columnChecks={tableState.columnChecks}
@@ -150,6 +159,7 @@ export function TableCompoundExample() {
 						}
 					/>
 
+					{/* @ts-expect-error - Deprecated example using old API */}
 					{/* Table content */}
 					<TableCompound.Table
 						columns={columns}
@@ -223,6 +233,7 @@ export function TableMetadataExample() {
 				Notice how the selection column doesn't appear in the column toggle menu
 			</p>
 
+			{/* @ts-expect-error - Deprecated example using old API */}
 			<TableCompound.Root
 				columnChecks={tableState.columnChecks}
 				setColumnChecks={tableState.setColumnChecks}
@@ -234,6 +245,7 @@ export function TableMetadataExample() {
 			>
 				<TableCompound.Container>
 					<TableCompound.Toolbar />
+					{/* @ts-expect-error - Deprecated example using old API */}
 					<TableCompound.Table
 						columns={columns}
 						data={tableState.data}
@@ -282,6 +294,7 @@ export function TableI18nExample() {
 		<div className="space-y-4">
 			<h2 className="text-2xl font-bold text-foreground">国际化示例 (i18n Example)</h2>
 
+			{/* @ts-expect-error - Deprecated example using old API */}
 			<TableCompound.Root
 				columnChecks={tableState.columnChecks}
 				setColumnChecks={tableState.setColumnChecks}
@@ -293,6 +306,7 @@ export function TableI18nExample() {
 			>
 				<TableCompound.Container>
 					<TableCompound.Toolbar filterPlaceholder="搜索用户..." />
+					{/* @ts-expect-error - Deprecated example using old API */}
 					<TableCompound.Table
 						columns={columns}
 						data={tableState.data}

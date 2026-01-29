@@ -1,10 +1,14 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
-import type { ColumnDef, RowSelectionState, SortingState, Updater } from "@tanstack/react-table"
+import type {
+	ColumnDef,
+	OnChangeFn,
+	RowSelectionState,
+	SortingState,
+	VisibilityState,
+} from "@tanstack/react-table"
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { PageInfo } from "@/types/pagination"
-import { type TableColumnCheck, useBaseTable } from "./use-base-table"
-
-export type { TableColumnCheck } from "./use-base-table"
 
 export interface PaginationState {
 	pageNumber: number
@@ -35,6 +39,7 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 		pageSize: number
 		sorting?: SortingParams
 		filters?: FilterParams
+		globalFilter?: string
 	}) => Promise<TResponse>
 	/**
 	 * Transform response to pagination data
@@ -46,13 +51,9 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 	 */
 	columns: ColumnDef<TData>[]
 	/**
-	 * Get column checks for visibility control
+	 * Get row ID (optional)
 	 */
-	getColumnChecks?: (columns: ColumnDef<TData>[]) => TableColumnCheck[]
-	/**
-	 * Unique table ID for storing settings
-	 */
-	tableId?: string
+	getRowId?: (row: TData) => string
 	/**
 	 * Initial page number
 	 * @default 1
@@ -63,6 +64,10 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 	 * @default 10
 	 */
 	initialPageSize?: number
+	/**
+	 * Initial column visibility state
+	 */
+	initialColumnVisibility?: VisibilityState
 	/**
 	 * Enable server-side sorting
 	 * @default false
@@ -89,12 +94,20 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 	 * Callback when pagination params change (for controlled mode)
 	 */
 	onPaginationChange?: (params: { pageNumber: number; pageSize: number }) => void | Promise<void>
+	/**
+	 * Controlled column visibility
+	 */
+	columnVisibility?: VisibilityState
+	/**
+	 * Callback when column visibility changes
+	 */
+	onColumnVisibilityChange?: OnChangeFn<VisibilityState>
 }
 
 /**
  * Table hook with pagination and TanStack Query integration
  * Enhanced with server-side sorting and filtering support
- * Uses TanStack Table's columnVisibility state
+ * Creates TanStack Table instance as single source of truth
  */
 export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 	options: UseTablePaginationOptions<TData, TResponse>,
@@ -103,24 +116,20 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		queryKey,
 		queryFn,
 		transform,
-		columns: baseColumns,
-		getColumnChecks,
-		tableId,
+		columns,
+		getRowId,
 		initialPage = 1,
 		initialPageSize = 10,
+		initialColumnVisibility,
 		pageNumber: controlledPageNumber,
 		pageSize: controlledPageSize,
 		enableServerSorting = false,
 		enableServerFiltering = false,
 		onFetched,
 		onPaginationChange,
+		columnVisibility: controlledColumnVisibility,
+		onColumnVisibilityChange,
 	} = options
-
-	const baseTable = useBaseTable({
-		columns: baseColumns,
-		...(getColumnChecks && { getColumnChecks }),
-		...(tableId && { tableId }),
-	})
 
 	// Internal pagination state (used if not controlled)
 	const [internalPagination, setInternalPagination] = useState({
@@ -145,6 +154,56 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 	// Filtering state (for server-side filtering)
 	const [filters, setFilters] = useState<FilterParams>({})
 
+	// Global filter state (for search)
+	const [globalFilter, setGlobalFilter] = useState<string>("")
+
+	// Column visibility state (internal if not controlled)
+	const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>(
+		initialColumnVisibility || {},
+	)
+
+	// Row selection state
+	const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+	// Empty state
+	const [empty, setEmpty] = useState(false)
+
+	// Pagination controls (defined before useEffect that uses them)
+	const setPage = useCallback(
+		(page: number) => {
+			if (onPaginationChange) {
+				onPaginationChange({ pageNumber: page, pageSize })
+			} else {
+				setInternalPagination((prev) => ({ ...prev, pageNumber: page }))
+			}
+		},
+		[onPaginationChange, pageSize],
+	)
+
+	const setPageSize = useCallback(
+		(size: number) => {
+			if (onPaginationChange) {
+				onPaginationChange({ pageNumber: 1, pageSize: size })
+			} else {
+				setInternalPagination({ pageSize: size, pageNumber: 1 })
+			}
+		},
+		[onPaginationChange],
+	)
+
+	// Auto-reset page index when filters or global filter change
+	useEffect(() => {
+		if (enableServerFiltering && Object.keys(filters).length > 0) {
+			setPage(1)
+		}
+	}, [filters, enableServerFiltering, setPage])
+
+	useEffect(() => {
+		if (globalFilter) {
+			setPage(1)
+		}
+	}, [globalFilter, setPage])
+
 	// Fetch data with pagination, sorting, and filtering
 	const query = useQuery({
 		queryKey: [
@@ -153,6 +212,7 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 			pageSize,
 			...(enableServerSorting ? [sortingParams] : []),
 			...(enableServerFiltering ? [filters] : []),
+			globalFilter,
 		],
 		queryFn: () =>
 			queryFn({
@@ -160,6 +220,7 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 				pageSize,
 				...(enableServerSorting && sortingParams && { sorting: sortingParams }),
 				...(enableServerFiltering && Object.keys(filters).length > 0 && { filters }),
+				globalFilter,
 			}),
 		placeholderData: keepPreviousData,
 	})
@@ -195,29 +256,6 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		[pageNumber, pageSize, pageData.pageInfo],
 	)
 
-	// Pagination controls
-	const setPage = useCallback(
-		(page: number) => {
-			if (onPaginationChange) {
-				onPaginationChange({ pageNumber: page, pageSize })
-			} else {
-				setInternalPagination((prev) => ({ ...prev, pageNumber: page }))
-			}
-		},
-		[onPaginationChange, pageSize],
-	)
-
-	const setPageSize = useCallback(
-		(size: number) => {
-			if (onPaginationChange) {
-				onPaginationChange({ pageNumber: 1, pageSize: size })
-			} else {
-				setInternalPagination({ pageSize: size, pageNumber: 1 })
-			}
-		},
-		[onPaginationChange],
-	)
-
 	const nextPage = useCallback(() => {
 		if (pagination.pageNumber < pagination.totalPages) {
 			setPage(pagination.pageNumber + 1)
@@ -230,10 +268,50 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		}
 	}, [pagination.pageNumber, setPage])
 
+	// Create TanStack Table instance (single source of truth)
+	const table = useReactTable({
+		data: pageData.data ?? [], // Defensive: always ensure array
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		manualPagination: true,
+		manualSorting: enableServerSorting,
+		enableRowSelection: true,
+		autoResetPageIndex: false, // Prevent auto-reset on data change
+		...(getRowId && { getRowId }),
+		state: {
+			sorting,
+			rowSelection,
+			globalFilter,
+			columnVisibility: controlledColumnVisibility ?? internalColumnVisibility,
+			pagination: {
+				pageIndex: pageNumber - 1,
+				pageSize,
+			},
+		},
+		onSortingChange: setSorting,
+		onRowSelectionChange: setRowSelection,
+		onGlobalFilterChange: setGlobalFilter,
+		onColumnVisibilityChange: onColumnVisibilityChange || setInternalColumnVisibility,
+		onPaginationChange: (updater) => {
+			if (typeof updater === "function") {
+				const newState = updater({
+					pageIndex: pageNumber - 1,
+					pageSize,
+				})
+				setPage(newState.pageIndex + 1)
+				setPageSize(newState.pageSize)
+			} else {
+				setPage(updater.pageIndex + 1)
+				setPageSize(updater.pageSize)
+			}
+		},
+		pageCount: pagination.totalPages,
+	})
+
 	// Update empty state when data changes
 	useEffect(() => {
-		baseTable.setEmpty(pageData.data.length === 0)
-	}, [pageData.data.length, baseTable.setEmpty])
+		setEmpty(pageData.data.length === 0)
+	}, [pageData.data.length])
 
 	// Call onFetched when data is fetched
 	useEffect(() => {
@@ -242,34 +320,28 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		}
 	}, [query.data, onFetched])
 
-	// Row selection state
-	const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-
-	const handleRowSelectionChange = useCallback(
-		(updater: RowSelectionState | Updater<RowSelectionState>) => {
-			setRowSelection((prev) => (typeof updater === "function" ? updater(prev) : updater))
-		},
-		[],
-	)
-
 	return {
+		// TanStack Table instance - single source of truth
+		table,
+		// Query states
 		loading: query.isLoading,
 		fetching: query.isFetching,
-		data: pageData.data,
+		isError: query.isError,
+		error: query.error,
+		refetch: query.refetch,
+		// UI states
+		empty,
+		// Pagination
 		pagination,
 		setPage,
 		setPageSize,
 		nextPage,
 		previousPage,
-		sorting,
-		setSorting,
+		// Filtering (for server-side)
 		filters,
 		setFilters,
-		refetch: query.refetch,
-		isError: query.isError,
-		error: query.error,
-		rowSelection,
-		onRowSelectionChange: handleRowSelectionChange,
-		...baseTable,
+		// Global filter (for search)
+		globalFilter,
+		setGlobalFilter,
 	}
 }

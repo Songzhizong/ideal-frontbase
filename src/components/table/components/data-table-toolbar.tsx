@@ -42,9 +42,10 @@ export interface DataTableToolbarProps {
 }
 
 /**
- * 带有搜索和列可视化开关的表格工具栏组件 使用 TableContext 访问表状态，减少了 prop 钻孔
+ * Table toolbar with search and column visibility toggle
+ * Uses TableContext to access table instance - all column operations go through table.column API
  *
- * 注意：对于支持扩展/折叠的复杂多字段过滤，请改用 `DataTableFilterBar`
+ * For complex multi-field filters with expand/collapse, use `DataTableFilterBar` instead
  */
 export function DataTableToolbar({
 	filterPlaceholder = "Search...",
@@ -56,7 +57,7 @@ export function DataTableToolbar({
 	className,
 	hideColumnToggle = false,
 }: DataTableToolbarProps) {
-	const { columnChecks, setColumnChecks, resetColumns } = useTableContext()
+	const { table } = useTableContext()
 	const [isRefreshing, setIsRefreshing] = useState(false)
 
 	const handleRefresh = async () => {
@@ -96,13 +97,7 @@ export function DataTableToolbar({
 						<RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
 					</Button>
 				)}
-				{!hideColumnToggle && (
-					<DataTableColumnToggle
-						columns={columnChecks}
-						onColumnsChange={setColumnChecks}
-						onReset={resetColumns}
-					/>
-				)}
+				{!hideColumnToggle && <DataTableColumnToggle table={table} />}
 			</div>
 		</div>
 	)

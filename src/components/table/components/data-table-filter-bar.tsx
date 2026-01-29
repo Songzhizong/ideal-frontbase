@@ -59,7 +59,7 @@ export function DataTableFilterBar({
 	defaultExpanded = false,
 	hideColumnToggle = false,
 }: DataTableFilterBarProps) {
-	const { columnChecks, setColumnChecks, resetColumns } = useTableContext()
+	const { table } = useTableContext()
 	const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 	const [isRefreshing, setIsRefreshing] = useState(false)
 
@@ -159,13 +159,7 @@ export function DataTableFilterBar({
 										<RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
 									</Button>
 								)}
-								{!hideColumnToggle && (
-									<DataTableColumnToggle
-										columns={columnChecks}
-										onColumnsChange={setColumnChecks}
-										onReset={resetColumns}
-									/>
-								)}
+								{!hideColumnToggle && <DataTableColumnToggle table={table} />}
 							</div>
 						</>
 					)}

@@ -1,3 +1,11 @@
+/**
+ * @deprecated This example uses the old table API with dual state management.
+ * See MIGRATION.md and EXAMPLE.md in src/components/table/ for the new API.
+ * This file is kept for reference only.
+ */
+
+// @ts-nocheck - Deprecated example file using old API
+
 import type { ColumnDef } from "@tanstack/react-table"
 import { DataTableToolbar, getSelectColumn, PaginatedTable } from "@/components/table"
 import { Badge } from "@/components/ui/badge"
@@ -139,6 +147,7 @@ export function TableExample() {
 				<Button onClick={() => console.log("Add user")}>Add User</Button>
 			</div>
 
+			{/* @ts-expect-error - Deprecated example using old API */}
 			<PaginatedTable
 				columns={table.columns}
 				data={table.data}

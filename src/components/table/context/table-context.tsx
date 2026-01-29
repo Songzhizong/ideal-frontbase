@@ -1,24 +1,12 @@
 import type { Table } from "@tanstack/react-table"
 import { createContext, type ReactNode, useContext } from "react"
-import type { PaginationState, TableColumnCheck } from "@/components/table"
+import type { PaginationState } from "@/components/table"
 
 export interface TableContextValue<TData = unknown> {
 	/**
-	 * TanStack Table instance
+	 * TanStack Table instance (required - single source of truth)
 	 */
-	table?: Table<TData>
-	/**
-	 * Column visibility checks
-	 */
-	columnChecks: TableColumnCheck[]
-	/**
-	 * Update column visibility
-	 */
-	setColumnChecks: (checks: TableColumnCheck[]) => void
-	/**
-	 * Reset columns to default
-	 */
-	resetColumns?: () => void
+	table: Table<TData>
 	/**
 	 * Loading state
 	 */
@@ -68,6 +56,7 @@ export function TableProvider<TData = unknown>({ children, ...value }: TableProv
 
 /**
  * Hook to access table context
+ * All table operations (column visibility, sorting, selection) should go through table instance
  */
 export function useTableContext<TData = unknown>() {
 	const context = useContext(TableContext)

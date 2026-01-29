@@ -19,6 +19,9 @@ export const usersTableColumns: ColumnDef<User>[] = [
 	{
 		accessorKey: "username",
 		header: "用户",
+		meta: {
+			label: "用户",
+		},
 		cell: ({ row }) => (
 			<div className="flex flex-col gap-1">
 				<div className="font-medium text-foreground">{row.getValue("username")}</div>
@@ -29,12 +32,18 @@ export const usersTableColumns: ColumnDef<User>[] = [
 	{
 		accessorKey: "userGroups",
 		header: "用户组",
+		meta: {
+			label: "用户组",
+		},
 		cell: ({ row }) => <UserGroupBadges userGroups={row.getValue("userGroups")} />,
 		enableSorting: false,
 	},
 	{
 		accessorKey: "phone",
 		header: "联系方式",
+		meta: {
+			label: "联系方式",
+		},
 		cell: ({ row }) => (
 			<div className="flex flex-col gap-1">
 				<div className="text-sm">{row.getValue("phone")}</div>
@@ -45,6 +54,9 @@ export const usersTableColumns: ColumnDef<User>[] = [
 	{
 		accessorKey: "status",
 		header: "状态",
+		meta: {
+			label: "状态",
+		},
 		cell: ({ row }) => {
 			const status = row.getValue("status") as User["status"]
 			return (
@@ -57,6 +69,9 @@ export const usersTableColumns: ColumnDef<User>[] = [
 	{
 		accessorKey: "mfaEnabled",
 		header: "MFA",
+		meta: {
+			label: "MFA",
+		},
 		cell: ({ row }) => {
 			const mfaEnabled = row.getValue("mfaEnabled") as boolean
 			return (
@@ -70,6 +85,9 @@ export const usersTableColumns: ColumnDef<User>[] = [
 	{
 		accessorKey: "lastVisit",
 		header: "最近访问",
+		meta: {
+			label: "最近访问",
+		},
 		cell: ({ row }) => {
 			const lastVisit = row.getValue("lastVisit") as string
 			return <div className="text-sm text-muted-foreground">{lastVisit || "从未访问"}</div>

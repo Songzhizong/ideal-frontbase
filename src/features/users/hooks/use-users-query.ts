@@ -6,11 +6,20 @@ import type { User } from "../types"
 export interface UseUsersQueryOptions {
 	columns: ColumnDef<User>[]
 	initialFilters?: Partial<GetUsersParams>
+	pageNumber?: number
+	pageSize?: number
+	onPaginationChange?: (params: { pageNumber: number; pageSize: number }) => void
 }
 
-export function useUsersQuery({ columns, initialFilters = {} }: UseUsersQueryOptions) {
+export function useUsersQuery({
+	columns,
+	initialFilters = {},
+	pageNumber,
+	pageSize,
+	onPaginationChange,
+}: UseUsersQueryOptions) {
 	return useTablePagination<User>({
-		queryKey: ["users"],
+		queryKey: ["users", initialFilters],
 		queryFn: async ({ pageNumber, pageSize, sorting, filters }) => {
 			const params: GetUsersParams = {
 				pageNumber,
@@ -24,6 +33,8 @@ export function useUsersQuery({ columns, initialFilters = {} }: UseUsersQueryOpt
 		columns,
 		enableServerSorting: true,
 		enableServerFiltering: true,
-		tableId: "users-table",
+		...(pageNumber !== undefined && { pageNumber }),
+		...(pageSize !== undefined && { pageSize }),
+		...(onPaginationChange !== undefined && { onPaginationChange }),
 	})
 }

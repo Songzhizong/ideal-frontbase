@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react"
+import { parseAsString } from "nuqs"
 import { useCallback } from "react"
 import { PageContainer } from "@/components/common"
 import {
@@ -9,51 +10,89 @@ import {
 	TableProvider,
 } from "@/components/table"
 import { Button } from "@/components/ui/button"
-import { useUsersFilters, useUsersQuery } from "@/features/users"
+import { useDataTable } from "@/hooks"
+import { type GetUsersParams, getUsers } from "../api/get-users"
+import type { User } from "../types"
 import { UsersExtraFilters, UsersFilterForm } from "./users-filter-form"
 import { usersTableColumns } from "./users-table-columns"
 
+/**
+ * Simplified Users Page using useDataTable hook
+ *
+ * Benefits:
+ * - Zero glue code: No manual URL sync, no manual page reset
+ * - Type-safe filters: Filter state is fully typed
+ * - Auto-debounced search: Built-in debouncing for search input
+ * - Auto page reset: Filters automatically reset page to 1
+ * - Single source of truth: URL state drives everything
+ *
+ * Comparison with old approach:
+ * - Before: 3 separate hooks (useUsersFilters, useUsersQuery, manual sync)
+ * - After: 1 hook (useDataTable) with automatic sync
+ * - Before: Manual page reset on filter change
+ * - After: Automatic page reset built-in
+ * - Before: Manual debounce implementation
+ * - After: Built-in debounced search
+ */
 export function UsersPage() {
-	const {
-		urlFilters,
-		updateSelectFilter,
-		resetFilters,
-		getApiFilters,
-	} = useUsersFilters()
-
-	const tableQuery = useUsersQuery({
+	// 🔥 One hook to rule them all - handles URL, pagination, API, search, debounce
+	const { table, filters, loading, empty, fetching, refetch, pagination } = useDataTable<User>({
+		queryKey: ["users"],
+		queryFn: (params) => getUsers(params as unknown as GetUsersParams),
 		columns: usersTableColumns,
-		initialFilters: getApiFilters(),
+		// Define business filters with their parsers
+		filterParsers: {
+			username: parseAsString,
+			email: parseAsString,
+			phone: parseAsString,
+			status: parseAsString.withDefault("all"),
+			mfaEnabled: parseAsString.withDefault("all"),
+			userGroups: parseAsString.withDefault("all"),
+		},
+		// Default values for filters (used in reset)
+		defaultFilters: {
+			status: "all",
+			mfaEnabled: "all",
+			userGroups: "all",
+		},
 	})
 
+	// Handlers
+	const handleSearch = useCallback(async () => {
+		await refetch()
+	}, [refetch])
+
 	const handleReset = useCallback(() => {
-		resetFilters()
-	}, [resetFilters])
+		filters.reset()
+		// URL changes automatically trigger refetch via React Query
+	}, [filters])
 
 	const handleRefresh = useCallback(async () => {
-		await tableQuery.refetch()
-	}, [tableQuery])
+		await refetch()
+	}, [refetch])
 
 	return (
 		<PageContainer>
 			<div className="space-y-6">
-				{/* Header */}
-				<div className="flex items-center justify-between">
-					<div>
-						<h1 className="text-2xl font-semibold text-foreground">用户管理</h1>
-						<p className="text-sm text-muted-foreground">管理系统用户账户和权限设置</p>
-					</div>
-				</div>
-
-				{/* Table */}
 				<TableProvider
-					{...tableQuery}
-					onPageChange={tableQuery.setPage}
-					onPageSizeChange={tableQuery.setPageSize}
+					table={table}
+					loading={loading}
+					empty={empty}
+					pagination={pagination}
+					onPageChange={(page) => {
+						// This is handled automatically by useDataTable
+						// but we need to satisfy the TableProvider interface
+						table.setPageIndex(page - 1)
+					}}
+					onPageSizeChange={(size) => {
+						// This is handled automatically by useDataTable
+						table.setPageSize(size)
+					}}
 				>
 					<DataTableContainer
 						toolbar={
 							<DataTableFilterBar
+								onSearch={handleSearch}
 								onReset={handleReset}
 								onRefresh={handleRefresh}
 								actions={
@@ -64,28 +103,24 @@ export function UsersPage() {
 								}
 								extraFilters={
 									<UsersExtraFilters
-										urlFilters={urlFilters}
-										onSelectChange={updateSelectFilter}
+										urlFilters={filters.state}
+										onSelectChange={(key, value) => filters.set(key, value)}
 									/>
 								}
 							>
 								<UsersFilterForm
-									urlFilters={urlFilters}
-									onSelectChange={updateSelectFilter}
+									urlFilters={filters.state}
+									onSelectChange={(key, value) => filters.set(key, value)}
 								/>
 							</DataTableFilterBar>
 						}
 						table={
 							<DataTable
-								columns={usersTableColumns}
-								data={tableQuery.data}
-								loading={tableQuery.loading}
-								empty={tableQuery.empty}
+								table={table}
+								loading={loading}
+								empty={empty}
 								emptyText="暂无用户数据"
-								rowSelection={tableQuery.rowSelection}
-								onRowSelectionChange={tableQuery.onRowSelectionChange}
-								columnVisibility={tableQuery.columnVisibility}
-								fetching={tableQuery.fetching}
+								fetching={fetching}
 							/>
 						}
 						pagination={<DataTablePagination />}

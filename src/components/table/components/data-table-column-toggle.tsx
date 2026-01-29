@@ -1,6 +1,5 @@
-import { GripVertical, RotateCcw, Settings2 } from "lucide-react"
-import type React from "react"
-import { useState } from "react"
+import type { Table } from "@tanstack/react-table"
+import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -10,69 +9,23 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import type { TableColumnCheck } from "../hooks/use-table"
 
-export interface DataTableColumnToggleProps {
-	columns: TableColumnCheck[]
-	onColumnsChange: (checks: TableColumnCheck[]) => void
-	onReset?: (() => void) | undefined
+export interface DataTableColumnToggleProps<TData = unknown> {
+	/**
+	 * TanStack Table instance (single source of truth)
+	 */
+	table: Table<TData>
 }
 
-export function DataTableColumnToggle({
-	columns,
-	onColumnsChange,
-	onReset,
-}: DataTableColumnToggleProps) {
-	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-	const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
-
-	const handleToggle = (key: string) => {
-		const updated = columns.map((check) =>
-			check.key === key ? { ...check, checked: !check.checked } : check,
-		)
-		onColumnsChange(updated)
-	}
-
-	const handleDragStart = (e: React.DragEvent, index: number) => {
-		e.stopPropagation()
-		setDraggedIndex(index)
-	}
-
-	const handleDragOver = (e: React.DragEvent, index: number) => {
-		e.preventDefault()
-		e.stopPropagation()
-		setDragOverIndex(index)
-	}
-
-	const handleDragEnd = (e: React.DragEvent) => {
-		e.stopPropagation()
-		if (draggedIndex === null || dragOverIndex === null || draggedIndex === dragOverIndex) {
-			setDraggedIndex(null)
-			setDragOverIndex(null)
-			return
-		}
-
-		const reordered = [...columns]
-		const draggedItem = reordered[draggedIndex]
-		if (!draggedItem) {
-			setDraggedIndex(null)
-			setDragOverIndex(null)
-			return
-		}
-
-		reordered.splice(draggedIndex, 1)
-		reordered.splice(dragOverIndex, 0, draggedItem)
-
-		onColumnsChange(reordered)
-		setDraggedIndex(null)
-		setDragOverIndex(null)
-	}
-
-	const handleDragLeave = (e: React.DragEvent) => {
-		e.stopPropagation()
-		setDragOverIndex(null)
-	}
+/**
+ * Column visibility toggle component
+ * Operates directly on table instance - no separate state management needed
+ */
+export function DataTableColumnToggle<TData>({ table }: DataTableColumnToggleProps<TData>) {
+	// Get all columns that can be hidden
+	const columns = table
+		.getAllColumns()
+		.filter((column) => column.getCanHide() && column.id !== "select" && column.id !== "actions")
 
 	return (
 		<DropdownMenu>
@@ -84,57 +37,34 @@ export function DataTableColumnToggle({
 			<DropdownMenuContent align="end" className="w-60">
 				<div className="flex items-center justify-between px-2 py-1.5">
 					<DropdownMenuLabel className="p-0">列设置</DropdownMenuLabel>
-					{onReset && (
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-7 px-2 text-xs"
-							onClick={(e) => {
-								e.stopPropagation()
-								onReset()
-							}}
-						>
-							<RotateCcw className="mr-1 h-3 w-3" />
-							重置
-						</Button>
-					)}
 				</div>
 				<DropdownMenuSeparator />
 				<div className="max-h-100 overflow-y-auto">
-					{columns.map((check, index) => (
-						<div
-							key={check.key}
-							className={cn(
-								"flex w-full items-center gap-2 px-2 py-2 hover:bg-accent rounded-sm transition-colors",
-								draggedIndex === index && "opacity-50",
-								dragOverIndex === index && "border-t-2 border-primary",
-							)}
-						>
-							{/* biome-ignore lint/a11y/noStaticElementInteractions: Drag handle requires event handlers for HTML5 drag API functionality */}
+					{columns.map((column) => {
+						const columnDef = column.columnDef
+						const label =
+							(columnDef.meta as { label?: string })?.label ||
+							(typeof columnDef.header === "string" ? columnDef.header : column.id)
+
+						return (
 							<div
-								draggable
-								onDragStart={(e) => handleDragStart(e, index)}
-								onDragEnd={handleDragEnd}
-								onDragOver={(e) => handleDragOver(e, index)}
-								onDragLeave={handleDragLeave}
-								className="cursor-move p-1 hover:bg-muted rounded flex items-center justify-center"
-								title={`Drag to reorder ${check.title} column`}
+								key={column.id}
+								className="flex w-full items-center gap-2 px-2 py-2 hover:bg-accent rounded-sm transition-colors"
 							>
-								<GripVertical className="h-4 w-4 text-muted-foreground" />
+								<label
+									htmlFor={`column-${column.id}`}
+									className="flex flex-1 items-center gap-2 cursor-pointer"
+								>
+									<Checkbox
+										id={`column-${column.id}`}
+										checked={column.getIsVisible()}
+										onCheckedChange={(value) => column.toggleVisibility(!!value)}
+									/>
+									<span className="flex-1 text-sm select-none">{label}</span>
+								</label>
 							</div>
-							<label
-								htmlFor={`column-${check.key}`}
-								className="flex flex-1 items-center gap-2 cursor-pointer"
-							>
-								<Checkbox
-									id={`column-${check.key}`}
-									checked={check.checked}
-									onCheckedChange={() => handleToggle(check.key)}
-								/>
-								<span className="flex-1 text-sm select-none">{check.title}</span>
-							</label>
-						</div>
-					))}
+						)
+					})}
 				</div>
 			</DropdownMenuContent>
 		</DropdownMenu>

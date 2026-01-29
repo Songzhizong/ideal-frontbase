@@ -1,3 +1,4 @@
+import { DataTableSearch } from "@/components/table/components/data-table-search"
 import { Label } from "@/components/ui/label"
 import {
 	Select,
@@ -6,7 +7,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
-import { DataTableSearch } from "@/components/table/components/data-table-search"
 import type { UsersFilters } from "@/features/users"
 import { UserGroupEnum, UserStatusEnum } from "../types"
 
@@ -15,10 +15,7 @@ interface UsersFilterFormProps {
 	onSelectChange: (key: "status" | "mfaEnabled" | "userGroups", value: string) => void
 }
 
-export function UsersFilterForm({
-	urlFilters,
-	onSelectChange,
-}: UsersFilterFormProps) {
+export function UsersFilterForm({ urlFilters, onSelectChange }: UsersFilterFormProps) {
 	return (
 		<>
 			{/* Main filters - always visible */}
@@ -55,10 +52,7 @@ interface UsersExtraFiltersProps {
 	onSelectChange: (key: "status" | "mfaEnabled" | "userGroups", value: string) => void
 }
 
-export function UsersExtraFilters({
-	urlFilters,
-	onSelectChange,
-}: UsersExtraFiltersProps) {
+export function UsersExtraFilters({ urlFilters, onSelectChange }: UsersExtraFiltersProps) {
 	return (
 		<>
 			<div className="space-y-2">
@@ -87,20 +81,14 @@ export function UsersExtraFilters({
 				<Label htmlFor="phone-filter" className="text-sm font-medium">
 					搜索手机号
 				</Label>
-				<DataTableSearch
-					queryKey="phone"
-					placeholder="输入手机号"
-				/>
+				<DataTableSearch queryKey="phone" placeholder="输入手机号" />
 			</div>
 
 			<div className="space-y-2">
 				<Label htmlFor="email-filter" className="text-sm font-medium">
 					搜索邮箱
 				</Label>
-				<DataTableSearch
-					queryKey="email"
-					placeholder="输入邮箱地址"
-				/>
+				<DataTableSearch queryKey="email" placeholder="输入邮箱地址" />
 			</div>
 
 			<div className="space-y-2">

@@ -1,10 +1,4 @@
-import type {
-	ColumnDef,
-	RowSelectionState,
-	SortingState,
-	Updater,
-	VisibilityState,
-} from "@tanstack/react-table"
+import type { Table } from "@tanstack/react-table"
 import type { ReactNode } from "react"
 import type { PaginationState } from "@/components/table"
 import { DataTableContainer, DataTablePagination, TableProvider } from "@/components/table"
@@ -12,13 +6,9 @@ import { DataTable } from "./data-table"
 
 export interface PaginatedTableProps<TData> {
 	/**
-	 * Table columns
+	 * TanStack Table instance (required - single source of truth)
 	 */
-	columns: ColumnDef<TData>[]
-	/**
-	 * Table data
-	 */
-	data: TData[]
+	table: Table<TData>
 	/**
 	 * Loading state
 	 */
@@ -56,50 +46,6 @@ export interface PaginatedTableProps<TData> {
 	 */
 	showTotal?: boolean
 	/**
-	 * Row selection state
-	 */
-	rowSelection?: RowSelectionState
-	/**
-	 * Row selection change handler
-	 */
-	onRowSelectionChange?: (selection: RowSelectionState | Updater<RowSelectionState>) => void
-	/**
-	 * Get row ID
-	 */
-	getRowId?: (row: TData) => string
-	/**
-	 * Column checks for visibility control
-	 */
-	columnChecks: Array<{ key: string; title: string; checked: boolean }>
-	/**
-	 * Update column checks
-	 */
-	setColumnChecks: (checks: Array<{ key: string; title: string; checked: boolean }>) => void
-	/**
-	 * Reset columns to default
-	 */
-	resetColumns?: () => void
-	/**
-	 * Column visibility state (TanStack Table format)
-	 */
-	columnVisibility?: VisibilityState
-	/**
-	 * Column visibility change handler
-	 */
-	onColumnVisibilityChange?: (visibility: VisibilityState | Updater<VisibilityState>) => void
-	/**
-	 * Column order state (TanStack Table format)
-	 */
-	columnOrder?: string[]
-	/**
-	 * Sorting state (TanStack Table format)
-	 */
-	sorting?: SortingState
-	/**
-	 * Sorting change handler
-	 */
-	onSortingChange?: (sorting: SortingState | Updater<SortingState>) => void
-	/**
 	 * Toolbar content (filters, search, actions) - Slot pattern
 	 */
 	toolbar?: ReactNode
@@ -123,12 +69,11 @@ export interface PaginatedTableProps<TData> {
 
 /**
  * Complete paginated table with fixed header/pagination and scrollable body
- * Uses TableProvider to share state via context, reducing prop drilling
- * Enhanced to support TanStack Table's columnVisibility state
+ * Uses TableProvider to share table instance via context
+ * All state management (column visibility, sorting, selection) goes through table instance
  */
 export function PaginatedTable<TData>({
-	columns,
-	data,
+	table,
 	loading,
 	fetching = false,
 	empty,
@@ -138,17 +83,6 @@ export function PaginatedTable<TData>({
 	onPageSizeChange,
 	pageSizeOptions = [10, 20, 50, 100],
 	showTotal = true,
-	rowSelection,
-	onRowSelectionChange,
-	getRowId,
-	columnChecks,
-	setColumnChecks,
-	resetColumns,
-	columnVisibility,
-	onColumnVisibilityChange,
-	columnOrder,
-	sorting,
-	onSortingChange,
 	toolbar,
 	emptyState,
 	loadingState,
@@ -157,9 +91,7 @@ export function PaginatedTable<TData>({
 }: PaginatedTableProps<TData>) {
 	return (
 		<TableProvider
-			columnChecks={columnChecks}
-			setColumnChecks={setColumnChecks}
-			{...(resetColumns && { resetColumns })}
+			table={table}
 			loading={loading}
 			empty={empty}
 			pagination={pagination}
@@ -172,20 +104,11 @@ export function PaginatedTable<TData>({
 				toolbar={toolbar}
 				table={
 					<DataTable
-						columns={columns}
-						data={data}
+						table={table}
 						loading={loading}
 						fetching={fetching}
 						empty={empty}
 						emptyText={emptyText}
-						{...(rowSelection && { rowSelection })}
-						{...(onRowSelectionChange && { onRowSelectionChange })}
-						{...(columnVisibility && { columnVisibility })}
-						{...(onColumnVisibilityChange && { onColumnVisibilityChange })}
-						{...(columnOrder && { columnOrder })}
-						{...(sorting && { sorting })}
-						{...(onSortingChange && { onSortingChange })}
-						{...(getRowId && { getRowId })}
 						{...(emptyState && { emptyState })}
 						{...(loadingState && { loadingState })}
 						className="border-0"
