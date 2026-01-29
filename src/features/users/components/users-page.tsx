@@ -36,26 +36,27 @@ import { usersTableColumns } from "./users-table-columns"
  */
 export function UsersPage() {
 	// 🔥 One hook to rule them all - handles URL, pagination, API, search, debounce
-	const { table, filters, loading, empty, fetching, refetch, pagination } = useDataTable<User>({
-		queryKey: ["users"],
-		queryFn: (params) => getUsers(params as unknown as GetUsersParams),
-		columns: usersTableColumns,
-		// Define business filters with their parsers
-		filterParsers: {
-			username: parseAsString,
-			email: parseAsString,
-			phone: parseAsString,
-			status: parseAsString.withDefault("all"),
-			mfaEnabled: parseAsString.withDefault("all"),
-			userGroups: parseAsString.withDefault("all"),
-		},
-		// Default values for filters (used in reset)
-		defaultFilters: {
-			status: "all",
-			mfaEnabled: "all",
-			userGroups: "all",
-		},
-	})
+	const { table, filters, loading, empty, fetching, refetch, pagination, setPage, setPageSize } =
+		useDataTable<User>({
+			queryKey: ["users"],
+			queryFn: (params) => getUsers(params as unknown as GetUsersParams),
+			columns: usersTableColumns,
+			// Define business filters with their parsers
+			filterParsers: {
+				username: parseAsString,
+				email: parseAsString,
+				phone: parseAsString,
+				status: parseAsString.withDefault("all"),
+				mfaEnabled: parseAsString.withDefault("all"),
+				userGroups: parseAsString.withDefault("all"),
+			},
+			// Default values for filters (used in reset)
+			defaultFilters: {
+				status: "all",
+				mfaEnabled: "all",
+				userGroups: "all",
+			},
+		})
 
 	// Handlers
 	const handleSearch = useCallback(async () => {
@@ -79,15 +80,8 @@ export function UsersPage() {
 					loading={loading}
 					empty={empty}
 					pagination={pagination}
-					onPageChange={(page) => {
-						// This is handled automatically by useDataTable
-						// but we need to satisfy the TableProvider interface
-						table.setPageIndex(page - 1)
-					}}
-					onPageSizeChange={(size) => {
-						// This is handled automatically by useDataTable
-						table.setPageSize(size)
-					}}
+					onPageChange={setPage}
+					onPageSizeChange={setPageSize}
 				>
 					<DataTableContainer
 						toolbar={

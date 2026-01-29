@@ -178,8 +178,12 @@ export function useDataTable<TData>({
 	}, [urlState])
 
 	// 6. Call underlying useTablePagination
+	// Exclude pagination params from the key since useTablePagination adds them
+	// but include all other business filters/sorting/search to trigger refetch
+	const { pageNumber, pageSize, ...extraParams } = apiParams
+
 	const tableQuery = useTablePagination({
-		queryKey, // 🔥 useTablePagination already appends pageNumber and pageSize to this key
+		queryKey: [...queryKey, extraParams], // 🔥 Include business filters in the key
 		queryFn: async () => queryFn(apiParams),
 		columns,
 		pageNumber: urlState.page,
