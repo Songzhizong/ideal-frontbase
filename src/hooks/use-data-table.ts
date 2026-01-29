@@ -108,7 +108,7 @@ export function useDataTable<TData>({
 	// 2. Filter operations (auto-reset page to 1)
 	const setFilter = useCallback(
 		(key: string, value: unknown) => {
-			setUrlState((old) => ({
+			void setUrlState((old) => ({
 				...old,
 				[key]: value,
 				page: 1, // 🔥 Core: Auto-reset page when any filter changes
@@ -136,7 +136,7 @@ export function useDataTable<TData>({
 			resetState[key] = defaultFilters[key] ?? null
 		}
 
-		setUrlState(resetState)
+		void setUrlState(resetState)
 	}, [setUrlState, urlState.size, filterParsers, defaultFilters])
 
 	// 5. Transform URL state to API params
@@ -179,13 +179,13 @@ export function useDataTable<TData>({
 
 	// 6. Call underlying useTablePagination
 	const tableQuery = useTablePagination({
-		queryKey: [...queryKey, apiParams],
+		queryKey, // 🔥 useTablePagination already appends pageNumber and pageSize to this key
 		queryFn: async () => queryFn(apiParams),
 		columns,
 		pageNumber: urlState.page,
 		pageSize: urlState.size,
 		onPaginationChange: ({ pageNumber, pageSize }) => {
-			setUrlState({ page: pageNumber, size: pageSize })
+			void setUrlState({ page: pageNumber, size: pageSize })
 		},
 		enableServerSorting,
 		...(getRowId && { getRowId }),

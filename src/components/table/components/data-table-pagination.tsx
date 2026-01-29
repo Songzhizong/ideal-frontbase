@@ -52,9 +52,9 @@ export function DataTablePagination({ className, text }: DataTablePaginationProp
 		total: (count: number) => `共 ${count} 条`,
 		perPage: "条/页",
 		firstPage: "第一页",
-		previousPage: "最后页",
+		previousPage: "上一页",
 		nextPage: "下一页",
-		lastPage: "上一页",
+		lastPage: "最后一页",
 	}
 
 	const i18n = { ...defaultText, ...text }
