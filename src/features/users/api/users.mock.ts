@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns"
 import { delay, HttpResponse, http } from "msw"
-import { mockRegistry } from "@/mocks/registry"
 import { UserSchema } from "@/features/users/types"
+import { mockRegistry } from "@/mocks/registry"
 import { createPageInfoSchema } from "@/types/pagination"
 
 const UserPageSchema = createPageInfoSchema(UserSchema)

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { PermissionSchema, type UserProfile } from "@/types/auth"
+import { PermissionSchema } from "@/types/auth"
 
 /**
  * User Schema - 当前登录用户信息

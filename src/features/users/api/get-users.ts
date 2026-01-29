@@ -27,8 +27,7 @@ export async function getUsers(params: GetUsersParams): Promise<PageInfo<User>> 
 
 	if (params.username) searchParams.username = params.username
 	if (params.status && params.status !== "all") searchParams.status = params.status
-	if (params.mfaEnabled && params.mfaEnabled !== "all")
-		searchParams.mfaEnabled = params.mfaEnabled
+	if (params.mfaEnabled && params.mfaEnabled !== "all") searchParams.mfaEnabled = params.mfaEnabled
 	if (params.email) searchParams.email = params.email
 	if (params.phone) searchParams.phone = params.phone
 	if (params.userGroup && params.userGroup !== "all") searchParams.userGroup = params.userGroup

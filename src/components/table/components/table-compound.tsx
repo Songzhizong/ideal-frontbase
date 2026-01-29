@@ -8,6 +8,7 @@ import {
 	DataTableToolbar,
 	TableProvider,
 } from "@/components/table"
+import { cn } from "@/lib/utils"
 import { DataTable } from "./data-table"
 
 /**
@@ -74,18 +75,12 @@ interface TableContainerProps {
 	pagination?: ReactNode
 }
 
-function TableContainer({
-	children,
-	height,
-	className,
-	toolbar,
-	pagination,
-}: TableContainerProps) {
+function TableContainer({ children, height, className, toolbar, pagination }: TableContainerProps) {
 	// If toolbar and pagination are provided as props, use DataTableContainer
 	if (toolbar !== undefined || pagination !== undefined) {
 		const containerProps = {
 			table: children,
-			height,
+			...(height && { height }),
 			...(toolbar !== undefined && { toolbar }),
 			...(pagination !== undefined && { pagination }),
 			...(className && { className }),
@@ -187,7 +182,7 @@ function TablePagination(props: TablePaginationProps) {
 	return <DataTablePagination {...props} />
 }
 
-import type { DataTableFilterBarProps } from "./data-table-filter-bar"
+import type { DataTableFilterBarProps } from "@/components/table"
 
 function TableFilterBar(props: DataTableFilterBarProps) {
 	return <DataTableFilterBar {...props} />

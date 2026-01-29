@@ -5,16 +5,31 @@
  * 其他模块应该从这里导入，而不是直接访问内部文件
  */
 
+// ============================================
+// Hooks (Public API)
+// ============================================
+export { useAuth } from "@/hooks/use-auth"
+export { useLogoutHandler } from "@/hooks/use-logout-handler"
+// ============================================
+// API Hooks (Public API)
+// ============================================
+export { useUserProfile } from "@/lib/auth-api/get-current-user"
+export { useLogout } from "@/lib/auth-api/logout"
+// ============================================
+// Stores (Public API)
+// ============================================
+export { authStore, useAuthStore } from "@/lib/auth-store"
+// ============================================
+// Types & Schemas (Public API)
+// ============================================
+export type { Permission, UserProfile as User } from "@/types/auth"
+export { PermissionSchema, UserProfileSchema as UserSchema } from "@/types/auth"
 export {
 	type CheckCaptchaRequest,
 	CheckCaptchaRequestSchema,
 	type CheckCaptchaResponse,
 	useCheckCaptcha,
 } from "./api/check-captcha"
-// ============================================
-// API Hooks (Public API)
-// ============================================
-export { useUserProfile } from "@/lib/auth-api/get-current-user"
 export { type PermissionIdents, usePermissions } from "./api/get-permissions"
 export {
 	type ChangePasswordLoginRequest,
@@ -53,31 +68,12 @@ export {
 	useSmsCodeLogin,
 	type VisibleToken,
 } from "./api/login"
-export { useLogout } from "@/lib/auth-api/logout"
-
 // ============================================
 // Components (Public API)
 // ============================================
 export { LoginPage } from "./components/login-page"
 export { PermissionGuard } from "./components/permission-guard"
-
-// ============================================
-// Hooks (Public API)
-// ============================================
-export { useAuth } from "@/hooks/use-auth"
 export { useLoginHandler } from "./hooks/use-login-handler"
-export { useLogoutHandler } from "@/hooks/use-logout-handler"
-
-// ============================================
-// Stores (Public API)
-// ============================================
-export { useAuthStore, authStore } from "@/lib/auth-store"
-
-// ============================================
-// Types & Schemas (Public API)
-// ============================================
-export type { Permission, UserProfile as User } from "@/types/auth"
-export { PermissionSchema, UserProfileSchema as UserSchema } from "@/types/auth"
 export type { AuthResponse } from "./types"
 export { AuthResponseSchema } from "./types"
 

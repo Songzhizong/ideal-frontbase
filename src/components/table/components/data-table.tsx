@@ -12,7 +12,8 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
-import { type ReactNode, useMemo, useState } from "react"
+import type { CSSProperties, ReactNode } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -293,7 +294,10 @@ export function DataTable<TData>({
 				</Table>
 			</div>
 			{/* Scrollable Body */}
-			<div className="flex-1 overflow-y-auto min-h-0 bg-card rounded-b-lg [overflow:overlay]" style={{ overflowY: "overlay" } as any}>
+			<div
+				className="flex-1 overflow-y-auto min-h-0 bg-card rounded-b-lg [overflow:overlay]"
+				style={{ overflowY: "overlay" } as CSSProperties}
+			>
 				<Table className="table-fixed">
 					<TableBody>
 						{loading

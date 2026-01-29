@@ -198,7 +198,7 @@ export function PaginatedTable<TData>({
 					/>
 				}
 				pagination={<DataTablePagination />}
-				height={height}
+				{...(height && { height })}
 				{...(className && { className })}
 			/>
 		</TableProvider>

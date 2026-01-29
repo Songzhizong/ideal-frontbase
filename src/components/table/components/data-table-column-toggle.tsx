@@ -98,8 +98,10 @@ export function DataTableColumnToggle({
 				<DropdownMenuSeparator />
 				<div className="max-h-100 overflow-y-auto">
 					{columns.map((check, index) => (
-						<div
+						<button
+							type="button"
 							key={check.key}
+							aria-label={`Toggle ${check.title} column visibility`}
 							draggable
 							onDragStart={() => handleDragStart(index)}
 							onDragOver={(e) => handleDragOver(e, index)}
@@ -111,6 +113,12 @@ export function DataTableColumnToggle({
 								dragOverIndex === index && "border-t-2 border-primary",
 							)}
 							onClick={() => handleToggle(check.key)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault()
+									handleToggle(check.key)
+								}
+							}}
 						>
 							<GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
 							<Checkbox
@@ -119,14 +127,8 @@ export function DataTableColumnToggle({
 								onCheckedChange={() => handleToggle(check.key)}
 								onClick={(e) => e.stopPropagation()}
 							/>
-							<label
-								htmlFor={`column-${check.key}`}
-								className="flex-1 text-sm cursor-pointer select-none"
-								onClick={(e) => e.stopPropagation()}
-							>
-								{check.title}
-							</label>
-						</div>
+							<span className="flex-1 text-sm select-none">{check.title}</span>
+						</button>
 					))}
 				</div>
 			</DropdownMenuContent>

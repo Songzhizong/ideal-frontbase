@@ -5,8 +5,8 @@
  * 这里是配置跨层依赖的正确位置
  */
 
-import { authStore } from "@/lib/auth-store"
 import { configureApiClient } from "@/lib/api-client"
+import { authStore } from "@/lib/auth-store"
 
 /**
  * 配置 API Client 的认证行为

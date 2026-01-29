@@ -1,3 +1,6 @@
+// Table hooks
+export type { TableColumnMeta } from "@/components/table/hooks"
+export { useTablePagination } from "@/components/table/hooks"
 export { useBoolean } from "./use-boolean"
 export { useLoading } from "./use-loading"
 export { useIsMobile } from "./use-mobile"

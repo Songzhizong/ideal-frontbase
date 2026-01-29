@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
-import { useUserProfile } from "@/lib/auth-api/get-current-user"
 import { usePermissions } from "@/features/auth/api/get-permissions"
 import { type LoginResponse, LoginResponseType } from "@/features/auth/api/login"
+import { useUserProfile } from "@/lib/auth-api/get-current-user"
 import { useAuthStore } from "@/lib/auth-store"
 
 /**

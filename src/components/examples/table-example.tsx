@@ -123,7 +123,7 @@ export function TableExample() {
 	const table = useTablePagination({
 		queryKey: ["users-example"],
 		queryFn: getUsers,
-		transform: (response) => response,
+		transform: (response: PageInfo<User>) => response,
 		columns,
 		initialPageSize: 10,
 	})
@@ -155,7 +155,7 @@ export function TableExample() {
 				columnChecks={table.columnChecks}
 				setColumnChecks={table.setColumnChecks}
 				columnVisibility={table.columnVisibility}
-				getRowId={(row) => row.id}
+				getRowId={(row: User) => row.id}
 				toolbar={
 					<DataTableToolbar
 						filterPlaceholder="Search users..."

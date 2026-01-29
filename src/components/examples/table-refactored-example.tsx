@@ -223,7 +223,15 @@ export function TableMetadataExample() {
 				Notice how the selection column doesn't appear in the column toggle menu
 			</p>
 
-			<TableCompound.Root {...tableState}>
+			<TableCompound.Root
+				columnChecks={tableState.columnChecks}
+				setColumnChecks={tableState.setColumnChecks}
+				loading={tableState.loading}
+				empty={tableState.empty}
+				pagination={tableState.pagination}
+				onPageChange={tableState.setPage}
+				onPageSizeChange={tableState.setPageSize}
+			>
 				<TableCompound.Container>
 					<TableCompound.Toolbar />
 					<TableCompound.Table
@@ -274,7 +282,15 @@ export function TableI18nExample() {
 		<div className="space-y-4">
 			<h2 className="text-2xl font-bold text-foreground">国际化示例 (i18n Example)</h2>
 
-			<TableCompound.Root {...tableState}>
+			<TableCompound.Root
+				columnChecks={tableState.columnChecks}
+				setColumnChecks={tableState.setColumnChecks}
+				loading={tableState.loading}
+				empty={tableState.empty}
+				pagination={tableState.pagination}
+				onPageChange={tableState.setPage}
+				onPageSizeChange={tableState.setPageSize}
+			>
 				<TableCompound.Container>
 					<TableCompound.Toolbar filterPlaceholder="搜索用户..." />
 					<TableCompound.Table
