@@ -1,52 +1,64 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { RefreshCw } from "lucide-react"
+import { RefreshCw, Smartphone } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { z } from "zod"
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useGetCaptcha } from "@/features/auth/api/get-captcha"
 import type { LoginResponse } from "@/features/auth/api/login"
-import {
-	LoginResponseType,
-	type SendSmsCodeRequest,
-	SendSmsCodeRequestSchema,
-	type SmsCodeLoginRequest,
-	SmsCodeLoginRequestSchema,
-	useSendSmsLoginCode,
-	useSmsCodeLogin,
-} from "@/features/auth/api/login"
+import { LoginResponseType, useSendSmsLoginCode, useSmsCodeLogin } from "@/features/auth/api/login"
 import { useLoginHandler } from "@/features/auth/hooks/use-login-handler"
 import { getCertificate } from "@/features/auth/utils/certificate"
-import { ChangePasswordDialog } from "./change-password-dialog"
-import { MfaDialog } from "./mfa-dialog"
-import { SelectAccountDialog } from "./select-account-dialog"
 
-export function SmsLoginForm() {
-	const [step, setStep] = useState<"phone" | "code">("phone")
+// Unified Schema for the UI form
+const SmsLoginFormSchema = z.object({
+	phone: z.string().min(1, "请输入手机号"),
+	code: z.string().min(1, "请输入验证码"),
+	certificate: z.string().optional(),
+	rememberMe: z.boolean().optional(),
+})
+
+const CaptchaSchema = z.object({
+	captcha: z.string().min(1, "请输入图片验证码"),
+})
+
+type SmsLoginFormValues = z.infer<typeof SmsLoginFormSchema>
+
+export function SmsLoginForm({ onResponse }: { onResponse?: (response: LoginResponse) => void }) {
 	const [countdown, setCountdown] = useState(0)
-	const [loginResponse, setLoginResponse] = useState<LoginResponse | null>(null)
+	const [isCaptchaOpen, setIsCaptchaOpen] = useState(false)
 
 	const { data: captcha, refetch: refetchCaptcha, isLoading: captchaLoading } = useGetCaptcha()
 	const sendCodeMutation = useSendSmsLoginCode()
 	const loginMutation = useSmsCodeLogin()
 	const { handleLoginSuccess } = useLoginHandler()
 
-	const phoneForm = useForm<SendSmsCodeRequest>({
-		resolver: zodResolver(SendSmsCodeRequestSchema),
-		defaultValues: {
-			phone: "",
-			certificate: getCertificate(),
-			captcha: "",
-		},
-	})
-
-	const codeForm = useForm<SmsCodeLoginRequest>({
-		resolver: zodResolver(SmsCodeLoginRequestSchema),
+	const form = useForm<SmsLoginFormValues>({
+		resolver: zodResolver(SmsLoginFormSchema),
 		defaultValues: {
 			phone: "",
 			code: "",
+			certificate: getCertificate(),
+			rememberMe: false,
+		},
+	})
+
+	const captchaForm = useForm<{ captcha: string }>({
+		resolver: zodResolver(CaptchaSchema),
+		defaultValues: {
+			captcha: "",
 		},
 	})
 
@@ -64,189 +76,201 @@ export function SmsLoginForm() {
 	}, [countdown])
 
 	const handleRefreshCaptcha = () => {
-		phoneForm.setValue("captcha", "")
+		captchaForm.setValue("captcha", "")
 		void refetchCaptcha()
 	}
 
-	const onSendCode = (data: SendSmsCodeRequest) => {
+	const handleSendCode = async () => {
+		const valid = await form.trigger("phone")
+		if (!valid) return
+		setIsCaptchaOpen(true)
+		void refetchCaptcha()
+	}
+
+	const handleCaptchaConfirm = async (data: { captcha: string }) => {
+		const phone = form.getValues("phone")
+		const certificate = form.getValues("certificate")
+
 		const formattedData = {
-			...data,
+			phone,
+			certificate: certificate ?? "",
 			captcha: JSON.stringify({ captchaCode: data.captcha }),
 		}
 
 		sendCodeMutation.mutate(formattedData, {
 			onSuccess: () => {
-				toast.success("SMS code sent successfully!")
-				setStep("code")
+				toast.success("验证码发送成功！")
 				setCountdown(60)
-				codeForm.setValue("phone", data.phone)
+				setIsCaptchaOpen(false)
+				captchaForm.reset()
 			},
 			onError: () => {
-				toast.error("Failed to send SMS code. Please try again.")
+				toast.error("验证码发送失败，请稍后重试。")
 				handleRefreshCaptcha()
 			},
 		})
 	}
 
-	const onLogin = (data: SmsCodeLoginRequest) => {
-		loginMutation.mutate(data, {
-			onSuccess: (response) => {
-				setLoginResponse(response)
+	const onLogin = (data: SmsLoginFormValues) => {
+		const loginData = {
+			phone: data.phone,
+			code: data.code,
+		}
 
+		loginMutation.mutate(loginData, {
+			onSuccess: (response) => {
 				if (response.type === LoginResponseType.TOKEN) {
 					void handleLoginSuccess(response)
+				} else {
+					onResponse?.(response)
 				}
 			},
 			onError: () => {
-				toast.error("Invalid verification code. Please try again.")
+				toast.error("验证码错误，请重新输入。")
 			},
 		})
 	}
 
-	const handleResendCode = () => {
-		const phone = codeForm.getValues("phone")
-		phoneForm.setValue("phone", phone)
-		setStep("phone")
-		void refetchCaptcha()
-	}
-
 	return (
 		<>
-			{step === "phone" ? (
-				<form onSubmit={phoneForm.handleSubmit(onSendCode)} className="space-y-4">
-					{/* Phone */}
-					<div className="space-y-2">
-						<Label htmlFor="phone">Phone Number</Label>
+			<form onSubmit={form.handleSubmit(onLogin)} className="space-y-6">
+				{/* Phone Number */}
+				<div className="space-y-2">
+					<Label htmlFor="phone" className="text-gray-700 dark:text-gray-300">
+						手机号
+					</Label>
+					<div className="relative">
+						<Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
 						<Input
 							id="phone"
 							type="tel"
-							placeholder="Enter your phone number"
+							placeholder="请输入手机号"
 							autoComplete="tel"
-							{...phoneForm.register("phone")}
+							{...form.register("phone")}
+							className="pl-11 bg-white/60 dark:bg-gray-800/60 border-white/60 dark:border-gray-700/60 focus:bg-white/80 dark:focus:bg-gray-800/80 transition-colors h-12 text-gray-900 dark:text-gray-100"
 						/>
-						{phoneForm.formState.errors.phone && (
-							<p className="text-sm text-destructive">{phoneForm.formState.errors.phone.message}</p>
-						)}
 					</div>
+					{form.formState.errors.phone && (
+						<p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
+					)}
+				</div>
 
-					{/* Captcha */}
-					<div className="space-y-2">
-						<Label htmlFor="sms-captcha">Verification Code</Label>
-						<div className="relative">
-							<Input
-								id="sms-captcha"
-								placeholder="Enter code"
-								autoComplete="off"
-								className="pr-32"
-								{...phoneForm.register("captcha")}
-							/>
-							<div className="absolute right-1 top-1 bottom-1 w-32 overflow-hidden rounded-r-md border-l border-border bg-muted/50">
-								{captchaLoading ? (
-									<div className="flex h-full items-center justify-center">
-										<RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
-									</div>
-								) : captcha?.imageBase64 ? (
-									<button
-										type="button"
-										onClick={handleRefreshCaptcha}
-										className="h-full w-full transition-opacity hover:opacity-80"
-										aria-label="Click to refresh captcha"
-										title="Click to refresh captcha"
-									>
-										<img
-											src={captcha.imageBase64}
-											alt="Captcha"
-											className="h-full w-full object-cover dark:invert"
-										/>
-									</button>
-								) : null}
-							</div>
-						</div>
-						{phoneForm.formState.errors.captcha && (
-							<p className="text-sm text-destructive">
-								{phoneForm.formState.errors.captcha.message}
-							</p>
-						)}
-					</div>
-
-					{/* Submit Button */}
-					<Button type="submit" className="w-full" disabled={sendCodeMutation.isPending}>
-						{sendCodeMutation.isPending ? "Sending..." : "Send SMS Code"}
-					</Button>
-				</form>
-			) : (
-				<form onSubmit={codeForm.handleSubmit(onLogin)} className="space-y-4">
-					{/* SMS Code */}
-					<div className="space-y-2">
-						<Label htmlFor="sms-code">SMS Verification Code</Label>
+				{/* SMS Code & Send Button Merged */}
+				<div className="space-y-2">
+					<Label htmlFor="code" className="text-gray-700 dark:text-gray-300">
+						验证码
+					</Label>
+					<div className="relative">
 						<Input
-							id="sms-code"
-							placeholder="Enter 6-digit code"
+							id="code"
+							type="text"
+							placeholder="请输入验证码"
 							autoComplete="one-time-code"
 							maxLength={6}
-							{...codeForm.register("code")}
+							{...form.register("code")}
+							className="pr-32 bg-white/60 dark:bg-gray-800/60 border-white/60 dark:border-gray-700/60 focus:bg-white/80 dark:focus:bg-gray-800/80 transition-colors h-12 text-gray-900 dark:text-gray-100"
 						/>
-						{codeForm.formState.errors.code && (
-							<p className="text-sm text-destructive">{codeForm.formState.errors.code.message}</p>
-						)}
-						<p className="text-sm text-muted-foreground">
-							Code sent to {codeForm.getValues("phone")}
-						</p>
+						<div className="absolute right-1 top-1 bottom-1">
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={handleSendCode}
+								disabled={countdown > 0 || sendCodeMutation.isPending}
+								className="h-full px-4 text-primary hover:bg-transparent"
+							>
+								{countdown > 0 ? `${countdown}s` : "发送验证码"}
+							</Button>
+						</div>
 					</div>
+					{form.formState.errors.code && (
+						<p className="text-sm text-destructive">{form.formState.errors.code.message}</p>
+					)}
+				</div>
 
-					{/* Resend Button */}
-					<Button
-						type="button"
-						variant="outline"
-						className="w-full"
-						onClick={handleResendCode}
-						disabled={countdown > 0}
+				{/* Remember Me */}
+				<div className="flex items-center gap-2">
+					<Checkbox
+						id="remember-sms"
+						checked={form.watch("rememberMe") ?? false}
+						onCheckedChange={(checked) => form.setValue("rememberMe", checked as boolean)}
+					/>
+					<Label
+						htmlFor="remember-sms"
+						className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
 					>
-						{countdown > 0 ? `Resend in ${countdown}s` : "Resend Code"}
-					</Button>
+						记住我
+					</Label>
+				</div>
 
-					{/* Submit Button */}
-					<Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-						{loginMutation.isPending ? "Signing in..." : "Sign In"}
-					</Button>
+				{/* Submit Button */}
+				<Button
+					type="submit"
+					className="w-full h-12 bg-linear-to-r from-[#2463EB] to-[#1e50c5] hover:from-[#1e50c5] hover:to-[#1a46ad] text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all rounded-2xl"
+					disabled={loginMutation.isPending}
+				>
+					{loginMutation.isPending ? "登录中..." : "立即登录"}
+				</Button>
+			</form>
 
-					{/* Back Button */}
-					<Button type="button" variant="ghost" className="w-full" onClick={() => setStep("phone")}>
-						Back to Phone Number
-					</Button>
-				</form>
-			)}
+			{/* Captcha Dialog */}
+			<AlertDialog open={isCaptchaOpen} onOpenChange={setIsCaptchaOpen}>
+				<AlertDialogContent className="max-w-100">
+					<AlertDialogHeader>
+						<AlertDialogTitle>请输入图片验证码</AlertDialogTitle>
+					</AlertDialogHeader>
 
-			{/* MFA Dialog */}
-			{loginResponse?.type === LoginResponseType.NEED_MFA && loginResponse.mfaTicket && (
-				<MfaDialog
-					ticket={loginResponse.mfaTicket}
-					onSuccess={(response) => setLoginResponse(response)}
-					onClose={() => setLoginResponse(null)}
-				/>
-			)}
+					<form
+						onSubmit={captchaForm.handleSubmit(handleCaptchaConfirm)}
+						className="space-y-4 mt-2"
+					>
+						<div className="space-y-2">
+							<div className="relative">
+								<Input
+									placeholder="请输入验证码"
+									autoComplete="off"
+									className="pr-32 bg-white/60 dark:bg-gray-800/60 border-white/60 dark:border-gray-700/60 focus:bg-white/80 dark:focus:bg-gray-800/80 transition-colors h-11 text-gray-900 dark:text-gray-100"
+									{...captchaForm.register("captcha")}
+								/>
+								<div className="absolute right-1 top-1 bottom-1 w-28 overflow-hidden rounded-r-md border-l border-border bg-muted/50">
+									{captchaLoading ? (
+										<div className="flex h-full items-center justify-center">
+											<RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+										</div>
+									) : (
+										captcha?.imageBase64 && (
+											<button
+												type="button"
+												onClick={handleRefreshCaptcha}
+												className="h-full w-full transition-opacity hover:opacity-80"
+												aria-label="点击刷新验证码"
+												title="点击刷新验证码"
+											>
+												<img
+													src={captcha.imageBase64}
+													alt="Captcha"
+													className="h-full w-full object-cover dark:invert"
+												/>
+											</button>
+										)
+									)}
+								</div>
+							</div>
+							{captchaForm.formState.errors.captcha && (
+								<p className="text-sm text-destructive">
+									{captchaForm.formState.errors.captcha.message}
+								</p>
+							)}
+						</div>
 
-			{/* Select Account Dialog */}
-			{loginResponse?.type === LoginResponseType.SELECT_ACCOUNT &&
-				loginResponse.selectAccountTicket && (
-					<SelectAccountDialog
-						ticket={loginResponse.selectAccountTicket}
-						onSuccess={(response) => setLoginResponse(response)}
-						onClose={() => setLoginResponse(null)}
-					/>
-				)}
-
-			{/* Change Password Dialog */}
-			{(loginResponse?.type === LoginResponseType.PASSWORD_EXPIRED ||
-				loginResponse?.type === LoginResponseType.PASSWORD_ILLEGAL) &&
-				loginResponse.passwordTicket && (
-					<ChangePasswordDialog
-						ticket={loginResponse.passwordTicket}
-						type={loginResponse.type}
-						onSuccess={(response) => setLoginResponse(response)}
-						onClose={() => setLoginResponse(null)}
-					/>
-				)}
+						<AlertDialogFooter className="justify-end gap-2">
+							<AlertDialogCancel className="mt-0">取消</AlertDialogCancel>
+							<Button type="submit" disabled={sendCodeMutation.isPending}>
+								{sendCodeMutation.isPending ? "发送中..." : "确认"}
+							</Button>
+						</AlertDialogFooter>
+					</form>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	)
 }

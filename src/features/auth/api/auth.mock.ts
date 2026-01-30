@@ -47,10 +47,43 @@ export const authHandlers = [
 	http.post("*/nexus-api/iam/login/password", async () => {
 		await delay(500)
 		return HttpResponse.json({
+			type: LoginResponseType.SELECT_ACCOUNT,
+			selectAccountTicket: {
+				ticket: "mock-select-ticket-123",
+				accounts: [
+					{
+						uid: "1",
+						account: "张三",
+						phone: "138****8888",
+						email: "zhangsan@cloudcompute.com",
+						registrationTime: Date.now() - 1000 * 60 * 60 * 24 * 365,
+						lastActiveTime: Date.now() - 1000 * 60 * 60 * 2,
+						blocked: false,
+						accountExpired: false,
+					},
+					{
+						uid: "2",
+						account: "张三 (企业账号)",
+						phone: "138****8888",
+						email: "zhangsan@enterprise.com",
+						registrationTime: Date.now() - 1000 * 60 * 60 * 24 * 30 * 6,
+						lastActiveTime: Date.now() - 1000 * 60 * 60 * 24,
+						blocked: false,
+						accountExpired: false,
+					},
+				],
+			},
+		})
+	}),
+
+	// Select Account
+	http.post("*/nexus-api/iam/login/select-account", async () => {
+		await delay(500)
+		return HttpResponse.json({
 			type: LoginResponseType.TOKEN,
 			token: {
 				token_type: "Bearer",
-				access_token: "mock-token-12345",
+				access_token: "mock-token-selected-456",
 			},
 		})
 	}),

@@ -4,10 +4,10 @@ import { z } from "zod"
  * 基础分页 schema (没有内容)
  */
 const BasePageInfoSchema = z.object({
-	pageNumber: z.number().int(),
-	pageSize: z.number().int(),
-	totalElements: z.number(),
-	totalPages: z.number().int(),
+	pageNumber: z.coerce.number().int(),
+	pageSize: z.coerce.number().int(),
+	totalElements: z.coerce.number(),
+	totalPages: z.coerce.number().int(),
 })
 
 /**
@@ -35,8 +35,8 @@ export type PageInfo<T> = z.infer<typeof BasePageInfoSchema> & {
  * 分页请求参数 schema，匹配后端 Paging 类
  */
 export const PagingSchema = z.object({
-	pageNumber: z.number().int().default(1),
-	pageSize: z.number().int().default(20),
+	pageNumber: z.coerce.number().int().default(1),
+	pageSize: z.coerce.number().int().default(20),
 })
 
 export type Paging = z.infer<typeof PagingSchema>

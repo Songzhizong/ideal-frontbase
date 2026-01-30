@@ -54,8 +54,8 @@ export const SelectableAccountSchema = z.object({
 	account: z.string(),
 	phone: z.string(),
 	email: z.string(),
-	registrationTime: z.number(),
-	lastActiveTime: z.number().nullable(),
+	registrationTime: z.coerce.number(),
+	lastActiveTime: z.coerce.number().nullable(),
 	blocked: z.boolean(),
 	accountExpired: z.boolean(),
 })
@@ -74,6 +74,11 @@ export type SelectAccountTicket = z.infer<typeof SelectAccountTicketSchema>
 
 /**
  * Login Response Type Enum
+ *
+ * - TOKEN：此时返回授权token，直接进入系统
+ * - NEED_MFA：此时代表需要进行MFA认证，应显示MFA认证窗口，输入完毕后调用MFA登录接口
+ * - SELECT_ACCOUNT：代表登录匹配了多个用户，需要从返回的用户列表中选择一个执行登录，确认后调用选择账号登录接口
+ * - PASSWORD_EXPIRED、PASSWORD_ILLEGAL：代表需要修改密码，此时显示修改密码窗口，输入完毕后调用修改密码并登录接口
  */
 export enum LoginResponseType {
 	TOKEN = "TOKEN", // 成功执行登录
@@ -88,10 +93,10 @@ export enum LoginResponseType {
  */
 export const LoginResponseSchema = z.object({
 	type: z.nativeEnum(LoginResponseType),
-	token: VisibleTokenSchema.optional(),
-	mfaTicket: MfaTicketSchema.optional(),
-	passwordTicket: ChangePasswordTicketSchema.optional(),
-	selectAccountTicket: SelectAccountTicketSchema.optional(),
+	token: VisibleTokenSchema.nullable().optional(),
+	mfaTicket: MfaTicketSchema.nullable().optional(),
+	passwordTicket: ChangePasswordTicketSchema.nullable().optional(),
+	selectAccountTicket: SelectAccountTicketSchema.nullable().optional(),
 })
 
 export type LoginResponse = z.infer<typeof LoginResponseSchema>
@@ -109,14 +114,34 @@ export const PasswordLoginRequestSchema = z.object({
 
 export type PasswordLoginRequest = z.infer<typeof PasswordLoginRequestSchema>
 
+/**
+ * 通用登录响应处理逻辑
+ * 支持处理 2xx 成功响应以及包含有效 LoginResponse 的 4xx 响应（如 MFA、密码过期等）
+ */
+const handleLoginResponse = async (response: Response): Promise<LoginResponse> => {
+	const data = await response.json()
+	const result = LoginResponseSchema.safeParse(data)
+
+	if (result.success) {
+		return result.data
+	}
+
+	// 如果解析 LoginResponse 失败，且响应不是 2xx，则抛出原始错误或默认错误
+	if (!response.ok) {
+		throw new Error("API_ERROR")
+	}
+
+	// 如果是 2xx 但解析失败，抛出解析错误
+	return LoginResponseSchema.parse(data)
+}
+
 const passwordLogin = async (credentials: PasswordLoginRequest): Promise<LoginResponse> => {
-	const json = await api
-		.withAuthClientId()
-		.post("nexus-api/iam/login/password", {
-			json: credentials,
-		})
-		.json()
-	return LoginResponseSchema.parse(json)
+	const response = await api.withAuthClientId().post("nexus-api/iam/login/password", {
+		json: credentials,
+		throwHttpErrors: false, // 我们手动处理错误以支持 sub-flow
+	})
+
+	return handleLoginResponse(response)
 }
 
 /**
@@ -185,13 +210,12 @@ export const SmsCodeLoginRequestSchema = z.object({
 export type SmsCodeLoginRequest = z.infer<typeof SmsCodeLoginRequestSchema>
 
 const smsCodeLogin = async (request: SmsCodeLoginRequest): Promise<LoginResponse> => {
-	const json = await api
-		.withAuthClientId()
-		.post("nexus-api/iam/login/sms-code", {
-			json: request,
-		})
-		.json()
-	return LoginResponseSchema.parse(json)
+	const response = await api.withAuthClientId().post("nexus-api/iam/login/sms-code", {
+		json: request,
+		throwHttpErrors: false,
+	})
+
+	return handleLoginResponse(response)
 }
 
 /**
@@ -221,12 +245,12 @@ export const SelectAccountRequestSchema = z.object({
 export type SelectAccountRequest = z.infer<typeof SelectAccountRequestSchema>
 
 const selectAccount = async (request: SelectAccountRequest): Promise<LoginResponse> => {
-	const json = await api
-		.post("nexus-api/iam/login/select-account", {
-			json: request,
-		})
-		.json()
-	return LoginResponseSchema.parse(json)
+	const response = await api.post("nexus-api/iam/login/select-account", {
+		json: request,
+		throwHttpErrors: false,
+	})
+
+	return handleLoginResponse(response)
 }
 
 /**
@@ -318,12 +342,12 @@ export const MultifactorLoginRequestSchema = z.object({
 export type MultifactorLoginRequest = z.infer<typeof MultifactorLoginRequestSchema>
 
 const multifactorLogin = async (request: MultifactorLoginRequest): Promise<LoginResponse> => {
-	const json = await api
-		.post("nexus-api/iam/login/multifactor", {
-			json: request,
-		})
-		.json()
-	return LoginResponseSchema.parse(json)
+	const response = await api.post("nexus-api/iam/login/multifactor", {
+		json: request,
+		throwHttpErrors: false,
+	})
+
+	return handleLoginResponse(response)
 }
 
 /**
@@ -355,12 +379,12 @@ export const ChangePasswordLoginRequestSchema = z.object({
 export type ChangePasswordLoginRequest = z.infer<typeof ChangePasswordLoginRequestSchema>
 
 const changePasswordLogin = async (request: ChangePasswordLoginRequest): Promise<LoginResponse> => {
-	const json = await api
-		.post("nexus-api/iam/login/change-password", {
-			json: request,
-		})
-		.json()
-	return LoginResponseSchema.parse(json)
+	const response = await api.post("nexus-api/iam/login/change-password", {
+		json: request,
+		throwHttpErrors: false,
+	})
+
+	return handleLoginResponse(response)
 }
 
 /**

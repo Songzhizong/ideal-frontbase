@@ -1,17 +1,18 @@
 import * as React from "react"
 import { fonts } from "@/app/fonts"
 import { themePresets } from "@/config/theme-presets"
+import { useResolvedTheme } from "@/hooks/use-resolved-theme"
 import { useThemeStore } from "@/hooks/use-theme-store"
-import { resolveThemeMode, updateThemeVariables } from "@/lib/theme-utils"
+import { updateThemeVariables } from "@/lib/theme-utils"
 
 /**
  * Theme effects hook - applies theme changes to DOM
  */
 export function useThemeEffects() {
-	const mode = useThemeStore((state) => state.mode)
 	const activePreset = useThemeStore((state) => state.activePreset)
 	const fontFamily = useThemeStore((state) => state.fontFamily)
 	const borderRadius = useThemeStore((state) => state.ui.borderRadius)
+	const resolvedTheme = useResolvedTheme()
 
 	React.useEffect(() => {
 		if (typeof document === "undefined") {
@@ -22,9 +23,8 @@ export function useThemeEffects() {
 
 		// Apply theme class
 		root.classList.remove("light", "dark")
-		const effectiveMode = resolveThemeMode(mode)
-		root.classList.add(effectiveMode)
-		root.dataset.theme = effectiveMode
+		root.classList.add(resolvedTheme)
+		root.dataset.theme = resolvedTheme
 
 		// Apply border radius
 		root.style.setProperty("--radius", `${borderRadius}px`)
@@ -41,7 +41,7 @@ export function useThemeEffects() {
 		// Apply theme preset colors
 		const preset = themePresets.find((p) => p.key === activePreset)
 		if (preset) {
-			updateThemeVariables(preset, effectiveMode)
+			updateThemeVariables(preset, resolvedTheme)
 		}
-	}, [borderRadius, activePreset, mode, fontFamily])
+	}, [borderRadius, activePreset, fontFamily, resolvedTheme])
 }
