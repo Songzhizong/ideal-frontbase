@@ -14,6 +14,7 @@ import { useAuthStore } from "@/lib/auth-store"
 import { cn } from "@/lib/utils"
 import { ALL_NAV, PRIMARY_NAV } from "./nav-config"
 import { Header } from "./parts/header"
+import { NoAccess } from "./parts/no-access"
 import { SearchCommand } from "./parts/search-command"
 import { SidebarBrand } from "./parts/sidebar-brand"
 import { SidebarNavItem } from "./parts/sidebar-nav-item"
@@ -34,14 +35,12 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 
 	const filteredPrimaryNav = React.useMemo(() => {
 		return PRIMARY_NAV.filter((item) => {
-			// @ts-expect-error - permission is optional
 			return !item.permission || hasPermission(item.permission)
 		})
 	}, [hasPermission])
 
 	const filteredAllNav = React.useMemo(() => {
 		return ALL_NAV.filter((item) => {
-			// @ts-expect-error - permission is optional
 			return !item.permission || hasPermission(item.permission)
 		})
 	}, [hasPermission])
@@ -92,7 +91,7 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 							pageAnimation !== "none" && `animate-${pageAnimation}`,
 						)}
 					>
-						{children}
+						{filteredPrimaryNav.length === 0 ? <NoAccess /> : children}
 					</div>
 				</main>
 			</div>

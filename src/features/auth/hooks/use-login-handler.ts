@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
+import { PRIMARY_NAV } from "@/components/layout/nav-config"
 import { useUserProfile } from "@/features/auth/api/get-current-user.ts"
 import { usePermissions } from "@/features/auth/api/get-permissions"
 import { type LoginResponse, LoginResponseType } from "@/features/auth/api/login"
@@ -40,8 +41,17 @@ export function useLoginHandler() {
 
 					toast.success("登录成功!")
 
-					// Redirect to home or intended page
-					void navigate({ to: "/" })
+					// Find first accessible page based on user permissions
+					const firstAccessiblePage = PRIMARY_NAV.find((item) => {
+						return !item.permission || authStore.hasPermission(item.permission)
+					})
+
+					// Redirect to first accessible page or 403 if no access
+					if (firstAccessiblePage) {
+						void navigate({ to: firstAccessiblePage.to })
+					} else {
+						void navigate({ to: "/" })
+					}
 				} else {
 					// noinspection ExceptionCaughtLocallyJS
 					throw new Error("Failed to fetch user data")

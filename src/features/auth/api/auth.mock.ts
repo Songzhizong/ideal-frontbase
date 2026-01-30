@@ -1,6 +1,6 @@
 import { delay, HttpResponse, http } from "msw"
 import { mockRegistry } from "@/mocks/registry"
-import type { UserProfile } from "@/types/auth"
+import { PERMISSIONS, type UserProfile } from "@/types/auth"
 import { LoginResponseType } from "./login"
 
 const MOCK_USER: UserProfile = {
@@ -64,7 +64,7 @@ export const authHandlers = [
 	// Get Permissions
 	http.get("*/nexus-api/iam/front/apps/:appId/available-permission-idents", async () => {
 		await delay(200)
-		return HttpResponse.json(["*", "admin", "dashboard:view"])
+		return HttpResponse.json([PERMISSIONS.USERS_READ])
 	}),
 
 	// Logout

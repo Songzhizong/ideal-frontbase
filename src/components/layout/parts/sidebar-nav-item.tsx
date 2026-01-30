@@ -6,6 +6,7 @@ export interface NavItem {
 	title: string
 	to: string
 	icon: LucideIcon
+	permission?: string
 }
 
 export function SidebarNavItem({
