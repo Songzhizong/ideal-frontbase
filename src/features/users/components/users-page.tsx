@@ -10,6 +10,7 @@ import {
 	DataTablePagination,
 	TableProvider,
 } from "@/components/table"
+import { PERMISSIONS } from "@/config/permissions"
 import { useDataTable } from "@/hooks"
 import { type GetUsersParams, getUsers } from "../api/get-users"
 import type { User } from "../types"
@@ -90,7 +91,7 @@ export function UsersPage() {
 								onReset={handleReset}
 								onRefresh={handleRefresh}
 								actions={
-									<AuthButton permission="users:add" size="sm" className="h-9">
+									<AuthButton permission={PERMISSIONS.USERS_ADD} size="sm" className="h-9">
 										<Plus className="mr-2 h-4 w-4" />
 										新增
 									</AuthButton>
