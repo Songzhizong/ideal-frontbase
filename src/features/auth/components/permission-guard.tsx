@@ -54,20 +54,18 @@ export function PermissionGuard({
 	children,
 	fallback = null,
 }: PermissionGuardProps) {
-	const { hasPermission, hasAnyPermission, hasAllPermissions } = useAuthStore()
+	// 性能优化: 使用 Selector 仅订阅 hasPermission 函数
+	// 避免 token、user、tenantId 等状态变化导致组件重新渲染
+	const hasPermission = useAuthStore((state) => state.hasPermission)
 
-	// 如果没有指定权限，直接渲染（相当于无权限检查）
+	// 如果没有指定权限,直接渲染(相当于无权限检查)
 	if (!permission) {
 		return children
 	}
 
-	// 单个权限检查
-	if (typeof permission === "string") {
-		return hasPermission(permission) ? children : fallback
-	}
-
-	// 多个权限检查
-	const hasAccess = mode === "any" ? hasAnyPermission(permission) : hasAllPermissions(permission)
+	// 统一使用 hasPermission 函数处理单个和多个权限
+	const modeMap = { any: "OR", all: "AND" } as const
+	const hasAccess = hasPermission(permission, modeMap[mode])
 
 	return hasAccess ? children : fallback
 }

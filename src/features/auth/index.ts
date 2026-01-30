@@ -13,7 +13,6 @@ export { useLogout } from "@/features/auth/api/logout.ts"
 // ============================================
 // Hooks (Public API)
 // ============================================
-export { useAuth } from "@/hooks/use-auth"
 export { useLogoutHandler } from "@/hooks/use-logout-handler"
 // ============================================
 // Stores (Public API)

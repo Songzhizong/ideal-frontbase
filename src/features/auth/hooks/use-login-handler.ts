@@ -12,7 +12,9 @@ import { useAuthStore } from "@/lib/auth-store"
  */
 export function useLoginHandler() {
 	const navigate = useNavigate()
-	const authStore = useAuthStore()
+	// 性能优化: 使用 Selector 仅订阅 hasPermission 函数
+	// 避免 token、user、permissions 等状态变化导致组件重新渲染
+	const hasPermission = useAuthStore((state) => state.hasPermission)
 	const { refetch: refetchUser } = useUserProfile({ enabled: false })
 	const { refetch: refetchPermissions } = usePermissions({ enabled: false })
 
@@ -20,6 +22,9 @@ export function useLoginHandler() {
 		const token = response.token
 		if (response.type === LoginResponseType.TOKEN && token) {
 			try {
+				// 使用 getState() 调用 action 方法,不会触发订阅
+				const authStore = useAuthStore.getState()
+
 				// Store token first
 				authStore.setToken(`${token.token_type} ${token.access_token}`)
 
@@ -43,7 +48,7 @@ export function useLoginHandler() {
 
 					// Find first accessible page based on user permissions
 					const firstAccessiblePage = PRIMARY_NAV.find((item) => {
-						return !item.permission || authStore.hasPermission(item.permission)
+						return !item.permission || hasPermission(item.permission)
 					})
 
 					// Redirect to first accessible page or 403 if no access
@@ -59,7 +64,8 @@ export function useLoginHandler() {
 			} catch (error) {
 				console.error("Login handler error:", error)
 				toast.error("Failed to complete login. Please try again.")
-				authStore.logout()
+				// 错误处理时也使用 getState()
+				useAuthStore.getState().logout()
 			}
 		}
 	}

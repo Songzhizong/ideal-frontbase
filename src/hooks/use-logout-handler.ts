@@ -9,7 +9,6 @@ import { useAuthStore } from "@/lib/auth-store"
  */
 export function useLogoutHandler() {
 	const navigate = useNavigate()
-	const authStore = useAuthStore()
 	const { logout: logoutApi, isLoggingOut } = useAuthContext()
 
 	const handleLogout = async () => {
@@ -40,7 +39,8 @@ export function useLogoutHandler() {
 			}
 
 			// 2. 清除 Store 状态
-			authStore.logout()
+			// 性能优化: 使用 getState() 调用 action,不会触发订阅
+			useAuthStore.getState().logout()
 
 			// 3. 提示并跳转
 			toast.success("已成功退出登录")
@@ -49,7 +49,7 @@ export function useLogoutHandler() {
 			console.error("Logout error:", error)
 			// 即使接口失败，也要确保本地状态清除
 			queryClient.clear()
-			authStore.logout()
+			useAuthStore.getState().logout()
 			toast.error("退出登录时发生错误，已强制退出")
 			void navigate({ to: "/login" })
 		}

@@ -31,7 +31,9 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
 	})
 	const [searchOpen, setSearchOpen] = React.useState(false)
 
-	const { hasPermission } = useAuthStore()
+	// 性能优化: 使用 Selector 仅订阅 hasPermission 函数
+	// 避免 token、user、tenantId 等状态变化导致 BaseLayout 重新渲染
+	const hasPermission = useAuthStore((state) => state.hasPermission)
 
 	const filteredPrimaryNav = React.useMemo(() => {
 		return PRIMARY_NAV.filter((item) => {

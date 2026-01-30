@@ -3,11 +3,18 @@ import { persist } from "zustand/middleware"
 import { env } from "@/lib/env"
 import type { Permission, UserProfile } from "@/types/auth"
 
+/**
+ * 性能优化：缓存静态权限判断结果
+ * 避免每次 hasPermission 调用都进行字符串比较
+ */
+const IS_STATIC_ADMIN = env.VITE_IS_STATIC_ADMIN === "true"
+
 type AuthState = {
 	// State
 	token: string | null
 	user: UserProfile | null
 	permissions: Permission[]
+	permissionSet: Set<Permission> // 性能优化：用于 O(1) 权限查找
 	isAuthenticated: boolean
 	tenantId: string | null
 
@@ -46,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
 			token: null,
 			user: null,
 			permissions: [],
+			permissionSet: new Set<Permission>(),
 			isAuthenticated: false,
 			tenantId: null,
 
@@ -58,6 +66,7 @@ export const useAuthStore = create<AuthState>()(
 					token,
 					user,
 					permissions,
+					permissionSet: new Set(permissions), // 同步更新 Set 以优化查找性能
 					isAuthenticated: true,
 					tenantId: user.tenantId,
 				})
@@ -81,7 +90,10 @@ export const useAuthStore = create<AuthState>()(
 			 * 设置权限列表
 			 */
 			setPermissions: (permissions) => {
-				set({ permissions })
+				set({
+					permissions,
+					permissionSet: new Set(permissions), // 同步更新 Set 以优化查找性能
+				})
 			},
 
 			/**
@@ -93,6 +105,7 @@ export const useAuthStore = create<AuthState>()(
 					token: null,
 					user: null,
 					permissions: [],
+					permissionSet: new Set<Permission>(),
 					isAuthenticated: false,
 					tenantId: null,
 				})
@@ -108,25 +121,26 @@ export const useAuthStore = create<AuthState>()(
 
 			/**
 			 * 检查用户是否拥有指定权限
+			 * 性能优化：使用 Set.has() 实现 O(1) 查找，替代 Array.includes() 的 O(n) 查找
 			 * @param permission - 权限标识符或列表
 			 * @param mode - 检查模式：'AND' (所有均需满足) 或 'OR' (满足其一即可)，默认为 'OR' (针对数组)
 			 */
 			hasPermission: (permission, mode = "OR") => {
 				// Static Admin Override - 用于开发环境或静态部署
-				if (env.VITE_IS_STATIC_ADMIN === "true") {
+				if (IS_STATIC_ADMIN) {
 					return true
 				}
 
-				const { permissions } = get()
-
-				const userPermissions = permissions as string[]
+				const { permissionSet } = get()
 				const required = Array.isArray(permission) ? permission : [permission]
 
 				if (mode === "AND") {
-					return required.every((p) => userPermissions.includes(p))
+					// 所有权限都必须存在
+					return required.every((p) => permissionSet.has(p))
 				}
 
-				return required.some((p) => userPermissions.includes(p))
+				// OR 模式：至少有一个权限存在
+				return required.some((p) => permissionSet.has(p))
 			},
 
 			/**
@@ -150,13 +164,19 @@ export const useAuthStore = create<AuthState>()(
 		{
 			name: "auth-storage", // LocalStorage key
 			partialize: (state) => ({
-				// 只持久化这些字段
+				// 只持久化这些字段 (Set 无法序列化到 JSON)
 				token: state.token,
 				user: state.user,
 				permissions: state.permissions,
 				isAuthenticated: state.isAuthenticated,
 				tenantId: state.tenantId,
 			}),
+			// 关键优化：从 localStorage 恢复数据后重建 permissionSet
+			onRehydrateStorage: () => (state) => {
+				if (state?.permissions) {
+					state.permissionSet = new Set(state.permissions)
+				}
+			},
 		},
 	),
 )
