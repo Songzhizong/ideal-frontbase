@@ -159,14 +159,3 @@
 	--paper-100: 222 47% 11%;
 	--paper-200: 217 33% 17%;
 }
-
-:root[data-theme="tide"] {
-	--ink-900: #0b1f2a;
-	--ink-700: #2b4a57;
-	--ink-500: #5a7b87;
-	--sun-400: #fb7185;
-	--sea-400: #22d3ee;
-	--mint-300: #a7f3d0;
-	--paper-100: #f4fbff;
-	--paper-200: #e6f2f8;
-}

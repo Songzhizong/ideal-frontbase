@@ -10,7 +10,7 @@ export function PageContainer({ className, ...props }: PageContainerProps) {
 	return (
 		<div
 			className={cn(
-				"mx-auto w-full px-6 py-6 sm:px-4 lg:px-8",
+				"mx-auto w-full py-4 px-4 xl:px-8 2xl:px-16",
 				containerWidth === "fixed" && "max-w-7xl",
 				className,
 			)}

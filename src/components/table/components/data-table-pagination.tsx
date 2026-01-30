@@ -60,7 +60,7 @@ export function DataTablePagination({ className, text }: DataTablePaginationProp
 	const i18n = { ...defaultText, ...text }
 
 	return (
-		<div className={`flex items-center justify-between px-2 ${className || ""}`}>
+		<div className={`flex items-center justify-between px-2 h-4 ${className || ""}`}>
 			<div className="flex-1 text-sm text-muted-foreground">
 				{showTotal && <span>{i18n.total(totalElements)}</span>}
 			</div>
