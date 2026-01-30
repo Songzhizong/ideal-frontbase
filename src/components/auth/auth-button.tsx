@@ -9,6 +9,10 @@ interface AuthButtonProps extends ButtonProps {
 	mode?: "AND" | "OR"
 	showTooltip?: boolean
 	tooltipContent?: string
+	/** Tooltip preferred side (top, right, bottom, left). Defaults to 'top'. */
+	tooltipSide?: "top" | "right" | "bottom" | "left"
+	/** Tooltip alignment (start, center, end). Defaults to 'center'. */
+	tooltipAlign?: "start" | "center" | "end"
 }
 
 /**
@@ -21,6 +25,8 @@ export function AuthButton({
 	mode = "OR",
 	showTooltip = true,
 	tooltipContent = "您没有权限执行此操作",
+	tooltipSide = "top",
+	tooltipAlign = "center",
 	className,
 	disabled,
 	children,
@@ -46,7 +52,7 @@ export function AuthButton({
 					<TooltipTrigger asChild>
 						<span className="inline-block">{button}</span>
 					</TooltipTrigger>
-					<TooltipContent>
+					<TooltipContent side={tooltipSide} align={tooltipAlign}>
 						<p>{tooltipContent}</p>
 					</TooltipContent>
 				</Tooltip>
