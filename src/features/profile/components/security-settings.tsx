@@ -275,8 +275,8 @@ export function SecuritySettings() {
 									<div className="flex items-center justify-between">
 										<div>
 											<h4 className="font-medium">恢复代码</h4>
-											<p className="text-sm text-muted-foreground">
-												当你无法访问验证设备时使用这些代码
+											<p className="text-sm text-muted-foreground max-w-xl">
+												恢复码可在无法使用双因素认证设备时，帮助你恢复账户访问。请妥善保存。
 											</p>
 										</div>
 										<AlertDialog>
