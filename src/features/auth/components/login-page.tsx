@@ -1,4 +1,4 @@
-import { Fingerprint, Lock, Server, Smartphone } from "lucide-react"
+import { Cpu, Fingerprint, Lock, Server, Smartphone } from "lucide-react"
 import { useState } from "react"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -47,8 +47,18 @@ export function LoginPage() {
 
 	return (
 		<div className="size-full min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-sky-50 dark:from-slate-900 dark:via-blue-950 dark:to-slate-950 relative overflow-hidden transition-colors">
+			{/* Brand Header */}
+			<div className="absolute top-6 left-8 z-50 flex items-center gap-2.5">
+				<div className="w-10 h-10 bg-linear-to-br from-brand-1 to-brand-2 rounded-xl flex items-center justify-center shadow-lg shadow-brand-1/20 group animate-in fade-in slide-in-from-left-4 duration-700">
+					<Cpu className="w-6 h-6 text-white transition-transform group-hover:rotate-12" />
+				</div>
+				<span className="text-2xl font-bold tracking-tight bg-linear-to-r from-gray-950 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+					Infera
+				</span>
+			</div>
+
 			{/* Theme Toggle */}
-			<div className="absolute top-6 right-6 z-50">
+			<div className="absolute top-6 right-8 z-50">
 				<ThemeToggle />
 			</div>
 
@@ -66,25 +76,20 @@ export function LoginPage() {
 					<div className="max-w-xl space-y-8">
 						{/* Logo */}
 						<div className="flex items-center gap-3">
-							<div className="w-12 h-12 bg-linear-to-br from-[#2463EB] to-[#1e50c5] rounded-xl flex items-center justify-center shadow-lg shadow-[#2463EB]/30">
-								<Server className="w-7 h-7 text-white" />
-							</div>
-							<h1 className="text-3xl font-bold bg-linear-to-r from-[#2463EB] to-[#1e50c5] dark:from-[#3b7bff] dark:to-[#2463EB] bg-clip-text text-transparent">
-								CloudCompute
+							<h1 className="text-5xl font-extrabold tracking-tight text-gray-950 dark:text-white leading-tight">
+								推理，
+								<span className="bg-linear-to-r from-brand-1 to-brand-2 bg-clip-text text-transparent">
+									唯快不破
+								</span>
 							</h1>
 						</div>
 
 						{/* Brand Slogan */}
 						<div className="space-y-4">
-							<h2 className="text-5xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
-								Powerful Computing
-								<br />
-								Within Reach
-							</h2>
 							<p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-								Enterprise-grade cloud infrastructure platform
+								面向 AI 模型服务的统一裸金属运营平台。
 								<br />
-								providing stable and reliable computing support for your business
+								消除虚拟化开销，实现对异构算力资源的绝对掌控。
 							</p>
 						</div>
 
@@ -92,16 +97,16 @@ export function LoginPage() {
 						<div className="space-y-4 pt-8">
 							{[
 								{
-									title: "Elastic Scaling",
-									desc: "Allocate resources on demand, flexibly respond to business peaks",
+									title: "零损耗性能",
+									desc: "无延迟的直通硬件执行。彻底释放你每一 TFLOPS 的算力潜能。",
 								},
 								{
-									title: "High Performance Computing",
-									desc: "GPU/CPU clusters meeting high computing power needs for AI and Big Data",
+									title: "异构大一统",
+									desc: "无缝聚合 Ray、vLLM 节点。一个 Master 接口，纳管任意硬件。",
 								},
 								{
-									title: "Security & Compliance",
-									desc: "Multi-layer security protection, compliant with Level 3 security certification standards",
+									title: "安全模型流",
+									desc: "签名直连分发系统，确保模型从存储安全直达算力节点，避开流量瓶颈。",
 								},
 							].map((feature, index) => (
 								// biome-ignore lint/suspicious/noArrayIndexKey: Static list
@@ -123,7 +128,7 @@ export function LoginPage() {
 				<div className="flex items-center justify-center px-6 py-12 lg:px-8">
 					{/* Glassmorphism Card */}
 					<div className="w-full max-w-130">
-						<div className="backdrop-blur-lg bg-white/40 dark:bg-gray-900/40 border border-white/60 dark:border-gray-700/60 rounded-3xl shadow-2xl p-8 lg:p-10 min-h-[500px] flex flex-col">
+						<div className="backdrop-blur-lg bg-white/40 dark:bg-gray-900/40 border border-white/60 dark:border-gray-700/60 rounded-3xl shadow-2xl p-8 lg:p-10 min-h-125 flex flex-col">
 							{/* Mobile Logo */}
 							<div className="lg:hidden flex items-center justify-center gap-3 mb-8">
 								<div className="w-10 h-10 bg-linear-to-br from-[#2463EB] to-[#1e50c5] rounded-xl flex items-center justify-center shadow-lg shadow-[#2463EB]/30">

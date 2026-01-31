@@ -83,6 +83,9 @@
 	--last-click-y: 0px;
 	--last-click-offset-x: 0px;
 	--last-click-offset-y: 0px;
+	/* Brand Gradient (Base: #2260E5) */
+	--brand-1: 262 70% 65%;
+	--brand-2: 221 78% 51%;
 }
 
 .dark {

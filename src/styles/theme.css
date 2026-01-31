@@ -11,6 +11,8 @@
 	--color-primary-hover: hsl(var(--primary-hover));
 	--color-primary-active: hsl(var(--primary-active));
 	--color-brand-text: hsl(var(--brand-text));
+	--color-brand-1: hsl(var(--brand-1));
+	--color-brand-2: hsl(var(--brand-2));
 	--color-secondary: hsl(var(--secondary));
 	--color-secondary-foreground: hsl(var(--secondary-foreground));
 	--color-muted: hsl(var(--muted));
