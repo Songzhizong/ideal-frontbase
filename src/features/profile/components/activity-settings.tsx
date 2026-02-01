@@ -327,7 +327,7 @@ export function ActivitySettings() {
 										<div className="flex items-center gap-2">
 											<Input
 												type="date"
-												className="h-9 w-40"
+												className="h-9 w-40 dark:[color-scheme:dark]"
 												value={
 													filterState.loginTimeStart
 														? format(new Date(filterState.loginTimeStart), "yyyy-MM-dd")
@@ -345,7 +345,7 @@ export function ActivitySettings() {
 											<span className="text-muted-foreground">-</span>
 											<Input
 												type="date"
-												className="h-9 w-40"
+												className="h-9 w-40 dark:[color-scheme:dark]"
 												value={
 													filterState.loginTimeEnd
 														? format(new Date(filterState.loginTimeEnd), "yyyy-MM-dd")
