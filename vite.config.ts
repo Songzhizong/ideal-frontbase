@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		server: {
+			host: true,
 			proxy: {
 				"/nexus-api": {
 					target: backendUrl,

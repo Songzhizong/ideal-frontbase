@@ -46,7 +46,7 @@ export function PasskeyLoginForm({
 				<Button
 					onClick={handlePasskeyLogin}
 					disabled={passkeyLogin.isPending}
-					className="w-full h-12 bg-linear-to-r from-[#2463EB] to-[#1e50c5] hover:from-[#1e50c5] hover:to-[#1a46ad] text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all"
+					className="w-full h-12 bg-linear-to-r from-[#2463EB] to-[#1e50c5] hover:from-[#1e50c5] hover:to-[#1a46ad] text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all rounded-2xl"
 				>
 					{passkeyLogin.isPending ? "正在验证..." : "使用 Passkey 登录"}
 				</Button>

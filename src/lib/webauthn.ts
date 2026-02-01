@@ -120,4 +120,23 @@ export const webauthnUtils = {
 
 		return result
 	},
+
+	/**
+	 * Checks if the current browser environment supports WebAuthn (Passkeys)
+	 */
+	async isSupported(): Promise<boolean> {
+		if (
+			typeof window !== "undefined" &&
+			window.PublicKeyCredential &&
+			typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === "function"
+		) {
+			try {
+				return await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+			} catch (e) {
+				console.error("[WebAuthn] Error checking support:", e)
+				return false
+			}
+		}
+		return false
+	},
 }

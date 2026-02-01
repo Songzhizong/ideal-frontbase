@@ -1,10 +1,11 @@
 import { Cpu, Fingerprint, Lock, Server, Smartphone } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Button } from "@/components/ui/button"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type LoginResponse, LoginResponseType } from "@/features/auth/api/login"
+import { webauthnUtils } from "@/lib/webauthn"
 import { ChangePasswordForm } from "./change-password-form"
 import { MfaForm } from "./mfa-form"
 import { PasskeyLoginForm } from "./passkey-login-form"
@@ -20,6 +21,15 @@ export function LoginPage() {
 	const [activeTab, setActiveTab] = useState<"password" | "sms" | "passkey">("password")
 	const [view, setView] = useState<"login" | "select-account" | "mfa" | "change-password">("login")
 	const [loginResponse, setLoginResponse] = useState<LoginResponse | null>(null)
+	const [passkeySupported, setPasskeySupported] = useState<boolean>(true) // Default to true to avoid flicker if possible, or false to be safe
+
+	useEffect(() => {
+		const checkSupport = async () => {
+			const supported = await webauthnUtils.isSupported()
+			setPasskeySupported(supported)
+		}
+		void checkSupport()
+	}, [])
 
 	const handleResponse = (response: LoginResponse) => {
 		setLoginResponse(response)
@@ -155,7 +165,11 @@ export function LoginPage() {
 										onValueChange={(v) => setActiveTab(v as "password" | "sms" | "passkey")}
 										className="w-full"
 									>
-										<TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-200/40 dark:bg-gray-800/60 p-1 rounded-2xl backdrop-blur-sm h-11">
+										<TabsList
+											className={`grid w-full ${
+												passkeySupported ? "grid-cols-3" : "grid-cols-2"
+											} mb-6 bg-gray-200/40 dark:bg-gray-800/60 p-1 rounded-2xl backdrop-blur-sm h-11`}
+										>
 											<TabsTrigger
 												value="password"
 												className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:shadow-black/10 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:shadow-black/30 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-xl transition-all duration-200"
@@ -170,13 +184,15 @@ export function LoginPage() {
 												<Smartphone className="w-4 h-4" />
 												验证码
 											</TabsTrigger>
-											<TabsTrigger
-												value="passkey"
-												className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:shadow-black/10 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:shadow-black/30 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-xl transition-all duration-200"
-											>
-												<Fingerprint className="w-4 h-4" />
-												Passkey
-											</TabsTrigger>
+											{passkeySupported && (
+												<TabsTrigger
+													value="passkey"
+													className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:shadow-black/10 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:shadow-black/30 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-xl transition-all duration-200"
+												>
+													<Fingerprint className="w-4 h-4" />
+													Passkey
+												</TabsTrigger>
+											)}
 										</TabsList>
 
 										<div className="min-h-80">
@@ -188,9 +204,11 @@ export function LoginPage() {
 												<SmsLoginForm onResponse={handleResponse} />
 											</TabsContent>
 
-											<TabsContent value="passkey">
-												<PasskeyLoginForm />
-											</TabsContent>
+											{passkeySupported && (
+												<TabsContent value="passkey">
+													<PasskeyLoginForm />
+												</TabsContent>
+											)}
 										</div>
 									</Tabs>
 
