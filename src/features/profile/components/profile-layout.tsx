@@ -1,8 +1,9 @@
 import { Activity, Menu, MoreHorizontal, Settings, Shield, User } from "lucide-react"
 import { useQueryState } from "nuqs"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useUserProfile } from "@/features/auth/api/get-current-user"
 // Import settings components
 import {
 	ActivitySettings,
@@ -10,6 +11,7 @@ import {
 	PreferencesSettings,
 	SecuritySettings,
 } from "@/features/profile"
+import { useAuthStore } from "@/lib/auth-store"
 import { cn } from "@/lib/utils"
 import { GeneralSettings } from "./general-settings"
 
@@ -24,6 +26,15 @@ const navItems = [
 export function ProfileLayout() {
 	const [tab, setTab] = useQueryState("tab", { defaultValue: "general" })
 	const [open, setOpen] = useState(false)
+	const setUser = useAuthStore((state) => state.setUser)
+	const { data: userProfile } = useUserProfile()
+
+	// 同步用户信息到 Store
+	useEffect(() => {
+		if (userProfile) {
+			setUser(userProfile)
+		}
+	}, [userProfile, setUser])
 
 	const NavLinks = () => (
 		<>

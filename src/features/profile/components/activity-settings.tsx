@@ -24,37 +24,14 @@ import {
 	TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { useDeleteSession, useMySessions } from "../api/session"
 
 export function ActivitySettings() {
-	const [sessions] = useState([
-		{
-			id: "1",
-			device: "MacBook Pro",
-			browser: "Chrome 120",
-			ip: "192.168.1.100",
-			location: "北京, 中国",
-			lastActive: "刚刚",
-			isCurrent: true,
-		},
-		{
-			id: "2",
-			device: "iPhone 14",
-			browser: "Safari",
-			ip: "192.168.1.101",
-			location: "北京, 中国",
-			lastActive: "2 小时前",
-			isCurrent: false,
-		},
-		{
-			id: "3",
-			device: "Windows PC",
-			browser: "Edge 120",
-			ip: "203.0.113.45",
-			location: "上海, 中国",
-			lastActive: "1 天前",
-			isCurrent: false,
-		},
-	])
+	const { data: sessions = [], isLoading } = useMySessions()
+	const sortedSessions = [...sessions].sort((a, b) =>
+		a.current === b.current ? 0 : a.current ? -1 : 1,
+	)
+	const deleteSession = useDeleteSession()
 
 	const [loginLogs] = useState([
 		{
@@ -100,23 +77,42 @@ export function ActivitySettings() {
 	])
 
 	const getDeviceIcon = (device: string) => {
-		if (device.includes("iPhone") || device.includes("Android")) {
+		if (device.includes("iPhone") || device.includes("Android") || device.includes("Mobile")) {
 			return <Smartphone className="size-5 text-muted-foreground" />
 		}
-		if (device.includes("Mac") || device.includes("Windows")) {
+		if (device.includes("Mac") || device.includes("Windows") || device.includes("Linux")) {
 			return <Laptop className="size-5 text-muted-foreground" />
 		}
 		return <Monitor className="size-5 text-muted-foreground" />
 	}
 
-	const handleRevokeSession = (sessionId: string) => {
-		// id used for revoke logic
-		console.log(sessionId)
-		toast.success("会话已注销")
+	const handleRevokeSession = async (sessionId: string) => {
+		try {
+			await deleteSession.mutateAsync(sessionId)
+			toast.success("会话已注销")
+		} catch (error) {
+			console.error("Failed to revoke session:", error)
+		}
 	}
 
-	const handleRevokeAllSessions = () => {
-		toast.success("所有其他会话已注销")
+	const handleRevokeAllSessions = async () => {
+		const otherSessions = sessions.filter((s) => !s.current)
+		if (otherSessions.length === 0) {
+			toast.info("没有其他可注销的会话")
+			return
+		}
+
+		const promise = Promise.all(otherSessions.map((s) => deleteSession.mutateAsync(s.id)))
+
+		toast.promise(promise, {
+			loading: "正在注销所有其他会话...",
+			success: "所有其他会话已注销",
+			error: "部分会话注销失败",
+		})
+	}
+
+	const formatDate = (timestamp: number) => {
+		return new Date(timestamp).toLocaleString()
 	}
 
 	return (
@@ -134,7 +130,11 @@ export function ActivitySettings() {
 						</div>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button variant="outline" size="sm">
+								<Button
+									variant="outline"
+									size="sm"
+									disabled={isLoading || sessions.filter((s) => !s.current).length === 0}
+								>
 									<LogOut className="mr-2 size-4" />
 									注销所有其他会话
 								</Button>
@@ -156,72 +156,87 @@ export function ActivitySettings() {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						{sessions.map((session) => (
-							<div
-								key={session.id}
-								className={cn(
-									"flex items-start justify-between rounded-lg border border-border/50 p-4 transition-all relative overflow-hidden",
-									session.isCurrent &&
-										"bg-primary/[0.03] border-primary/20 dark:bg-primary/[0.05] dark:border-primary/30 shadow-sm",
-								)}
-							>
-								{session.isCurrent && (
-									<div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/80" />
-								)}
-								<div className="flex gap-4">
-									<div className="mt-1">{getDeviceIcon(session.device)}</div>
-									<div className="space-y-1">
-										<div className="flex items-center gap-2">
-											<h4 className="font-medium">{session.device}</h4>
-											{session.isCurrent && (
-												<Badge variant="default" className="text-xs">
-													当前设备
-												</Badge>
-											)}
-										</div>
-										<div className="flex flex-col gap-1 text-sm text-muted-foreground">
-											<div className="flex items-center gap-1.5">
-												<Monitor className="size-3.5" />
-												<span>{session.browser}</span>
+						{isLoading ? (
+							<div className="flex h-32 items-center justify-center text-muted-foreground">
+								正在加载会话...
+							</div>
+						) : sessions.length === 0 ? (
+							<div className="flex h-32 items-center justify-center text-muted-foreground">
+								暂无活动会话
+							</div>
+						) : (
+							sortedSessions.map((session) => (
+								<div
+									key={session.id}
+									className={cn(
+										"flex items-start justify-between rounded-lg border border-border/50 p-4 transition-all relative overflow-hidden",
+										session.current &&
+											"bg-primary/3 border-primary/20 dark:bg-primary/5 dark:border-primary/30 shadow-sm",
+									)}
+								>
+									{session.current && (
+										<div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/80" />
+									)}
+									<div className="flex gap-4">
+										<div className="mt-1">{getDeviceIcon(session.device)}</div>
+										<div className="space-y-1">
+											<div className="flex items-center gap-2">
+												<h4 className="font-medium">{session.device}</h4>
+												{session.current && (
+													<Badge variant="default" className="text-xs">
+														当前设备
+													</Badge>
+												)}
 											</div>
-											<div className="flex items-center gap-1.5">
-												<MapPin className="size-3.5" />
-												<span>
-													{session.ip} · {session.location}
-												</span>
-											</div>
-											<div className="flex items-center gap-1.5">
-												<Clock className="size-3.5" />
-												<span>最后活跃: {session.lastActive}</span>
+											<div className="flex flex-col gap-1 text-sm text-muted-foreground">
+												<div className="flex items-center gap-1.5">
+													<Monitor className="size-3.5" />
+													<span>{session.device}</span>
+												</div>
+												<div className="flex items-center gap-1.5">
+													<MapPin className="size-3.5" />
+													<span>
+														{session.loginIp} · {session.location || "未知位置"}
+													</span>
+												</div>
+												<div className="flex items-center gap-1.5">
+													<Clock className="size-3.5" />
+													<span>
+														最后活跃: {formatDate(session.latestActivity || session.createdTime)}
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
+									{!session.current && (
+										<AlertDialog>
+											<AlertDialogTrigger asChild>
+												<Button variant="ghost" size="sm" disabled={deleteSession.isPending}>
+													注销
+												</Button>
+											</AlertDialogTrigger>
+											<AlertDialogContent>
+												<AlertDialogHeader>
+													<AlertDialogTitle>注销会话</AlertDialogTitle>
+													<AlertDialogDescription>
+														确定要注销 "{session.device}" 上的会话吗？
+													</AlertDialogDescription>
+												</AlertDialogHeader>
+												<AlertDialogFooter>
+													<AlertDialogCancel>取消</AlertDialogCancel>
+													<AlertDialogAction
+														onClick={() => handleRevokeSession(session.id)}
+														disabled={deleteSession.isPending}
+													>
+														确认注销
+													</AlertDialogAction>
+												</AlertDialogFooter>
+											</AlertDialogContent>
+										</AlertDialog>
+									)}
 								</div>
-								{!session.isCurrent && (
-									<AlertDialog>
-										<AlertDialogTrigger asChild>
-											<Button variant="ghost" size="sm">
-												注销
-											</Button>
-										</AlertDialogTrigger>
-										<AlertDialogContent>
-											<AlertDialogHeader>
-												<AlertDialogTitle>注销会话</AlertDialogTitle>
-												<AlertDialogDescription>
-													确定要注销 "{session.device}" 上的会话吗？
-												</AlertDialogDescription>
-											</AlertDialogHeader>
-											<AlertDialogFooter>
-												<AlertDialogCancel>取消</AlertDialogCancel>
-												<AlertDialogAction onClick={() => handleRevokeSession(session.id)}>
-													确认注销
-												</AlertDialogAction>
-											</AlertDialogFooter>
-										</AlertDialogContent>
-									</AlertDialog>
-								)}
-							</div>
-						))}
+							))
+						)}
 					</div>
 				</CardContent>
 			</Card>
