@@ -11,7 +11,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 		<DayPicker
 			locale={zhCN}
 			showOutsideDays={showOutsideDays}
-			className={cn("p-3", className)}
+			className={cn("p-4 pl-0", className)}
 			classNames={{
 				months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
 				month: "space-y-4 relative w-fit mx-auto",
@@ -20,11 +20,11 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 				nav: "space-x-1 flex items-center",
 				button_previous: cn(
 					buttonVariants({ variant: "ghost" }),
-					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-2",
+					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-6 top-4 z-10",
 				),
 				button_next: cn(
 					buttonVariants({ variant: "ghost" }),
-					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-2",
+					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-6 top-4 z-10",
 				),
 				month_grid: "w-full border-collapse space-y-1",
 				weekdays: "flex",
