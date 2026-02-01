@@ -19,12 +19,14 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 				caption_label: "text-sm font-medium",
 				nav: "space-x-1 flex items-center",
 				button_previous: cn(
-					buttonVariants({ variant: "ghost" }),
-					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-6 top-4 z-10",
+					"h-7 w-7 bg-transparent p-0 hover:opacity-80 absolute left-6 top-4 z-10",
+					"!text-foreground hover:bg-accent/10 rounded-md inline-flex items-center justify-center",
+					"[&>svg]:!text-foreground [&>svg]:!fill-foreground [&>svg]:!stroke-foreground",
 				),
 				button_next: cn(
-					buttonVariants({ variant: "ghost" }),
-					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-6 top-4 z-10",
+					"h-7 w-7 bg-transparent p-0 hover:opacity-80 absolute right-6 top-4 z-10",
+					"!text-foreground hover:bg-accent/10 rounded-md inline-flex items-center justify-center",
+					"[&>svg]:!text-foreground [&>svg]:!fill-foreground [&>svg]:!stroke-foreground",
 				),
 				month_grid: "w-full border-collapse space-y-1",
 				weekdays: "flex",
