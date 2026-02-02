@@ -117,16 +117,17 @@ export function ActivitySettings() {
 		[],
 	)
 
-	const { table, filters, loading, empty, fetching, refetch, pagination } = useDataTable({
-		queryKey: ["login-logs"],
-		queryFn: (params) => fetchCurrentUserLoginLog(params),
-		enableServerSorting: false,
-		columns: loginLogColumns,
-		filterParsers: {
-			loginTimeStart: parseAsInteger,
-			loginTimeEnd: parseAsInteger,
-		},
-	})
+	const { table, filters, loading, empty, fetching, refetch, pagination, setPage, setPageSize } =
+		useDataTable({
+			queryKey: ["login-logs"],
+			queryFn: (params) => fetchCurrentUserLoginLog(params),
+			enableServerSorting: false,
+			columns: loginLogColumns,
+			filterParsers: {
+				loginTimeStart: parseAsInteger,
+				loginTimeEnd: parseAsInteger,
+			},
+		})
 
 	// biome-ignore lint/suspicious/noExplicitAny: nuqs dynamic keys
 	const filterState = filters.state as any
@@ -313,8 +314,8 @@ export function ActivitySettings() {
 						loading={loading}
 						empty={empty}
 						pagination={pagination}
-						onPageChange={(page) => table.setPageIndex(page - 1)}
-						onPageSizeChange={(size) => table.setPageSize(size)}
+						onPageChange={(page) => setPage(page)}
+						onPageSizeChange={(size) => setPageSize(size)}
 					>
 						<DataTableContainer
 							toolbar={

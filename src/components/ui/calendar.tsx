@@ -19,12 +19,12 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 				caption_label: "text-sm font-medium",
 				nav: "space-x-1 flex items-center",
 				button_previous: cn(
-					"h-7 w-7 bg-transparent p-0 hover:opacity-80 absolute left-6 top-4 z-10",
+					"h-5 w-5 bg-transparent p-0 hover:opacity-80 absolute left-6 top-5 z-10",
 					"!text-foreground hover:bg-accent/10 rounded-md inline-flex items-center justify-center",
 					"[&>svg]:!text-foreground [&>svg]:!fill-foreground [&>svg]:!stroke-foreground",
 				),
 				button_next: cn(
-					"h-7 w-7 bg-transparent p-0 hover:opacity-80 absolute right-6 top-4 z-10",
+					"h-5 w-5 bg-transparent p-0 hover:opacity-80 absolute right-6 top-5 z-10",
 					"!text-foreground hover:bg-accent/10 rounded-md inline-flex items-center justify-center",
 					"[&>svg]:!text-foreground [&>svg]:!fill-foreground [&>svg]:!stroke-foreground",
 				),
@@ -32,15 +32,15 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 				weekdays: "flex",
 				weekday: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
 				week: "flex w-full mt-2",
-				day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+				day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 data-[selected]:[&>button]:!text-primary-foreground data-[selected]:[&>button]:hover:!text-primary-foreground data-[selected]:[&>button]:focus:!text-primary-foreground",
 				day_button: cn(
 					buttonVariants({ variant: "ghost" }),
-					"h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+					"h-9 w-9 p-0 font-normal aria-selected:opacity-100 aria-selected:bg-primary aria-selected:!text-primary-foreground aria-selected:hover:bg-primary aria-selected:hover:!text-primary-foreground aria-selected:focus:bg-primary aria-selected:focus:!text-primary-foreground",
 				),
 				range_end: "day-range-end",
 				selected:
-					"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-				today: "bg-accent text-accent-foreground",
+					"bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md border-none !text-primary-foreground",
+				today: "bg-accent text-accent-foreground rounded-md",
 				outside:
 					"day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
 				disabled: "text-muted-foreground opacity-50",
