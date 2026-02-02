@@ -51,13 +51,13 @@ export function ProfileLayout() {
 							setOpen(false)
 						}}
 						className={cn(
-							"flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+							"flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer",
 							isActive
-								? "bg-secondary font-medium text-foreground"
-								: "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
+								? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+								: "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
 						)}
 					>
-						<Icon className="size-4" />
+						<Icon className="size-4 shrink-0" />
 						<span>{item.label}</span>
 					</button>
 				)
