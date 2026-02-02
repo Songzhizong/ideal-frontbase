@@ -1,4 +1,4 @@
-import { Activity, Menu, Shield, User } from "lucide-react"
+import { Activity, ClipboardList, Menu, Shield, User } from "lucide-react"
 import { useQueryState } from "nuqs"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -6,8 +6,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useUserProfile } from "@/features/auth/api/get-current-user"
 // Import settings components
 import {
-	ActivitySettings,
+	ActiveSessionsSettings,
 	AdvancedSettings,
+	LogRecordsSettings,
 	PreferencesSettings,
 	SecuritySettings,
 } from "@/features/profile"
@@ -18,7 +19,8 @@ import { GeneralSettings } from "./general-settings"
 const navItems = [
 	{ value: "general", label: "通用", icon: User },
 	{ value: "security", label: "安全", icon: Shield },
-	{ value: "activity", label: "活动", icon: Activity },
+	{ value: "sessions", label: "活跃会话", icon: Activity },
+	{ value: "logs", label: "日志记录", icon: ClipboardList },
 	// { value: "preferences", label: "偏好", icon: Settings },
 	// { value: "advanced", label: "其他", icon: MoreHorizontal },
 ] as const
@@ -66,19 +68,19 @@ export function ProfileLayout() {
 	)
 
 	return (
-		<div className="min-h-screen bg-background">
-			<div className="mx-auto max-w-6xl px-4 py-6">
+		<div className="bg-background h-full overflow-hidden">
+			<div className="mx-auto max-w-6xl px-4 py-6 h-full flex flex-col overflow-hidden">
 				{/* Main Grid */}
-				<div className="grid grid-cols-1 gap-6 md:grid-cols-[160px_1fr]">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-[160px_1fr] flex-1 min-h-0 overflow-hidden">
 					{/* Desktop Sidebar */}
 					<aside className="hidden md:block">
-						<nav className="sticky top-8 space-y-1">
+						<nav className="space-y-1">
 							<NavLinks />
 						</nav>
 					</aside>
 
 					{/* Mobile Navigation */}
-					<div className="mb-4 md:hidden">
+					<div className="mb-4 md:hidden shrink-0">
 						<Sheet open={open} onOpenChange={setOpen}>
 							<SheetTrigger asChild>
 								<Button variant="outline" size="sm" className="w-full justify-start">
@@ -95,10 +97,11 @@ export function ProfileLayout() {
 					</div>
 
 					{/* Content Area */}
-					<main className="min-w-0">
+					<main className="min-w-0 flex flex-col h-full overflow-y-auto scrollbar-thin">
 						{tab === "general" && <GeneralSettings />}
 						{tab === "security" && <SecuritySettings />}
-						{tab === "activity" && <ActivitySettings />}
+						{tab === "sessions" && <ActiveSessionsSettings />}
+						{tab === "logs" && <LogRecordsSettings />}
 						{tab === "preferences" && <PreferencesSettings />}
 						{tab === "advanced" && <AdvancedSettings />}
 					</main>
