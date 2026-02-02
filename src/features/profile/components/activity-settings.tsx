@@ -331,8 +331,12 @@ export function ActivitySettings() {
 			</Card>
 
 			{/* Activity Logs */}
-			<Card>
-				<Tabs value={activeLogTab} onValueChange={setActiveLogTab} className="w-full">
+			<Card className="h-[calc(100vh-6rem)] flex flex-col overflow-hidden">
+				<Tabs
+					value={activeLogTab}
+					onValueChange={setActiveLogTab}
+					className="w-full flex-1 flex flex-col min-h-0"
+				>
 					<CardHeader>
 						<div className="flex flex-col gap-3">
 							<div className="flex flex-wrap items-center justify-between gap-3">
@@ -358,8 +362,8 @@ export function ActivitySettings() {
 							</CardDescription>
 						</div>
 					</CardHeader>
-					<CardContent>
-						<TabsContent value="login" className="mt-0">
+					<CardContent className="flex-1 flex flex-col min-h-0">
+						<TabsContent value="login" className="mt-0 flex-1 flex flex-col min-h-0">
 							<TableProvider
 								table={table}
 								loading={loading}
@@ -422,19 +426,17 @@ export function ActivitySettings() {
 											empty={empty}
 											emptyText="暂无登录日志数据"
 											fetching={fetching}
-											maxHeight="calc(100vh - 26rem)"
 										/>
 									}
 									pagination={<DataTablePagination />}
 								/>
 							</TableProvider>
 						</TabsContent>
-						<TabsContent value="operation" className="mt-0">
+						<TabsContent value="operation" className="mt-0 flex-1 flex flex-col min-h-0">
 							<PersonalOperationLogTable
 								userId={userProfile?.userId ?? ""}
 								onViewDetail={handleOpenDetail}
 								emptyText="暂无操作日志数据"
-								maxHeight="calc(100vh - 26rem)"
 							/>
 						</TabsContent>
 					</CardContent>

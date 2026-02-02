@@ -33,7 +33,6 @@ import { cn } from "@/lib/utils"
 interface PersonalOperationLogTableProps {
 	userId: string
 	onViewDetail?: (id: string) => void
-	maxHeight?: string
 	className?: string
 	emptyText?: string
 	baseParams?: Partial<Api.OperationLog.SearchParams>
@@ -57,7 +56,6 @@ const formatIp = (ip?: string | null) => {
 export function PersonalOperationLogTable({
 	userId,
 	onViewDetail,
-	maxHeight = "calc(100vh - 24rem)",
 	className,
 	emptyText = "暂无操作日志数据",
 	baseParams,
@@ -363,7 +361,6 @@ export function PersonalOperationLogTable({
 							empty={empty}
 							emptyText={emptyText}
 							fetching={fetching}
-							maxHeight={maxHeight}
 						/>
 					}
 					pagination={<DataTablePagination />}
