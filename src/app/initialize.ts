@@ -5,7 +5,7 @@
  * 这里是配置跨层依赖的正确位置
  */
 
-import { createDebouncedUnauthorizedHandler } from "@/features/auth"
+import { createDebouncedUnauthorizedHandler } from "@/features/core/auth"
 import { configureApiClient } from "@/lib/api-client"
 import { authStore } from "@/lib/auth-store"
 

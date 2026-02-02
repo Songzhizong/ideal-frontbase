@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { queryClient } from "@/app/query-client"
-import { useLogout } from "@/features/auth"
+import { useLogout } from "@/features/core/auth"
 import { useAuthStore } from "@/lib/auth-store"
 
 /**

@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { PERMISSIONS } from "@/config/permissions"
-import { UsersPage } from "@/features/users"
+import { UsersPage } from "@/features/core/users"
 import { authStore } from "@/lib/auth-store"
 
 export const Route = createFileRoute("/_authenticated/users")({
