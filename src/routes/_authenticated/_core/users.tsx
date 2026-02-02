@@ -3,7 +3,7 @@ import { PERMISSIONS } from "@/config/permissions"
 import { UsersPage } from "@/features/core/users"
 import { authStore } from "@/lib/auth-store"
 
-export const Route = createFileRoute("/_authenticated/users")({
+export const Route = createFileRoute("/_authenticated/_core/users")({
 	beforeLoad: () => {
 		const { hasPermission } = authStore.getState()
 		if (!hasPermission(PERMISSIONS.USERS_READ)) {

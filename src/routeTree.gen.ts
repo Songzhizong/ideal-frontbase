@@ -9,28 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as BlankRouteImport } from './routes/_blank'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
+import { Route as BlankRouteRouteImport } from './routes/_blank/route'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as Errors500RouteImport } from './routes/errors/500'
 import { Route as Errors404RouteImport } from './routes/errors/404'
 import { Route as Errors403RouteImport } from './routes/errors/403'
-import { Route as BlankLoginRouteImport } from './routes/_blank.login'
-import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated.users'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/_dashboard/index'
+import { Route as BlankAuthLoginRouteImport } from './routes/_blank/_auth/login'
+import { Route as AuthenticatedCoreUsersRouteImport } from './routes/_authenticated/_core/users'
+import { Route as AuthenticatedCoreProfileRouteImport } from './routes/_authenticated/_core/profile'
 
-const BlankRoute = BlankRouteImport.update({
+const BlankRouteRoute = BlankRouteRouteImport.update({
   id: '/_blank',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const Errors500Route = Errors500RouteImport.update({
   id: '/errors/500',
@@ -47,87 +42,94 @@ const Errors403Route = Errors403RouteImport.update({
   path: '/errors/403',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlankLoginRoute = BlankLoginRouteImport.update({
-  id: '/login',
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/_dashboard/',
+    path: '/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const BlankAuthLoginRoute = BlankAuthLoginRouteImport.update({
+  id: '/_auth/login',
   path: '/login',
-  getParentRoute: () => BlankRoute,
+  getParentRoute: () => BlankRouteRoute,
 } as any)
-const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
-  id: '/users',
+const AuthenticatedCoreUsersRoute = AuthenticatedCoreUsersRouteImport.update({
+  id: '/_core/users',
   path: '/users',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
+const AuthenticatedCoreProfileRoute =
+  AuthenticatedCoreProfileRouteImport.update({
+    id: '/_core/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/users': typeof AuthenticatedUsersRoute
-  '/login': typeof BlankLoginRoute
+  '/': typeof AuthenticatedDashboardIndexRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/profile': typeof AuthenticatedCoreProfileRoute
+  '/users': typeof AuthenticatedCoreUsersRoute
+  '/login': typeof BlankAuthLoginRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedIndexRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/users': typeof AuthenticatedUsersRoute
-  '/login': typeof BlankLoginRoute
+  '/': typeof AuthenticatedDashboardIndexRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/profile': typeof AuthenticatedCoreProfileRoute
+  '/users': typeof AuthenticatedCoreUsersRoute
+  '/login': typeof BlankAuthLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_blank': typeof BlankRouteWithChildren
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/users': typeof AuthenticatedUsersRoute
-  '/_blank/login': typeof BlankLoginRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_blank': typeof BlankRouteRouteWithChildren
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
-  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/_core/profile': typeof AuthenticatedCoreProfileRoute
+  '/_authenticated/_core/users': typeof AuthenticatedCoreUsersRoute
+  '/_blank/_auth/login': typeof BlankAuthLoginRoute
+  '/_authenticated/_dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/profile'
-    | '/users'
-    | '/login'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/profile'
+    | '/users'
+    | '/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/profile'
-    | '/users'
-    | '/login'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/profile'
+    | '/users'
+    | '/login'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_blank'
-    | '/_authenticated/profile'
-    | '/_authenticated/users'
-    | '/_blank/login'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
-    | '/_authenticated/'
+    | '/_authenticated/_core/profile'
+    | '/_authenticated/_core/users'
+    | '/_blank/_auth/login'
+    | '/_authenticated/_dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  BlankRoute: typeof BlankRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  BlankRouteRoute: typeof BlankRouteRouteWithChildren
   Errors403Route: typeof Errors403Route
   Errors404Route: typeof Errors404Route
   Errors500Route: typeof Errors500Route
@@ -139,22 +141,15 @@ declare module '@tanstack/react-router' {
       id: '/_blank'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof BlankRouteImport
+      preLoaderRoute: typeof BlankRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/errors/500': {
       id: '/errors/500'
@@ -177,59 +172,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Errors403RouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_blank/login': {
-      id: '/_blank/login'
+    '/_authenticated/_dashboard/': {
+      id: '/_authenticated/_dashboard/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_blank/_auth/login': {
+      id: '/_blank/_auth/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof BlankLoginRouteImport
-      parentRoute: typeof BlankRoute
+      preLoaderRoute: typeof BlankAuthLoginRouteImport
+      parentRoute: typeof BlankRouteRoute
     }
-    '/_authenticated/users': {
-      id: '/_authenticated/users'
+    '/_authenticated/_core/users': {
+      id: '/_authenticated/_core/users'
       path: '/users'
       fullPath: '/users'
-      preLoaderRoute: typeof AuthenticatedUsersRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedCoreUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
+    '/_authenticated/_core/profile': {
+      id: '/_authenticated/_core/profile'
       path: '/profile'
       fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedCoreProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCoreProfileRoute: typeof AuthenticatedCoreProfileRoute
+  AuthenticatedCoreUsersRoute: typeof AuthenticatedCoreUsersRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedUsersRoute: AuthenticatedUsersRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCoreProfileRoute: AuthenticatedCoreProfileRoute,
+  AuthenticatedCoreUsersRoute: AuthenticatedCoreUsersRoute,
+  AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface BlankRouteRouteChildren {
+  BlankAuthLoginRoute: typeof BlankAuthLoginRoute
+}
+
+const BlankRouteRouteChildren: BlankRouteRouteChildren = {
+  BlankAuthLoginRoute: BlankAuthLoginRoute,
+}
+
+const BlankRouteRouteWithChildren = BlankRouteRoute._addFileChildren(
+  BlankRouteRouteChildren,
 )
 
-interface BlankRouteChildren {
-  BlankLoginRoute: typeof BlankLoginRoute
-}
-
-const BlankRouteChildren: BlankRouteChildren = {
-  BlankLoginRoute: BlankLoginRoute,
-}
-
-const BlankRouteWithChildren = BlankRoute._addFileChildren(BlankRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  BlankRoute: BlankRouteWithChildren,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  BlankRouteRoute: BlankRouteRouteWithChildren,
   Errors403Route: Errors403Route,
   Errors404Route: Errors404Route,
   Errors500Route: Errors500Route,

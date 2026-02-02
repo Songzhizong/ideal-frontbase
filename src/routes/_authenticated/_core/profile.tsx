@@ -6,7 +6,7 @@ const profileSearchSchema = z.object({
 	tab: z.enum(["general", "security", "activity", "preferences", "advanced"]).optional(),
 })
 
-export const Route = createFileRoute("/_authenticated/profile")({
+export const Route = createFileRoute("/_authenticated/_core/profile")({
 	component: ProfileLayout,
 	validateSearch: profileSearchSchema,
 	staticData: {

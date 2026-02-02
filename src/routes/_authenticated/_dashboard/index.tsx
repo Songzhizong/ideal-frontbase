@@ -4,7 +4,7 @@ import { PERMISSIONS } from "@/config/permissions"
 import { InfrastructureDashboard } from "@/features/dashboard/routes/infrastructure-dashboard"
 import { authStore } from "@/lib/auth-store"
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/_dashboard/")({
 	beforeLoad: () => {
 		const { hasPermission } = authStore.getState()
 
