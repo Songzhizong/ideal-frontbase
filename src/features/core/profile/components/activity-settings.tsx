@@ -12,7 +12,7 @@ import {
 	Monitor,
 	Smartphone,
 } from "lucide-react"
-import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
+import { parseAsInteger } from "nuqs"
 import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
 import {
@@ -40,7 +40,7 @@ import { DateRangePicker } from "@/components/ui/date-picker-rac"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUserProfile } from "@/features/core/auth"
 import { OperationLogDetailDrawer, PersonalOperationLogTable } from "@/features/core/operation-log"
-import { useDataTable } from "@/hooks"
+import { useDataTable, useTabQueryState } from "@/hooks"
 import { formatTimestampToRelativeTime } from "@/lib/time-utils.ts"
 import { cn } from "@/lib/utils"
 import { type Api, fetchCurrentUserLoginLog } from "../api/login-log"
@@ -60,48 +60,18 @@ export function ActivitySettings() {
 	const { data: sessions = [], isLoading } = useMySessions()
 	const { data: userProfile } = useUserProfile()
 
-	const [states, setStates] = useQueryStates(
-		{
-			activityTab: parseAsString.withDefault("login"),
-			// Parameters to clear when switching
-			loginTimeStart: parseAsInteger,
-			loginTimeEnd: parseAsInteger,
-			startTimeMs: parseAsInteger,
-			endTimeMs: parseAsInteger,
-			success: parseAsString,
-			actionType: parseAsString,
-			page: parseAsInteger,
-			size: parseAsInteger,
-			q: parseAsString,
+	const [activeLogTab, setActiveLogTab] = useTabQueryState<"login" | "operation">({
+		key: "activityTab",
+		defaultValue: "login",
+		tabs: {
+			login: {
+				exclusiveParams: ["loginTimeStart", "loginTimeEnd"],
+			},
+			operation: {
+				exclusiveParams: ["startTimeMs", "endTimeMs", "success", "actionType"],
+			},
 		},
-		{ shallow: false },
-	)
-
-	const activeLogTab = states.activityTab
-
-	const handleTabChange = useCallback(
-		(value: string) => {
-			const newState: Record<string, null | string> = {
-				activityTab: value,
-				page: null,
-				size: null,
-				q: null,
-			}
-
-			if (value === "login") {
-				newState.startTimeMs = null
-				newState.endTimeMs = null
-				newState.success = null
-				newState.actionType = null
-			} else {
-				newState.loginTimeStart = null
-				newState.loginTimeEnd = null
-			}
-
-			void setStates(newState)
-		},
-		[setStates],
-	)
+	})
 	const [detailOpen, setDetailOpen] = useState(false)
 	const [detailLogId, setDetailLogId] = useState<string | null>(null)
 	const sortedSessions = [...sessions].sort((a, b) =>
@@ -376,7 +346,7 @@ export function ActivitySettings() {
 			<Card className="flex flex-col">
 				<Tabs
 					value={activeLogTab}
-					onValueChange={handleTabChange}
+					onValueChange={(val) => setActiveLogTab(val as "login" | "operation")}
 					className="w-full flex-1 flex flex-col min-h-0"
 				>
 					<CardHeader>
