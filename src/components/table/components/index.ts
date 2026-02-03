@@ -21,5 +21,3 @@ export { DataTableToolbar } from "./data-table-toolbar"
 
 export type { PaginatedTableProps } from "./paginated-table"
 export { PaginatedTable } from "./paginated-table"
-
-export { TableCompound } from "./table-compound"
