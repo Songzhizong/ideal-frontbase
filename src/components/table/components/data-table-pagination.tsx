@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useTableContext } from "@/components/table"
+import { useTableConfig, useTableContext } from "@/components/table"
 import { Button } from "@/components/ui/button"
 import {
 	Select,
@@ -90,6 +90,7 @@ export function DataTablePagination({ className, text }: DataTablePaginationProp
 		pageSizeOptions = [10, 20, 50, 100],
 		showTotal = true,
 	} = useTableContext()
+	const { i18n: defaultI18n } = useTableConfig()
 
 	if (!pagination || !onPageChange || !onPageSizeChange) {
 		throw new Error("DataTablePagination requires pagination context")
@@ -100,17 +101,8 @@ export function DataTablePagination({ className, text }: DataTablePaginationProp
 	const canPreviousPage = pageNumber > 1
 	const canNextPage = pageNumber < totalPages
 
-	// Default i18n text (Chinese)
-	const defaultText = {
-		total: (count: number) => `共 ${count} 条`,
-		perPage: "条/页",
-		firstPage: "第一页",
-		previousPage: "上一页",
-		nextPage: "下一页",
-		lastPage: "最后一页",
-	}
-
-	const i18n = { ...defaultText, ...text }
+	// Merge default i18n with custom text (custom text takes priority)
+	const i18n = { ...defaultI18n, ...text }
 	const paginationItems = getPaginationItems(pageNumber, totalPages, 1, 1)
 
 	return (

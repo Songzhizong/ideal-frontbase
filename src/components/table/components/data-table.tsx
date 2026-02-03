@@ -1,8 +1,8 @@
 import { flexRender, type Table as TanStackTable } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import type React from "react"
-import { type ReactNode, useContext, useRef } from "react"
-import { TableContext, type TableContextValue } from "@/components/table/context/table-context"
+import { type ReactNode, useCallback, useContext, useEffect, useRef } from "react"
+import { TableContext, type TableContextValue, useTableConfig } from "@/components/table/context"
 import { Button } from "@/components/ui/button"
 import {
 	Table,
@@ -77,27 +77,56 @@ export function DataTableContent<TData>({
 	// We use useContext directly instead of useTableContext to avoid throwing error
 	// when DataTable is used outside of TableProvider.
 	const context = useContext(TableContext) as TableContextValue<TData> | null
+	const { i18n } = useTableConfig()
+
 	const loading = propLoading ?? context?.loading ?? false
 	const fetching = propFetching ?? false
 	const empty = propEmpty ?? context?.empty ?? false
-	const emptyText = propEmptyText ?? "暂无数据"
+	const emptyText = propEmptyText ?? i18n.emptyText
 	const emptyState = propEmptyState ?? context?.emptyState
 	const loadingState = propLoadingState ?? context?.loadingState
 
 	const totalColumns = table.getAllColumns().length
 	const headerRef = useRef<HTMLDivElement>(null)
 	const bodyRef = useRef<HTMLDivElement>(null)
+	const rafRef = useRef<number | null>(null)
+	const lastScrollLeft = useRef<number>(0)
 
 	const tableBodyWrapperClassName = cn(
 		"flex-1 min-h-0 w-full overflow-x-auto",
 		maxHeight && "overflow-y-auto",
 	)
 
-	const handleBodyScroll = (e: React.UIEvent<HTMLDivElement>) => {
-		if (headerRef.current) {
-			headerRef.current.scrollLeft = e.currentTarget.scrollLeft
+	// Optimized scroll handler using requestAnimationFrame
+	const handleBodyScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+		const scrollLeft = e.currentTarget.scrollLeft
+
+		// Prevent redundant scheduling
+		if (scrollLeft === lastScrollLeft.current) return
+		lastScrollLeft.current = scrollLeft
+
+		// Cancel previous frame if exists
+		if (rafRef.current !== null) {
+			cancelAnimationFrame(rafRef.current)
 		}
-	}
+
+		// Schedule sync in next frame
+		rafRef.current = requestAnimationFrame(() => {
+			if (headerRef.current) {
+				headerRef.current.scrollLeft = scrollLeft
+			}
+			rafRef.current = null
+		})
+	}, [])
+
+	// Cleanup RAF on unmount
+	useEffect(() => {
+		return () => {
+			if (rafRef.current !== null) {
+				cancelAnimationFrame(rafRef.current)
+			}
+		}
+	}, [])
 
 	// Default loading state
 	const defaultLoadingState = (
@@ -105,7 +134,7 @@ export function DataTableContent<TData>({
 			<TableCell colSpan={totalColumns} className="h-24 text-center">
 				<div className="flex items-center justify-center">
 					<div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-					<span className="ml-2 text-muted-foreground">加载中...</span>
+					<span className="ml-2 text-muted-foreground">{i18n.loadingText}</span>
 				</div>
 			</TableCell>
 		</TableRow>
@@ -126,7 +155,7 @@ export function DataTableContent<TData>({
 				<div className="absolute inset-0 z-20 flex items-center justify-center bg-background/50 backdrop-blur-sm">
 					<div className="flex items-center gap-2 rounded-lg bg-card px-4 py-3 shadow-lg border border-border">
 						<div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-						<span className="text-sm text-foreground">刷新中...</span>
+						<span className="text-sm text-foreground">{i18n.refreshingText}</span>
 					</div>
 				</div>
 			)}

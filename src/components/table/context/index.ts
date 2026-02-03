@@ -1,2 +1,4 @@
-export type { TableContextValue, TableProviderProps } from "./table-context"
-export { TableProvider, useTableContext } from "./table-context"
+// Context
+
+export * from "./table-config-context"
+export * from "./table-context"
