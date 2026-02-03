@@ -12,7 +12,7 @@ import {
 	Monitor,
 	Smartphone,
 } from "lucide-react"
-import { parseAsInteger } from "nuqs"
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
 import {
@@ -59,7 +59,49 @@ const getDeviceIcon = (device: string) => {
 export function ActivitySettings() {
 	const { data: sessions = [], isLoading } = useMySessions()
 	const { data: userProfile } = useUserProfile()
-	const [activeLogTab, setActiveLogTab] = useState("login")
+
+	const [states, setStates] = useQueryStates(
+		{
+			activityTab: parseAsString.withDefault("login"),
+			// Parameters to clear when switching
+			loginTimeStart: parseAsInteger,
+			loginTimeEnd: parseAsInteger,
+			startTimeMs: parseAsInteger,
+			endTimeMs: parseAsInteger,
+			success: parseAsString,
+			actionType: parseAsString,
+			page: parseAsInteger,
+			size: parseAsInteger,
+			q: parseAsString,
+		},
+		{ shallow: false },
+	)
+
+	const activeLogTab = states.activityTab
+
+	const handleTabChange = useCallback(
+		(value: string) => {
+			const newState: Record<string, null | string> = {
+				activityTab: value,
+				page: null,
+				size: null,
+				q: null,
+			}
+
+			if (value === "login") {
+				newState.startTimeMs = null
+				newState.endTimeMs = null
+				newState.success = null
+				newState.actionType = null
+			} else {
+				newState.loginTimeStart = null
+				newState.loginTimeEnd = null
+			}
+
+			void setStates(newState)
+		},
+		[setStates],
+	)
 	const [detailOpen, setDetailOpen] = useState(false)
 	const [detailLogId, setDetailLogId] = useState<string | null>(null)
 	const sortedSessions = [...sessions].sort((a, b) =>
@@ -334,7 +376,7 @@ export function ActivitySettings() {
 			<Card className="flex flex-col">
 				<Tabs
 					value={activeLogTab}
-					onValueChange={setActiveLogTab}
+					onValueChange={handleTabChange}
 					className="w-full flex-1 flex flex-col min-h-0"
 				>
 					<CardHeader>

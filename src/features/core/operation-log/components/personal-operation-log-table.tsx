@@ -1,13 +1,13 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { CircleAlert, CircleCheck, Eye, MapPin, Plus, Shield } from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { parseAsInteger, parseAsString } from "nuqs"
+import { useCallback, useEffect, useMemo } from "react"
 import {
 	DataTable,
 	DataTableContainer,
 	DataTableFilterBar,
 	DataTablePagination,
 	TableProvider,
-	useTablePagination,
 } from "@/components/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,6 +27,7 @@ import {
 	actionTypeOptions,
 	getActionTypeConfig,
 } from "@/features/core/operation-log/utils/operation-log-utils"
+import { useDataTable } from "@/hooks"
 import { formatTimestampToDateTime, formatTimestampToRelativeTime } from "@/lib/time-utils"
 import { cn } from "@/lib/utils"
 
@@ -62,25 +63,6 @@ export function PersonalOperationLogTable({
 	baseParams,
 	tableMaxHeight,
 }: PersonalOperationLogTableProps) {
-	const [dateRange, setDateRange] = useState<
-		{ from: Date | undefined; to: Date | undefined } | undefined
-	>()
-	const [success, setSuccess] = useState<"all" | "true" | "false">("all")
-	const [actionType, setActionType] = useState<Api.ActionType | "all">("all")
-
-	const queryParams = useMemo<Api.OperationLog.SearchParams>(() => {
-		const start = dateRange?.from ? dateRange.from.getTime() : null
-		const end = dateRange?.to ? new Date(dateRange.to).setHours(23, 59, 59, 999) : null
-		return {
-			...baseParams,
-			userId,
-			success: success === "all" ? null : success,
-			actionType: actionType === "all" ? null : actionType,
-			startTimeMs: start,
-			endTimeMs: end,
-		}
-	}, [actionType, baseParams, dateRange, userId, success])
-
 	const columns = useMemo<ColumnDef<Api.OperationLog.SimpleLog>[]>(
 		() => [
 			{
@@ -239,48 +221,71 @@ export function PersonalOperationLogTable({
 		[onViewDetail],
 	)
 
-	const { table, loading, empty, fetching, refetch, pagination, setPage, setPageSize } =
-		useTablePagination<Api.OperationLog.SimpleLog>({
-			queryKey: ["personal-operation-logs", queryParams],
-			queryFn: ({ pageNumber, pageSize }) => {
+	const { table, filters, loading, empty, fetching, refetch, pagination, setPage, setPageSize } =
+		useDataTable<Api.OperationLog.SimpleLog>({
+			queryKey: ["personal-operation-logs"],
+			queryFn: (params) => {
+				const { startTimeMs, endTimeMs, ...rest } = params
 				return fetchOperationLogList({
-					...queryParams,
-					pageNumber,
-					pageSize,
-				})
+					...baseParams,
+					userId,
+					startTimeMs: startTimeMs as number | null,
+					endTimeMs: (endTimeMs as number | null)
+						? new Date(endTimeMs as number).setHours(23, 59, 59, 999)
+						: null,
+					...rest,
+				} as Api.OperationLog.SearchParams)
 			},
 			columns,
 			getRowId: (row) => row.id,
 			enableServerSorting: false,
+			filterParsers: {
+				startTimeMs: parseAsInteger,
+				endTimeMs: parseAsInteger,
+				success: parseAsString.withDefault("all"),
+				actionType: parseAsString.withDefault("all"),
+			},
 		})
+
+	const filterState = filters.state as unknown as {
+		startTimeMs?: number | null
+		endTimeMs?: number | null
+		success: "all" | "true" | "false"
+		actionType: Api.ActionType | "all"
+	}
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset page when userId changes
 	useEffect(() => {
 		setPage(1)
-	}, [setPage, queryParams.userId])
+	}, [setPage, userId])
 
 	const hasActiveFilters = useMemo(() => {
-		return Boolean(dateRange?.from || dateRange?.to || success !== "all" || actionType !== "all")
-	}, [actionType, dateRange, success])
+		return Boolean(
+			filterState.startTimeMs ||
+				filterState.endTimeMs ||
+				filterState.success !== "all" ||
+				filterState.actionType !== "all",
+		)
+	}, [filterState])
 
 	const handleReset = useCallback(() => {
-		setDateRange(undefined)
-		setSuccess("all")
-		setActionType("all")
-		setPage(1)
-	}, [setPage])
+		filters.reset()
+	}, [filters])
 
 	const handleRefresh = useCallback(async () => {
 		await refetch()
 	}, [refetch])
 
 	const successLabel = useMemo(() => {
-		return successOptions.find((option) => option.value === success)?.label ?? "状态"
-	}, [success])
+		return successOptions.find((option) => option.value === filterState.success)?.label ?? "状态"
+	}, [filterState.success])
 
 	const actionTypeLabel = useMemo(() => {
-		return actionTypeOptions.find((option) => option.value === actionType)?.label ?? "操作类型"
-	}, [actionType])
+		return (
+			actionTypeOptions.find((option) => option.value === filterState.actionType)?.label ??
+			"操作类型"
+		)
+	}, [filterState.actionType])
 
 	return (
 		<TableProvider
@@ -302,25 +307,33 @@ export function PersonalOperationLogTable({
 						>
 							<div className="flex flex-wrap items-center gap-2">
 								<DateRangePicker
-									value={dateRange ? { from: dateRange.from, to: dateRange.to } : undefined}
-									onChange={(range) =>
-										setDateRange(range ? { from: range.from, to: range.to } : undefined)
+									value={
+										filterState.startTimeMs
+											? {
+													from: new Date(filterState.startTimeMs),
+													to: filterState.endTimeMs ? new Date(filterState.endTimeMs) : undefined,
+												}
+											: undefined
 									}
+									onChange={(range) => {
+										filters.set("startTimeMs", range?.from?.getTime() ?? null)
+										filters.set("endTimeMs", range?.to?.getTime() ?? null)
+									}}
 									placeholder="时间范围"
 								/>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button variant="outline" size="sm" className="h-9 gap-1">
 											<Plus className="h-4 w-4" />
-											{success === "all" ? "状态" : `状态: ${successLabel}`}
+											{filterState.success === "all" ? "状态" : `状态: ${successLabel}`}
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="start" className="w-36">
 										<DropdownMenuLabel>状态</DropdownMenuLabel>
 										<DropdownMenuSeparator />
 										<DropdownMenuRadioGroup
-											value={success}
-											onValueChange={(value) => setSuccess(value as "all" | "true" | "false")}
+											value={filterState.success}
+											onValueChange={(value) => filters.set("success", value)}
 										>
 											{successOptions.map((option) => (
 												<DropdownMenuRadioItem key={option.value} value={option.value}>
@@ -334,15 +347,15 @@ export function PersonalOperationLogTable({
 									<DropdownMenuTrigger asChild>
 										<Button variant="outline" size="sm" className="h-9 gap-1">
 											<Plus className="h-4 w-4" />
-											{actionType === "all" ? "操作类型" : `类型: ${actionTypeLabel}`}
+											{filterState.actionType === "all" ? "操作类型" : `类型: ${actionTypeLabel}`}
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="start" className="w-44">
 										<DropdownMenuLabel>操作类型</DropdownMenuLabel>
 										<DropdownMenuSeparator />
 										<DropdownMenuRadioGroup
-											value={actionType}
-											onValueChange={(value) => setActionType(value as Api.ActionType | "all")}
+											value={filterState.actionType}
+											onValueChange={(value) => filters.set("actionType", value)}
 										>
 											{actionTypeOptions.map((option) => (
 												<DropdownMenuRadioItem key={option.value} value={option.value}>

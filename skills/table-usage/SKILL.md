@@ -1,6 +1,6 @@
 ---
 name: table-usage
-description: "Use when implementing or modifying table components in this codebase, especially paginated tables, server-side pagination, search, filters, or URL-synced table state (nuqs). Triggers include: 新增分页表格, 分页表格, 表格分页."
+description: "Use when implementing or modifying table components in this codebase, especially paginated tables, server-side pagination, search, filters, or URL-synced table state (nuqs). Triggers include: 分页表格, 表格分页."
 ---
 
 # Table Usage Skill

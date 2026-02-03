@@ -1,5 +1,5 @@
 import { Activity, Menu, Shield, User } from "lucide-react"
-import { useQueryState } from "nuqs"
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -24,7 +24,25 @@ const navItems = [
 ] as const
 
 export function ProfileLayout() {
-	const [tab, setTab] = useQueryState("tab", { defaultValue: "general" })
+	const [states, setStates] = useQueryStates(
+		{
+			tab: parseAsString.withDefault("general"),
+			// Activity related params to clear
+			activityTab: parseAsString,
+			loginTimeStart: parseAsInteger,
+			loginTimeEnd: parseAsInteger,
+			startTimeMs: parseAsInteger,
+			endTimeMs: parseAsInteger,
+			success: parseAsString,
+			actionType: parseAsString,
+			page: parseAsInteger,
+			size: parseAsInteger,
+			q: parseAsString,
+		},
+		{ shallow: false },
+	)
+
+	const tab = states.tab
 	const [open, setOpen] = useState(false)
 	const setUser = useAuthStore((state) => state.setUser)
 	const { data: userProfile } = useUserProfile()
@@ -47,7 +65,21 @@ export function ProfileLayout() {
 						key={item.value}
 						type="button"
 						onClick={() => {
-							void setTab(item.value)
+							const newState: Record<string, string | null> = { tab: item.value }
+							// 如果当前从活动页面切走，清理所有相关参数
+							if (tab === "activity" && item.value !== "activity") {
+								newState.activityTab = null
+								newState.loginTimeStart = null
+								newState.loginTimeEnd = null
+								newState.startTimeMs = null
+								newState.endTimeMs = null
+								newState.success = null
+								newState.actionType = null
+								newState.page = null
+								newState.size = null
+								newState.q = null
+							}
+							void setStates(newState)
 							setOpen(false)
 						}}
 						className={cn(
