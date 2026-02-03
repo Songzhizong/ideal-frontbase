@@ -14,6 +14,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx"
+import { AppSheetContent } from "@/components/ui/app-sheet"
 import { Button } from "@/components/ui/button.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import {
@@ -23,7 +24,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select.tsx"
-import { AppSheetContent } from "@/components/ui/app-sheet"
 import { Sheet, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet.tsx"
 import { themePresets } from "@/config/theme-presets"
 import { useThemeStore } from "@/hooks/use-theme-store"
@@ -390,7 +390,7 @@ export function ThemeSettingsDrawer() {
 						</Button>
 					</div>
 				</div>
-			</SheetContent>
+			</AppSheetContent>
 
 			<AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
 				<AlertDialogContent>
