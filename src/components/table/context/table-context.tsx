@@ -35,9 +35,17 @@ export interface TableContextValue<TData = unknown> {
 	 * Show total count (optional, for paginated tables)
 	 */
 	showTotal?: boolean
+	/**
+	 * Custom empty state component
+	 */
+	emptyState?: ReactNode
+	/**
+	 * Custom loading state component
+	 */
+	loadingState?: ReactNode
 }
 
-const TableContext = createContext<TableContextValue | null>(null)
+export const TableContext = createContext<TableContextValue | null>(null)
 
 export interface TableProviderProps<TData = unknown> extends TableContextValue<TData> {
 	children: ReactNode

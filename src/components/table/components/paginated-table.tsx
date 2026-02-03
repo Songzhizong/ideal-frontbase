@@ -106,11 +106,11 @@ export function PaginatedTable<TData>({
 					<DataTable
 						table={table}
 						loading={loading}
-						fetching={fetching}
 						empty={empty}
 						emptyText={emptyText}
-						{...(emptyState && { emptyState })}
-						{...(loadingState && { loadingState })}
+						emptyState={emptyState}
+						loadingState={loadingState}
+						fetching={fetching}
 						className="border-0"
 					/>
 				}

@@ -7,6 +7,7 @@ import {
 	DataTablePagination,
 	DataTableToolbar,
 	TableProvider,
+	useTableContext,
 } from "@/components/table"
 import { cn } from "@/lib/utils"
 import { DataTable } from "./data-table"
@@ -151,7 +152,9 @@ function TableContent<TData>({
 		...(className && { className }),
 	}
 
-	return <DataTable {...tableProps} />
+	const { table } = useTableContext<TData>()
+
+	return <DataTable table={table} {...tableProps} />
 }
 
 interface TableToolbarProps {

@@ -12,13 +12,20 @@
 - **防御性数据处理**：自动处理 API 返回的空结果。
 
 ### 1.2 组件层级结构
-必须遵循以下组件层级嵌套规则，确保上下文传递和布局稳定性：
+重构后的组件更加纯粹，必须通过 `table` 实例作为单一事实来源：
 
 ```tsx
 <TableProvider {...}>
   <DataTableContainer
-    toolbar={<DataTableFilterBar onSearch={refetch} onReset={filters.reset} ... />}
-    table={<DataTable table={table} ... />}
+    toolbar={<DataTableToolbar ... />}
+    table={
+      <DataTable
+        table={table} // 必须传入 table 实例
+        loading={loading}
+        empty={empty}
+        emptyText="暂无数据"
+      />
+    }
     pagination={<DataTablePagination />}
   />
 </TableProvider>
@@ -64,11 +71,13 @@
 ## 4. AIAgent 开发准则
 
 ### 4.1 生成逻辑
-- **单一数据源**：生成的组件必须通过 `table` 实例（TanStack Table）获取所有数据和状态。
+- **强制单一实例驱动**：生成的组件**必须**使用 `useDataTable` 或 `useReactTable` 创建 `table` 实例并传入。严禁再在 `DataTable` 内部维护并行状态。
+- **利用 Context 简化代码**：`DataTable` 现在能自动从 Context 中读取其需要的 `loading`、`empty` 等通用状态。在 `TableProvider` 内部使用时，应优先忽略这些冗余 Props 以保持代码简洁。
 - **不要直接操作分页**：在分页按钮或筛选器中，使用 `setPage` 而不是 `table.setPageIndex`。
 - **数据安全**：始终确保传递给表格的 `data` 具有默认值 `?? []`。
 
 ### 4.2 禁止项 (Anti-patterns)
+- ❌ **严禁**使用已废弃的 `InternalDataTable` 模式（即不传 `table` 实例而只传 `columns` 和 `data`）。
 - ❌ 严禁创建并行的状态来存储列显示或选择情况。
 - ❌ 严禁手动编写 `useEffect` 来同步 URL 参数。
 - ❌ 严禁在筛选表单中使用自定义的 `debounce` 逻辑（已集成在 `onSearch` 中）。

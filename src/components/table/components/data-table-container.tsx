@@ -1,4 +1,5 @@
-import React, { type ReactNode, useLayoutEffect, useRef, useState } from "react"
+import React, { type ReactNode, useRef } from "react"
+import { useElementSize } from "@/components/table/hooks"
 import { cn } from "@/lib/utils"
 
 export interface DataTableContainerProps {
@@ -37,29 +38,7 @@ export function DataTableContainer({
 	className,
 }: DataTableContainerProps) {
 	const containerRef = useRef<HTMLDivElement>(null)
-	const toolbarRef = useRef<HTMLDivElement>(null)
-	const [toolbarHeight, setToolbarHeight] = useState(0)
-
-	useLayoutEffect(() => {
-		if (toolbarRef.current) {
-			const updateHeight = () => {
-				if (toolbarRef.current) {
-					// getBoundingClientRect ensures we get the precise visual height including borders and padding
-					setToolbarHeight(toolbarRef.current.getBoundingClientRect().height)
-				}
-			}
-
-			// Measure immediately
-			updateHeight()
-
-			const resizeObserver = new ResizeObserver(() => {
-				updateHeight()
-			})
-
-			resizeObserver.observe(toolbarRef.current)
-			return () => resizeObserver.disconnect()
-		}
-	}, [])
+	const [toolbarRef, { height: toolbarHeight }] = useElementSize<HTMLDivElement>()
 
 	return (
 		<div

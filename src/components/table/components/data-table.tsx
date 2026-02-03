@@ -1,21 +1,8 @@
-import {
-	type ColumnDef,
-	type ColumnOrderState,
-	flexRender,
-	getCoreRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	type RowSelectionState,
-	type SortingState,
-	type Table as TanStackTable,
-	type Updater,
-	useReactTable,
-	type VisibilityState,
-} from "@tanstack/react-table"
+import { flexRender, type Table as TanStackTable } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import type React from "react"
-import { type ReactNode, useRef, useState } from "react"
-import type { PaginationState } from "@/components/table"
+import { type ReactNode, useContext, useRef } from "react"
+import { TableContext, type TableContextValue } from "@/components/table/context/table-context"
 import { Button } from "@/components/ui/button"
 import {
 	Table,
@@ -29,18 +16,9 @@ import { cn } from "@/lib/utils"
 
 export interface DataTableProps<TData> {
 	/**
-	 * External table instance (optional)
-	 * If provided, internal table creation is skipped
+	 * TanStack Table instance (required)
 	 */
-	table?: TanStackTable<TData>
-	/**
-	 * Columns definition (required if table is not provided)
-	 */
-	columns?: ColumnDef<TData>[]
-	/**
-	 * Table data (required if table is not provided)
-	 */
-	data?: TData[]
+	table: TanStackTable<TData>
 	/**
 	 * Loading state
 	 */
@@ -48,7 +26,7 @@ export interface DataTableProps<TData> {
 	/**
 	 * Fetching state (for refresh)
 	 */
-	fetching?: boolean | undefined
+	fetching?: boolean
 	/**
 	 * Empty state
 	 */
@@ -58,89 +36,58 @@ export interface DataTableProps<TData> {
 	 */
 	emptyText: string
 	/**
-	 * Row selection state (only used if table is not provided)
-	 */
-	rowSelection?: RowSelectionState
-	/**
-	 * Row selection change handler (only used if table is not provided)
-	 */
-	onRowSelectionChange?: (selection: RowSelectionState | Updater<RowSelectionState>) => void
-	/**
-	 * Get row ID
-	 */
-	getRowId?: (row: TData) => string
-	/**
 	 * Additional class names
 	 */
-	className?: string | undefined
+	className?: string
 	/**
 	 * Optional max height for internal scroll area (enables body scrolling)
 	 */
 	maxHeight?: string | undefined
 	/**
-	 * Sorting state (only used if table is not provided)
-	 */
-	sorting?: SortingState
-	/**
-	 * Sorting change handler (only used if table is not provided)
-	 */
-	onSortingChange?: (sorting: SortingState | Updater<SortingState>) => void
-	/**
-	 * Column visibility state (only used if table is not provided)
-	 */
-	columnVisibility?: VisibilityState
-	/**
-	 * Column visibility change handler (only used if table is not provided)
-	 */
-	onColumnVisibilityChange?: (visibility: VisibilityState | Updater<VisibilityState>) => void
-	/**
-	 * Column order state (only used if table is not provided)
-	 */
-	columnOrder?: ColumnOrderState
-	/**
-	 * Column order change handler (only used if table is not provided)
-	 */
-	onColumnOrderChange?: (order: ColumnOrderState | Updater<ColumnOrderState>) => void
-	/**
-	 * Pagination state (optional, for client-side pagination or controlled state)
-	 */
-	pagination?: PaginationState
-	/**
 	 * Custom empty state component
 	 */
-	emptyState?: ReactNode | undefined
+	emptyState?: ReactNode
 	/**
 	 * Custom loading state component
 	 */
-	loadingState?: ReactNode | undefined
+	loadingState?: ReactNode
 }
 
-export interface DataTableContentProps<TData> {
+export interface DataTableContentProps<TData> extends Partial<DataTableProps<TData>> {
 	table: TanStackTable<TData>
-	loading: boolean
-	fetching?: boolean | undefined
-	empty: boolean
-	emptyText: string
-	className?: string | undefined
-	maxHeight?: string | undefined
-	emptyState?: ReactNode | undefined
-	loadingState?: ReactNode | undefined
 }
 
+/**
+ * Pure rendering component for TanStack Table.
+ * It uses the table instance to render the header and body.
+ * Performance optimized with sticky header support and scroll synchronization.
+ */
 export function DataTableContent<TData>({
 	table,
-	loading,
-	fetching = false,
-	empty,
-	emptyText,
+	loading: propLoading,
+	fetching: propFetching,
+	empty: propEmpty,
+	emptyText: propEmptyText,
 	className,
 	maxHeight,
-	emptyState,
-	loadingState,
+	emptyState: propEmptyState,
+	loadingState: propLoadingState,
 }: DataTableContentProps<TData>) {
+	// Try to get values from context if they are available
+	// We use useContext directly instead of useTableContext to avoid throwing error
+	// when DataTable is used outside of TableProvider.
+	const context = useContext(TableContext) as TableContextValue<TData> | null
+	const loading = propLoading ?? context?.loading ?? false
+	const fetching = propFetching ?? false
+	const empty = propEmpty ?? context?.empty ?? false
+	const emptyText = propEmptyText ?? "暂无数据"
+	const emptyState = propEmptyState ?? context?.emptyState
+	const loadingState = propLoadingState ?? context?.loadingState
+
 	const totalColumns = table.getAllColumns().length
 	const headerRef = useRef<HTMLDivElement>(null)
 	const bodyRef = useRef<HTMLDivElement>(null)
+
 	const tableBodyWrapperClassName = cn(
 		"flex-1 min-h-0 w-full overflow-x-auto",
 		maxHeight && "overflow-y-auto",
@@ -158,7 +105,7 @@ export function DataTableContent<TData>({
 			<TableCell colSpan={totalColumns} className="h-24 text-center">
 				<div className="flex items-center justify-center">
 					<div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-					<span className="ml-2 text-muted-foreground">Loading...</span>
+					<span className="ml-2 text-muted-foreground">加载中...</span>
 				</div>
 			</TableCell>
 		</TableRow>
@@ -286,129 +233,10 @@ export function DataTableContent<TData>({
 	)
 }
 
-function InternalDataTable<TData>({
-	columns: propColumns,
-	data: propData,
-	loading,
-	fetching,
-	empty,
-	emptyText,
-	className,
-	maxHeight,
-	emptyState,
-	loadingState,
-	rowSelection: controlledRowSelection,
-	onRowSelectionChange,
-	getRowId,
-	sorting: controlledSorting,
-	onSortingChange,
-	columnVisibility: controlledColumnVisibility,
-	onColumnVisibilityChange,
-	columnOrder: controlledColumnOrder,
-	onColumnOrderChange,
-	pagination: controlledPagination,
-}: DataTableProps<TData>) {
-	const [internalSorting, setInternalSorting] = useState<SortingState>([])
-	const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
-	const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
-	const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
-
-	const sorting = controlledSorting ?? internalSorting
-	const handleSortingChange = (updater: Updater<SortingState>) => {
-		onSortingChange?.(updater)
-		if (!controlledSorting) {
-			setInternalSorting(updater)
-		}
-	}
-
-	const rowSelection = controlledRowSelection ?? internalRowSelection
-	const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
-		onRowSelectionChange?.(updater)
-		if (!controlledRowSelection) {
-			setInternalRowSelection(updater)
-		}
-	}
-
-	const columnVisibility = controlledColumnVisibility ?? internalColumnVisibility
-	const handleColumnVisibilityChange = (updater: Updater<VisibilityState>) => {
-		onColumnVisibilityChange?.(updater)
-		if (!controlledColumnVisibility) {
-			setInternalColumnVisibility(updater)
-		}
-	}
-
-	const columnOrder = controlledColumnOrder ?? internalColumnOrder
-	const handleColumnOrderChange = (updater: Updater<ColumnOrderState>) => {
-		onColumnOrderChange?.(updater)
-		if (!controlledColumnOrder) {
-			setInternalColumnOrder(updater)
-		}
-	}
-
-	const columns = propColumns || []
-	const data = propData || []
-
-	const table = useReactTable({
-		data,
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		onSortingChange: handleSortingChange,
-		onRowSelectionChange: handleRowSelectionChange,
-		onColumnVisibilityChange: handleColumnVisibilityChange,
-		onColumnOrderChange: handleColumnOrderChange,
-		...(getRowId && { getRowId }),
-		state: {
-			sorting,
-			rowSelection,
-			columnVisibility,
-			columnOrder,
-			...(controlledPagination
-				? {
-						pagination: {
-							pageIndex: controlledPagination.pageNumber - 1,
-							pageSize: controlledPagination.pageSize,
-						},
-					}
-				: {}),
-		},
-		enableRowSelection: true,
-	})
-
-	return (
-		<DataTableContent
-			table={table}
-			loading={loading}
-			fetching={fetching}
-			empty={empty}
-			emptyText={emptyText}
-			className={className}
-			maxHeight={maxHeight}
-			emptyState={emptyState}
-			loadingState={loadingState}
-		/>
-	)
-}
-
-export function DataTable<TData>({ table, ...props }: DataTableProps<TData>) {
-	const { loading, fetching, empty, emptyText, className, maxHeight, emptyState, loadingState } =
-		props
-	if (table) {
-		return (
-			<DataTableContent
-				table={table}
-				loading={loading}
-				fetching={fetching}
-				empty={empty}
-				emptyText={emptyText}
-				className={className}
-				maxHeight={maxHeight}
-				emptyState={emptyState}
-				loadingState={loadingState}
-			/>
-		)
-	}
-
-	return <InternalDataTable {...props} />
+/**
+ * Main Table Component.
+ * Now requires a table instance, promoting a single source of truth.
+ */
+export function DataTable<TData>(props: DataTableProps<TData>) {
+	return <DataTableContent {...props} />
 }
