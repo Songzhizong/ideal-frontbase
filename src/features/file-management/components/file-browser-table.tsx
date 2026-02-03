@@ -1,0 +1,164 @@
+import { flexRender, type Table as ReactTable, type Row } from "@tanstack/react-table"
+import { type DragEvent, type MouseEvent, memo } from "react"
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+import type { FileManagerItem } from "../types"
+
+interface FileBrowserTableProps {
+	table: ReactTable<FileManagerItem>
+	items: FileManagerItem[]
+	selectedSet: Set<string>
+	isRecycleBin: boolean
+	onSelectItem: (index: number, id: string, event: MouseEvent) => void
+	onOpenItem: (item: FileManagerItem) => void
+	onItemContextMenu: (item: FileManagerItem) => void
+	onDragStart: (event: DragEvent, item: FileManagerItem) => void
+	onDragOverItem: (event: DragEvent, item: FileManagerItem) => void
+	onDragLeaveItem: () => void
+	onDropOnItem: (event: DragEvent, item: FileManagerItem) => void
+	dragOverId: string | null
+}
+
+const TableRowItem = memo(function TableRowItem({
+	row,
+	item,
+	isSelected,
+	isRecycleBin,
+	onSelectItem,
+	onOpenItem,
+	onItemContextMenu,
+	onDragStart,
+	onDragOverItem,
+	onDragLeaveItem,
+	onDropOnItem,
+	isDragOver,
+}: {
+	row: Row<FileManagerItem>
+	item: FileManagerItem
+	isSelected: boolean
+	isRecycleBin: boolean
+	onSelectItem: (index: number, id: string, event: MouseEvent) => void
+	onOpenItem: (item: FileManagerItem) => void
+	onItemContextMenu: (item: FileManagerItem) => void
+	onDragStart: (event: DragEvent, item: FileManagerItem) => void
+	onDragOverItem: (event: DragEvent, item: FileManagerItem) => void
+	onDragLeaveItem: () => void
+	onDropOnItem: (event: DragEvent, item: FileManagerItem) => void
+	isDragOver: boolean
+}) {
+	return (
+		<TableRow
+			data-selection-id={item.id}
+			className={cn(
+				"transition-colors",
+				isSelected ? "bg-primary/10" : "hover:bg-muted/50",
+				isDragOver && "bg-primary/20",
+			)}
+			onClick={(event) => onSelectItem(row.index, item.id, event)}
+			onDoubleClick={() => onOpenItem(item)}
+			onContextMenu={() => {
+				onItemContextMenu(item)
+			}}
+			draggable={!isRecycleBin}
+			onDragStart={(event) => onDragStart(event, item)}
+			onDragOver={(event) => onDragOverItem(event, item)}
+			onDragLeave={onDragLeaveItem}
+			onDrop={(event) => onDropOnItem(event, item)}
+		>
+			{row.getVisibleCells().map((cell) => {
+				const meta = cell.column.columnDef.meta as { className?: string } | undefined
+				return (
+					<TableCell key={cell.id} className={cn(meta?.className)}>
+						{flexRender(cell.column.columnDef.cell, cell.getContext())}
+					</TableCell>
+				)
+			})}
+		</TableRow>
+	)
+})
+
+export const FileBrowserTable = memo(function FileBrowserTable({
+	table,
+	items,
+	selectedSet,
+	isRecycleBin,
+	onSelectItem,
+	onOpenItem,
+	onItemContextMenu,
+	onDragStart,
+	onDragOverItem,
+	onDragLeaveItem,
+	onDropOnItem,
+	dragOverId,
+}: FileBrowserTableProps) {
+	if (items.length === 0) {
+		return (
+			<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+				暂无文件
+			</div>
+		)
+	}
+
+	return (
+		<div className="flex flex-1 flex-col overflow-hidden">
+			{/* Separate Header Table */}
+			<div className="border-b border-gray-100 bg-gray-50/50 px-4">
+				<Table>
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id} className="border-none hover:bg-transparent">
+								{headerGroup.headers.map((header) => {
+									const meta = header.column.columnDef.meta as { className?: string } | undefined
+									return (
+										<TableHead
+											key={header.id}
+											className={cn(
+												"h-10 text-xs font-medium text-muted-foreground",
+												meta?.className,
+											)}
+										>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</TableHead>
+									)
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+				</Table>
+			</div>
+			{/* Scrollable Body Table */}
+			<div className="flex-1 overflow-auto p-4 pt-0">
+				<Table>
+					<TableBody>
+						{table.getRowModel().rows.map((row) => (
+							<TableRowItem
+								key={row.id}
+								row={row}
+								item={row.original}
+								isSelected={selectedSet.has(row.original.id)}
+								isRecycleBin={isRecycleBin}
+								onSelectItem={onSelectItem}
+								onOpenItem={onOpenItem}
+								onItemContextMenu={onItemContextMenu}
+								onDragStart={onDragStart}
+								onDragOverItem={onDragOverItem}
+								onDragLeaveItem={onDragLeaveItem}
+								onDropOnItem={onDropOnItem}
+								isDragOver={dragOverId === row.original.id}
+							/>
+						))}
+					</TableBody>
+				</Table>
+			</div>
+		</div>
+	)
+})

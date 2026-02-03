@@ -1,31 +1,33 @@
-You are an expert Full-Stack Developer utilizing **React 19**, **TypeScript**, **Vite**, **Tailwind CSS 4**, **TanStack Router**, and **TanStack Query**.
-Your mindset maps Backend concepts (DTO, Controller, Service) to Frontend patterns (Zod Schema, Api Layer, Query Hooks).
+你是一名资深全栈开发者，使用 **React 19**、**TypeScript**、**Vite**、**Tailwind CSS 4**、**TanStack Router** 和 **TanStack Query**。
+你的思维模式是将后端概念（DTO、Controller、Service）映射到前端模式（Zod Schema、API 层、Query Hooks）。
 
-## 1. 基础准则 (General Rules)
-- **Strict TypeScript**: Never use `any`. Use `unknown` and strict type guards or Zod parsing.
-- **React 19 Paradigms**:
-  - Functional Components: `export function Name() {}`.
-  - No `forwardRef`: Pass `ref` directly as a prop.
-  - Context: Use `<Context>` provider syntax.
-- **HTTP Client**: Use `ky` exclusively.
-- **Lint/Format**: Use Biome (Tabs, Double Quotes).
-- **Package Manager**: Exclusively use **pnpm**.
+## 1. 基础准则
+- **语言要求**：AIAgent 必须使用简体中文回答问题、编写文档、输出计划。
+- **严格 TypeScript**：禁止使用 `any`。使用 `unknown` 并配合严格的类型守卫或 Zod 解析。
+- **React 19 规范**：
+  - 函数组件：`export function Name() {}`。
+  - 禁用 `forwardRef`：直接将 `ref` 作为 prop 传递。
+  - Context：使用 `<Context>` provider 语法。
+- **HTTP 客户端**：仅使用 `ky`。
+- **Lint/Format**：使用 Biome（Tab 缩进，双引号）。
+- **包管理器**：仅使用 **pnpm**。
 
-## 2. 样式与视觉规范 (Styling & UI)
-- **Shadcn UI**: Always use components from `@/components/ui`.
-- **Tailwind CSS 4**: Use utility classes (CSS-first config).
-- **Semantic Variables**: ALWAYS use Shadcn's semantic tokens (e.g., `bg-background`).
-  - **Zero Hardcoding**: Strictly forbid hex or named colors.
-- **Visual Hierarchy**:
-  - Subtle Borders: Use `border-border/50` for internal dividers.
-  - Table Overflow: Wrap `Table` in a `div` with `overflow-x-auto`.
+## 2. 样式与视觉规范
+- **Shadcn UI**：始终使用 `@/components/ui` 中的组件。
+- **Tailwind CSS 4**：使用工具类（CSS-first 配置）。
+- **语义化变量**：始终使用 Shadcn 的语义化令牌（例如 `bg-background`）。
+  - **零硬编码**：严格禁止使用十六进制或具名颜色。
+- **视觉层级**：
+  - 细腻边框：内部分隔使用 `border-border/50`。
+  - 表格溢出：`Table` 外层用 `div` 包裹并添加 `overflow-x-auto`。
 
-## 3. 目录与垂直领域规范 (Modular Guidelines)
+## 3. 目录与垂直领域规范
 核心逻辑应参照以下细分规则：
 
 - **架构与 API 数据流**：详细规则请阅读 [architecture.md](architecture.md)。
 - **表单与异常反馈**：详细规则请阅读 [forms.md](forms.md)。
 - **表格与查询状态**：详细规则请阅读 [data-table.md](data-table.md)。
+- **权限与鉴权控制**：详细规则请阅读 [permissions.md](permissions.md)。
 - **代码风格与命名**：详细规则请阅读 [coding-style.md](coding-style.md)。
 
 ---

@@ -14,10 +14,12 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as Errors500RouteImport } from './routes/errors/500'
 import { Route as Errors404RouteImport } from './routes/errors/404'
 import { Route as Errors403RouteImport } from './routes/errors/403'
+import { Route as AuthenticatedCoreRouteRouteImport } from './routes/_authenticated/_core/route'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/_dashboard/index'
 import { Route as BlankAuthLoginRouteImport } from './routes/_blank/_auth/login'
 import { Route as AuthenticatedCoreUsersRouteImport } from './routes/_authenticated/_core/users'
 import { Route as AuthenticatedCoreProfileRouteImport } from './routes/_authenticated/_core/profile'
+import { Route as AuthenticatedCoreFileManagementRouteImport } from './routes/_authenticated/_core/file-management'
 
 const BlankRouteRoute = BlankRouteRouteImport.update({
   id: '/_blank',
@@ -42,6 +44,10 @@ const Errors403Route = Errors403RouteImport.update({
   path: '/errors/403',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCoreRouteRoute = AuthenticatedCoreRouteRouteImport.update({
+  id: '/_core',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/_dashboard/',
@@ -54,15 +60,21 @@ const BlankAuthLoginRoute = BlankAuthLoginRouteImport.update({
   getParentRoute: () => BlankRouteRoute,
 } as any)
 const AuthenticatedCoreUsersRoute = AuthenticatedCoreUsersRouteImport.update({
-  id: '/_core/users',
+  id: '/users',
   path: '/users',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedCoreRouteRoute,
 } as any)
 const AuthenticatedCoreProfileRoute =
   AuthenticatedCoreProfileRouteImport.update({
-    id: '/_core/profile',
+    id: '/profile',
     path: '/profile',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedCoreRouteRoute,
+  } as any)
+const AuthenticatedCoreFileManagementRoute =
+  AuthenticatedCoreFileManagementRouteImport.update({
+    id: '/file-management',
+    path: '/file-management',
+    getParentRoute: () => AuthenticatedCoreRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -70,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
   '/users': typeof AuthenticatedCoreUsersRoute
   '/login': typeof BlankAuthLoginRoute
@@ -79,6 +92,7 @@ export interface FileRoutesByTo {
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
   '/users': typeof AuthenticatedCoreUsersRoute
   '/login': typeof BlankAuthLoginRoute
@@ -87,9 +101,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_blank': typeof BlankRouteRouteWithChildren
+  '/_authenticated/_core': typeof AuthenticatedCoreRouteRouteWithChildren
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
+  '/_authenticated/_core/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/_authenticated/_core/profile': typeof AuthenticatedCoreProfileRoute
   '/_authenticated/_core/users': typeof AuthenticatedCoreUsersRoute
   '/_blank/_auth/login': typeof BlankAuthLoginRoute
@@ -102,6 +118,7 @@ export interface FileRouteTypes {
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/file-management'
     | '/profile'
     | '/users'
     | '/login'
@@ -111,6 +128,7 @@ export interface FileRouteTypes {
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/file-management'
     | '/profile'
     | '/users'
     | '/login'
@@ -118,9 +136,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/_blank'
+    | '/_authenticated/_core'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
+    | '/_authenticated/_core/file-management'
     | '/_authenticated/_core/profile'
     | '/_authenticated/_core/users'
     | '/_blank/_auth/login'
@@ -172,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Errors403RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/_core': {
+      id: '/_authenticated/_core'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedCoreRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/_dashboard/': {
       id: '/_authenticated/_dashboard/'
       path: '/'
@@ -191,27 +218,50 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof AuthenticatedCoreUsersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedCoreRouteRoute
     }
     '/_authenticated/_core/profile': {
       id: '/_authenticated/_core/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedCoreProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedCoreRouteRoute
+    }
+    '/_authenticated/_core/file-management': {
+      id: '/_authenticated/_core/file-management'
+      path: '/file-management'
+      fullPath: '/file-management'
+      preLoaderRoute: typeof AuthenticatedCoreFileManagementRouteImport
+      parentRoute: typeof AuthenticatedCoreRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedCoreRouteRouteChildren {
+  AuthenticatedCoreFileManagementRoute: typeof AuthenticatedCoreFileManagementRoute
   AuthenticatedCoreProfileRoute: typeof AuthenticatedCoreProfileRoute
   AuthenticatedCoreUsersRoute: typeof AuthenticatedCoreUsersRoute
+}
+
+const AuthenticatedCoreRouteRouteChildren: AuthenticatedCoreRouteRouteChildren =
+  {
+    AuthenticatedCoreFileManagementRoute: AuthenticatedCoreFileManagementRoute,
+    AuthenticatedCoreProfileRoute: AuthenticatedCoreProfileRoute,
+    AuthenticatedCoreUsersRoute: AuthenticatedCoreUsersRoute,
+  }
+
+const AuthenticatedCoreRouteRouteWithChildren =
+  AuthenticatedCoreRouteRoute._addFileChildren(
+    AuthenticatedCoreRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCoreRouteRoute: typeof AuthenticatedCoreRouteRouteWithChildren
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedCoreProfileRoute: AuthenticatedCoreProfileRoute,
-  AuthenticatedCoreUsersRoute: AuthenticatedCoreUsersRoute,
+  AuthenticatedCoreRouteRoute: AuthenticatedCoreRouteRouteWithChildren,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
 
