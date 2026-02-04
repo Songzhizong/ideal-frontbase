@@ -14,7 +14,7 @@ export function useThemeEffects() {
 	const borderRadius = useThemeStore((state) => state.ui.borderRadius)
 	const resolvedTheme = useResolvedTheme()
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (typeof document === "undefined") {
 			return
 		}

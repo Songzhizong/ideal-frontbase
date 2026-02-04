@@ -31,7 +31,7 @@ export function Header({ navItems, onSearchOpen }: HeaderProps) {
 	return (
 		<header
 			className={cn(
-				"sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 backdrop-blur-md px-4 transition-colors sm:px-6",
+				"sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 backdrop-blur-md px-4 sm:px-6",
 				isScrolled ? "border-border" : "border-transparent",
 			)}
 			style={{ height: `${headerHeight}px` }}

@@ -1,7 +1,6 @@
 /**
  * Theme Store - Global theme state management
  */
-
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { defaultThemeSettings, themePresets } from "@/config/theme-presets"
@@ -131,8 +130,13 @@ function applyTheme(config: ThemeConfig) {
 	const effectiveMode = resolveThemeMode(config.mode)
 	updateThemeVariables(preset, effectiveMode)
 
-	// Apply border radius and font family (handled by useThemeEffects if active, but good for initialization)
+	// Apply class + CSS vars immediately to keep all regions in sync.
 	const root = document.documentElement
+	root.classList.remove("light", "dark")
+	root.classList.add(effectiveMode)
+	root.dataset.theme = effectiveMode
+
+	// Apply border radius and font family (handled by useThemeEffects if active, but good for initialization)
 	root.style.setProperty("--radius", `${config.ui.borderRadius}px`)
 
 	const currentFontClass = `font-${config.fontFamily.replace(/\s+/g, "-").toLowerCase()}`
