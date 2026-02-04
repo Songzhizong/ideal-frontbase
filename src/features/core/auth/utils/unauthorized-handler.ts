@@ -1,5 +1,7 @@
+import { router } from "@/app/router"
 import { showUnauthorizedDialog } from "@/features/core/auth"
 import { authStore } from "@/lib/auth-store"
+import { getAppLocationPath } from "@/lib/base-path"
 
 /**
  * 未授权处理器的状态管理
@@ -12,11 +14,16 @@ let isUnauthorizedHandling = false
  */
 function handleUnauthorizedRedirect() {
 	authStore.getState().logout()
-	const currentPath = window.location.pathname
+	const currentPath = getAppLocationPath()
 	if (!currentPath.includes("/login")) {
 		// 不重置标志位，让页面刷新后自动重置
 		// 这样可以防止在跳转过程中再次触发弹框
-		window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+		void router.navigate({
+			to: "/login",
+			search: {
+				redirect: currentPath,
+			},
+		})
 	} else {
 		// 如果已经在登录页，重置标志位
 		isUnauthorizedHandling = false

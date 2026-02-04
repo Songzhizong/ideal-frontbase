@@ -12,6 +12,7 @@
 - **HTTP 客户端**：仅使用 `ky`。
 - **Lint/Format**：使用 Biome（Tab 缩进，双引号）。
 - **包管理器**：仅使用 **pnpm**。
+- **子路径导航**：站内跳转必须使用 `useBaseNavigate()` 或 `<BaseLink />`；禁止 `window.location` 与 `<a href="/...">` 的硬编码内链；若必须生成静态地址，使用 `withBasePath()`。
 
 ## 2. 样式与视觉规范
 - **Shadcn UI**：始终使用 `@/components/ui` 中的组件。
