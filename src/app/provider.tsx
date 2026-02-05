@@ -5,6 +5,7 @@ import { NuqsAdapter } from "nuqs/adapters/react"
 import { Toaster } from "sonner"
 import { queryClient } from "@/app/query-client"
 import { router } from "@/app/router"
+import { GlobalConfirmDialog } from "@/components/common/global-confirm-dialog"
 import { ThemeProvider } from "@/components/theme/theme-provider"
 
 export function AppProvider() {
@@ -14,6 +15,7 @@ export function AppProvider() {
 				<NuqsAdapter>
 					<RouterProvider router={router} />
 				</NuqsAdapter>
+				<GlobalConfirmDialog />
 				<Toaster position="top-center" richColors />
 				{import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
 			</ThemeProvider>

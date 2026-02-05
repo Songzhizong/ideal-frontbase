@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
-import type React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type { z } from "zod"
+import { useConfirm } from "@/hooks/use-confirm"
 import {
 	fetchBatchDeleteFile,
 	fetchBatchHardDeleteFile,
@@ -61,6 +61,7 @@ export function useFileManagerActions({
 	setPreviewItem,
 }: UseFileManagerActionsProps) {
 	const queryClient = useQueryClient()
+	const { confirm } = useConfirm()
 
 	// Dialog States
 	const [moveDialogOpen, setMoveDialogOpen] = useState(false)
@@ -68,14 +69,6 @@ export function useFileManagerActions({
 	const [targetCatalogId, setTargetCatalogId] = useState<string | null>(null)
 	const [dialogMode, setDialogMode] = useState<"create" | "rename" | null>(null)
 	const [dialogTarget, setDialogTarget] = useState<FileManagerItem | FileCatalog | null>(null)
-	const [confirmAction, setConfirmAction] = useState<{
-		title: string
-		description?: string
-		icon?: React.ReactNode
-		variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
-		confirmText?: string
-		onConfirm: () => Promise<void> | void
-	} | null>(null)
 
 	// Folder Form
 	const folderForm = useForm<z.infer<typeof FolderSchema>>({
@@ -134,46 +127,44 @@ export function useFileManagerActions({
 	)
 
 	const handleRecoverItem = useCallback(
-		(item: FileManagerItem) => {
-			setConfirmAction({
+		async (item: FileManagerItem) => {
+			const isConfirmed = await confirm({
 				title: "确认恢复?",
 				description: "将文件从回收站恢复到原目录。",
-				onConfirm: async () => {
-					if (item.kind === "folder") {
-						await fetchRecoveryCatalog(bizType, item.id)
-						void refetchCatalogs()
-					} else {
-						await fetchRecoveryFile(bizType, item.id)
-					}
-					void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-					toast.success("已恢复")
-				},
 			})
+			if (!isConfirmed) return
+			if (item.kind === "folder") {
+				await fetchRecoveryCatalog(bizType, item.id)
+				void refetchCatalogs()
+			} else {
+				await fetchRecoveryFile(bizType, item.id)
+			}
+			void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+			toast.success("已恢复")
 		},
-		[bizType, queryClient, refetchCatalogs],
+		[bizType, confirm, queryClient, refetchCatalogs],
 	)
 
 	const handleHardDeleteItem = useCallback(
-		(item: FileManagerItem) => {
-			setConfirmAction({
+		async (item: FileManagerItem) => {
+			const isConfirmed = await confirm({
 				title: "确认彻底删除?",
 				description: "此操作无法撤销。",
 				icon: <Trash2 className="size-6 text-destructive" />,
 				variant: "destructive",
 				confirmText: "删除",
-				onConfirm: async () => {
-					if (item.kind === "folder") {
-						await fetchHardDeleteCatalog(bizType, item.id)
-						void refetchCatalogs()
-					} else {
-						await fetchHardDeleteFile(bizType, item.id)
-					}
-					void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-					toast.success("已删除")
-				},
 			})
+			if (!isConfirmed) return
+			if (item.kind === "folder") {
+				await fetchHardDeleteCatalog(bizType, item.id)
+				void refetchCatalogs()
+			} else {
+				await fetchHardDeleteFile(bizType, item.id)
+			}
+			void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+			toast.success("已删除")
 		},
-		[bizType, queryClient, refetchCatalogs],
+		[bizType, confirm, queryClient, refetchCatalogs],
 	)
 
 	const handleBatchDelete = useCallback(async () => {
@@ -196,73 +187,66 @@ export function useFileManagerActions({
 		}
 	}, [selectedItems, bizType, refetchCatalogs, queryClient, setSelectedIds])
 
-	const handleBatchRecover = useCallback(() => {
+	const handleBatchRecover = useCallback(async () => {
 		if (selectedItems.length === 0) return
-		setConfirmAction({
+		const isConfirmed = await confirm({
 			title: "确认恢复?",
 			description: "选中项将被恢复。",
-			onConfirm: async () => {
-				const files = selectedItems.filter((item) => item.kind === "file").map((item) => item.id)
-				const folders = selectedItems
-					.filter((item) => item.kind === "folder")
-					.map((item) => item.id)
-				if (files.length > 0) {
-					await fetchBatchRecoveryFile(bizType, files)
-				}
-				for (const id of folders) {
-					await fetchRecoveryCatalog(bizType, id)
-				}
-				void refetchCatalogs()
-				void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-				setSelectedIds([])
-				toast.success("已恢复")
-			},
 		})
-	}, [selectedItems, bizType, refetchCatalogs, queryClient, setSelectedIds])
+		if (!isConfirmed) return
+		const files = selectedItems.filter((item) => item.kind === "file").map((item) => item.id)
+		const folders = selectedItems.filter((item) => item.kind === "folder").map((item) => item.id)
+		if (files.length > 0) {
+			await fetchBatchRecoveryFile(bizType, files)
+		}
+		for (const id of folders) {
+			await fetchRecoveryCatalog(bizType, id)
+		}
+		void refetchCatalogs()
+		void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+		setSelectedIds([])
+		toast.success("已恢复")
+	}, [selectedItems, bizType, confirm, refetchCatalogs, queryClient, setSelectedIds])
 
-	const handleBatchHardDelete = useCallback(() => {
+	const handleBatchHardDelete = useCallback(async () => {
 		if (selectedItems.length === 0) return
-		setConfirmAction({
+		const isConfirmed = await confirm({
 			title: "确认彻底删除?",
 			description: "此操作无法撤销。",
 			icon: <Trash2 className="size-6 text-destructive" />,
 			variant: "destructive",
 			confirmText: "删除",
-			onConfirm: async () => {
-				const files = selectedItems.filter((item) => item.kind === "file").map((item) => item.id)
-				const folders = selectedItems
-					.filter((item) => item.kind === "folder")
-					.map((item) => item.id)
-				if (files.length > 0) {
-					await fetchBatchHardDeleteFile(bizType, files)
-				}
-				for (const id of folders) {
-					await fetchHardDeleteCatalog(bizType, id)
-				}
-				void refetchCatalogs()
-				void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-				setSelectedIds([])
-				toast.success("已删除")
-			},
 		})
-	}, [selectedItems, bizType, refetchCatalogs, queryClient, setSelectedIds])
+		if (!isConfirmed) return
+		const files = selectedItems.filter((item) => item.kind === "file").map((item) => item.id)
+		const folders = selectedItems.filter((item) => item.kind === "folder").map((item) => item.id)
+		if (files.length > 0) {
+			await fetchBatchHardDeleteFile(bizType, files)
+		}
+		for (const id of folders) {
+			await fetchHardDeleteCatalog(bizType, id)
+		}
+		void refetchCatalogs()
+		void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+		setSelectedIds([])
+		toast.success("已删除")
+	}, [selectedItems, bizType, confirm, refetchCatalogs, queryClient, setSelectedIds])
 
-	const handleClearRecycle = useCallback(() => {
-		setConfirmAction({
+	const handleClearRecycle = useCallback(async () => {
+		const isConfirmed = await confirm({
 			title: "确认清空回收站?",
 			description: "此操作无法撤销。",
 			icon: <Trash2 className="size-6 text-destructive" />,
 			variant: "destructive",
 			confirmText: "清空",
-			onConfirm: async () => {
-				await fetchClearRecycleBin(bizType)
-				void refetchCatalogs()
-				void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-				setSelectedIds([])
-				toast.success("回收站已清空")
-			},
 		})
-	}, [bizType, refetchCatalogs, queryClient, setSelectedIds])
+		if (!isConfirmed) return
+		await fetchClearRecycleBin(bizType)
+		void refetchCatalogs()
+		void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+		setSelectedIds([])
+		toast.success("回收站已清空")
+	}, [bizType, confirm, refetchCatalogs, queryClient, setSelectedIds])
 
 	const handleSubmitFolder = useCallback(
 		async (values: z.infer<typeof FolderSchema>) => {
@@ -548,8 +532,6 @@ export function useFileManagerActions({
 		setDialogMode,
 		dialogTarget,
 		setDialogTarget,
-		confirmAction,
-		setConfirmAction,
 		folderForm,
 
 		handleDownloadItem,

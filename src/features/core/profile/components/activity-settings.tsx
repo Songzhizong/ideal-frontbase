@@ -22,17 +22,6 @@ import {
 	DataTablePagination,
 	TableProvider,
 } from "@/components/table"
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +29,7 @@ import { DateRangePicker } from "@/components/ui/date-picker-rac"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUserProfile } from "@/features/core/auth"
 import { OperationLogDetailDrawer, PersonalOperationLogTable } from "@/features/core/operation-log"
-import { useDataTable, useTabQueryState } from "@/hooks"
+import { useConfirm, useDataTable, useTabQueryState } from "@/hooks"
 import { formatTimestampToRelativeTime } from "@/lib/time-utils.ts"
 import { cn } from "@/lib/utils"
 import { type Api, fetchCurrentUserLoginLog } from "../api/login-log"
@@ -59,6 +48,7 @@ const getDeviceIcon = (device: string) => {
 export function ActivitySettings() {
 	const { data: sessions = [], isLoading } = useMySessions()
 	const { data: userProfile } = useUserProfile()
+	const { confirm } = useConfirm()
 
 	const [activeLogTab, setActiveLogTab] = useTabQueryState<"login" | "operation">({
 		key: "activityTab",
@@ -226,30 +216,22 @@ export function ActivitySettings() {
 							</div>
 							<CardDescription className="mt-1.5">管理你在不同设备上的登录会话</CardDescription>
 						</div>
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									disabled={isLoading || sessions.filter((s) => !s.current).length === 0}
-								>
-									<LogOut className="mr-2 size-4" />
-									注销所有其他会话
-								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent>
-								<AlertDialogHeader>
-									<AlertDialogTitle>注销所有其他会话</AlertDialogTitle>
-									<AlertDialogDescription>
-										这将注销除当前设备外的所有会话。你需要在这些设备上重新登录。
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel>取消</AlertDialogCancel>
-									<AlertDialogAction onClick={handleRevokeAllSessions}>确认注销</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</AlertDialog>
+						<Button
+							variant="outline"
+							size="sm"
+							disabled={isLoading || sessions.filter((s) => !s.current).length === 0}
+							onClick={async () => {
+								const isConfirmed = await confirm({
+									title: "注销所有其他会话",
+									description: "这将注销除当前设备外的所有会话。你需要在这些设备上重新登录。",
+									confirmText: "确认注销",
+								})
+								if (isConfirmed) await handleRevokeAllSessions()
+							}}
+						>
+							<LogOut className="mr-2 size-4" />
+							注销所有其他会话
+						</Button>
 					</div>
 				</CardHeader>
 				<CardContent>
@@ -310,30 +292,21 @@ export function ActivitySettings() {
 										</div>
 									</div>
 									{!session.current && (
-										<AlertDialog>
-											<AlertDialogTrigger asChild>
-												<Button variant="ghost" size="sm" disabled={deleteSession.isPending}>
-													注销
-												</Button>
-											</AlertDialogTrigger>
-											<AlertDialogContent>
-												<AlertDialogHeader>
-													<AlertDialogTitle>注销会话</AlertDialogTitle>
-													<AlertDialogDescription>
-														确定要注销 "{session.device}" 上的会话吗？
-													</AlertDialogDescription>
-												</AlertDialogHeader>
-												<AlertDialogFooter>
-													<AlertDialogCancel>取消</AlertDialogCancel>
-													<AlertDialogAction
-														onClick={() => handleRevokeSession(session.id)}
-														disabled={deleteSession.isPending}
-													>
-														确认注销
-													</AlertDialogAction>
-												</AlertDialogFooter>
-											</AlertDialogContent>
-										</AlertDialog>
+										<Button
+											variant="ghost"
+											size="sm"
+											disabled={deleteSession.isPending}
+											onClick={async () => {
+												const isConfirmed = await confirm({
+													title: "注销会话",
+													description: `确定要注销 "${session.device}" 上的会话吗？`,
+													confirmText: "确认注销",
+												})
+												if (isConfirmed) await handleRevokeSession(session.id)
+											}}
+										>
+											注销
+										</Button>
 									)}
 								</div>
 							))

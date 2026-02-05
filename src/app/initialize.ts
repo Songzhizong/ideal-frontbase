@@ -5,6 +5,7 @@
  * 这里是配置跨层依赖的正确位置
  */
 
+import { configureQueryClient } from "@/app/query-client"
 import { createDebouncedUnauthorizedHandler } from "@/features/core/auth"
 import { configureApiClient } from "@/lib/api-client"
 import { authStore } from "@/lib/auth-store"
@@ -20,6 +21,9 @@ export function initializeApiClient() {
 			const state = authStore.getState()
 			return state.tenantId ?? state.user?.tenantId ?? null
 		},
+	})
+
+	configureQueryClient({
 		onUnauthorized: createDebouncedUnauthorizedHandler(),
 	})
 }

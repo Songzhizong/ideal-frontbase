@@ -21,20 +21,11 @@ import {
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useConfirm } from "@/hooks/use-confirm"
 import { cn } from "@/lib/utils"
 import { type UploadTask, useUploadStore } from "../store/upload-store"
 import { formatDuration, formatFileSize, formatSpeed } from "../utils/file-utils"
@@ -289,11 +280,11 @@ export function FileUploadWidget({
 		removeCompletedTasksOlderThan,
 		setUploadWidgetExpanded,
 	} = useUploadStore()
+	const { confirm } = useConfirm()
 	const fileInputRef = useRef<HTMLInputElement | null>(null)
 	const [resumeTarget, setResumeTarget] = useState<UploadTask | null>(null)
 	const [activeTab, setActiveTab] = useState<"all" | "active" | "error">("all")
 	const [autoCleanupEnabled, setAutoCleanupEnabled] = useState(true)
-	const [cancelAllOpen, setCancelAllOpen] = useState(false)
 	const collapseTimerRef = useRef<number | null>(null)
 	const AUTO_COLLAPSE_DELAY = 4000
 
@@ -512,13 +503,20 @@ export function FileUploadWidget({
 													size="icon"
 													className="h-7 w-7"
 													disabled={!canCancelAll}
-													onClick={() => {
+													onClick={async () => {
 														if (!canCancelAll) return
-														if (activeUploads.length > 0) {
-															setCancelAllOpen(true)
+														if (activeUploads.length === 0) {
+															onCancelAll()
 															return
 														}
-														onCancelAll()
+														const isConfirmed = await confirm({
+															title: "确认取消并清空？",
+															description: `当前有 ${activeUploads.length} 个任务正在上传，确定要取消上传并清空记录吗？`,
+															confirmText: "确定取消并清空",
+															cancelText: "继续上传",
+															variant: "destructive",
+														})
+														if (isConfirmed) onCancelAll()
 													}}
 												>
 													<X className="size-3.5" />
@@ -587,28 +585,6 @@ export function FileUploadWidget({
 					</div>
 				)}
 			</div>
-			<AlertDialog open={cancelAllOpen} onOpenChange={setCancelAllOpen}>
-				<AlertDialogContent size="sm">
-					<AlertDialogHeader>
-						<AlertDialogTitle>确认取消并清空？</AlertDialogTitle>
-						<AlertDialogDescription>
-							当前有 {activeUploads.length} 个任务正在上传，确定要取消上传并清空记录吗？
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>继续上传</AlertDialogCancel>
-						<AlertDialogAction
-							variant="destructive"
-							onClick={() => {
-								onCancelAll()
-								setCancelAllOpen(false)
-							}}
-						>
-							确定取消并清空
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
 		</div>
 	)
 }

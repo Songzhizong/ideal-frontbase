@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import { api } from "@/lib/api-client.ts"
+import { isApiError } from "@/lib/api-error"
 
 /**
  * Logout Response Interface
@@ -12,8 +13,15 @@ export interface LogoutResponse {
  * Fetcher - 登出接口（通知后端清除 Session）
  */
 const logout = async (): Promise<LogoutResponse> => {
-	const response = await api.post("nexus-api/iam/logout").json()
-	return response as LogoutResponse
+	try {
+		const response = await api.post("nexus-api/iam/logout").json()
+		return response as LogoutResponse
+	} catch (error: unknown) {
+		if (isApiError(error) && error.status === 401) {
+			return {}
+		}
+		throw error
+	}
 }
 
 /**

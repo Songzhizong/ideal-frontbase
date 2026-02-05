@@ -17,7 +17,7 @@ import { useFileManagerUpload } from "../hooks/use-file-manager-upload"
 import { useFileUploadManager } from "../hooks/use-file-upload-manager"
 import { useUploadStore } from "../store/upload-store"
 import { FileBrowserPane } from "./file-browser-pane"
-import { ConfirmDialog, FolderDialog, MoveDialog } from "./file-manager-dialogs"
+import { FolderDialog, MoveDialog } from "./file-manager-dialogs"
 import { findCatalogPath } from "./file-manager-helpers"
 import { FileManagerLayout } from "./file-manager-layout"
 import { FilePreviewDialog } from "./file-preview-dialog"
@@ -535,13 +535,6 @@ export function FileManagerPage() {
 				onSelect={setUploadTargetId}
 				disabledIds={[]}
 				onConfirm={handleConfirmUpload}
-			/>
-
-			<ConfirmDialog
-				action={actions.confirmAction}
-				onOpenChange={(open) => {
-					if (!open) actions.setConfirmAction(null)
-				}}
 			/>
 		</div>
 	)

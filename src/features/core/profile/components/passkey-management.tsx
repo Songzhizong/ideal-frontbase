@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useConfirm } from "@/hooks/use-confirm"
 import { formatTimestampToDateTime, formatTimestampToRelativeTime } from "@/lib/time-utils.ts"
 import { useDeletePasskey, usePasskeys, useRegisterPasskey, useUpdatePasskey } from "../api/passkey"
 
@@ -24,6 +25,7 @@ export function PasskeyManagement() {
 	const registerMutation = useRegisterPasskey()
 	const updateMutation = useUpdatePasskey()
 	const deleteMutation = useDeletePasskey()
+	const { confirm } = useConfirm()
 
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 	const [newNickname, setNewNickname] = useState("")
@@ -217,35 +219,24 @@ export function PasskeyManagement() {
 											{formatTimestampToDateTime(passkey.createdTime)}
 										</span>
 									</div>
-									<AlertDialog>
-										<AlertDialogTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-8 text-destructive hover:text-destructive"
-											>
-												<Trash2 className="size-4" />
-											</Button>
-										</AlertDialogTrigger>
-										<AlertDialogContent>
-											<AlertDialogHeader>
-												<AlertDialogTitle>确认删除</AlertDialogTitle>
-												<AlertDialogDescription>
-													确定要删除 "{passkey.credentialNickname}" 这个 Passkey
-													吗？此操作无法撤销。
-												</AlertDialogDescription>
-											</AlertDialogHeader>
-											<AlertDialogFooter>
-												<AlertDialogCancel>取消</AlertDialogCancel>
-												<AlertDialogAction
-													onClick={() => handleDeletePasskey(passkey.id)}
-													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-												>
-													删除
-												</AlertDialogAction>
-											</AlertDialogFooter>
-										</AlertDialogContent>
-									</AlertDialog>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="size-8 text-destructive hover:text-destructive"
+										onClick={async () => {
+											const isConfirmed = await confirm({
+												title: "确认删除",
+												description: `确定要删除 "${passkey.credentialNickname}" 这个 Passkey 吗？此操作无法撤销。`,
+												variant: "destructive",
+												confirmText: "删除",
+											})
+											if (isConfirmed) {
+												await handleDeletePasskey(passkey.id)
+											}
+										}}
+									>
+										<Trash2 className="size-4" />
+									</Button>
 								</div>
 							</div>
 						))

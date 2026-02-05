@@ -2,6 +2,7 @@
 export { useTablePagination } from "@/components/table/hooks"
 export { useBaseNavigate } from "./use-base-navigate"
 export { useBoolean } from "./use-boolean"
+export { useConfirm } from "./use-confirm"
 export type { UseDataTableOptions } from "./use-data-table"
 export { useDataTable } from "./use-data-table"
 export { useDebouncedQueryState } from "./use-debounced-query-state"

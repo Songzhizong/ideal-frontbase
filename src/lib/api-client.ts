@@ -1,6 +1,6 @@
 import ky, { type KyInstance, type Options } from "ky"
-import { toast } from "sonner"
 
+import { ApiError } from "@/lib/api-error"
 import { env } from "@/lib/env"
 import { ProblemDetailSchema } from "@/types/problem-detail"
 
@@ -36,12 +36,10 @@ interface ExtendedKyInstance extends KyInstance {
 // Dependency Injection: 定义回调函数类型
 type GetTokenFn = () => string | null
 type GetTenantIdFn = () => string | null
-type OnUnauthorizedFn = () => void
 
 // 初始化为空函数（默认行为）
 let getToken: GetTokenFn = () => null
 let getTenantId: GetTenantIdFn = () => null
-let onUnauthorized: OnUnauthorizedFn = () => {}
 
 /**
  * 配置 API Client 的依赖注入
@@ -50,11 +48,9 @@ let onUnauthorized: OnUnauthorizedFn = () => {}
 export const configureApiClient = (options: {
 	getToken: GetTokenFn
 	getTenantId: GetTenantIdFn
-	onUnauthorized: OnUnauthorizedFn
 }) => {
 	getToken = options.getToken
 	getTenantId = options.getTenantId
-	onUnauthorized = options.onUnauthorized
 }
 
 const apiInstance = ky.create({
@@ -109,35 +105,33 @@ const apiInstance = ky.create({
 				}
 			},
 		],
-		afterResponse: [
-			async (_request, _options, response) => {
-				if (!response.ok) {
-					if (response.status === 401) {
-						const url = _request.url
-						if (url.endsWith("/nexus-api/iam/logout")) {
-							// 避免在 logout 请求上触发重复的 401 处理, 返回一个成功响应
-							return new Response("{}", { status: 200 })
-						}
-						// 调用外部注入的 401 处理逻辑
-						onUnauthorized()
-					} else {
-						let message = response.status >= 500 ? "Server error. Try again." : "Request failed."
+		beforeError: [
+			async (error) => {
+				const { request, response } = error
+				let problem = null
+				let message = response.status >= 500 ? "Server error. Try again." : "Request failed."
 
-						try {
-							// 尝试解析 RFC 7807 Problem Details
-							const data = await response.clone().json()
-							const result = ProblemDetailSchema.safeParse(data)
-							if (result.success && result.data.detail) {
-								message = result.data.detail
-							}
-						} catch {
-							// 解析失败则保留默认错误提示
+				try {
+					const data: unknown = await response.clone().json()
+					const result = ProblemDetailSchema.safeParse(data)
+					if (result.success) {
+						problem = result.data
+						if (result.data.detail) {
+							message = result.data.detail
 						}
-
-						toast.error(message)
 					}
+				} catch {
+					// ignore parse errors
 				}
-				return response
+
+				throw new ApiError({
+					status: response.status,
+					message,
+					url: request.url,
+					method: request.method,
+					problem,
+					originalError: error,
+				})
 			},
 		],
 	},
