@@ -102,6 +102,14 @@ export interface UseTablePaginationOptions<TData, TResponse = PageInfo<TData>> {
 	 * Callback when column visibility changes
 	 */
 	onColumnVisibilityChange?: OnChangeFn<VisibilityState>
+	/**
+	 * Controlled sorting state
+	 */
+	sorting?: SortingState
+	/**
+	 * Callback when sorting changes
+	 */
+	onSortingChange?: OnChangeFn<SortingState>
 }
 
 /**
@@ -129,6 +137,8 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 		onPaginationChange,
 		columnVisibility: controlledColumnVisibility,
 		onColumnVisibilityChange,
+		sorting: controlledSorting,
+		onSortingChange: controlledOnSortingChange,
 	} = options
 
 	// Internal pagination state (used if not controlled)
@@ -142,7 +152,9 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 	const pageSize = controlledPageSize ?? internalPagination.pageSize
 
 	// Sorting state (for server-side sorting)
-	const [sorting, setSorting] = useState<SortingState>([])
+	const [internalSorting, setInternalSorting] = useState<SortingState>([])
+	const sorting = controlledSorting ?? internalSorting
+	const onSortingChange = controlledOnSortingChange ?? setInternalSorting
 	const sortingParams = useMemo<SortingParams | undefined>(() => {
 		if (!enableServerSorting || sorting.length === 0 || !sorting[0]) return undefined
 		return {
@@ -288,7 +300,7 @@ export function useTablePagination<TData, TResponse = PageInfo<TData>>(
 				pageSize,
 			},
 		},
-		onSortingChange: setSorting,
+		onSortingChange,
 		onRowSelectionChange: setRowSelection,
 		onGlobalFilterChange: setGlobalFilter,
 		onColumnVisibilityChange: onColumnVisibilityChange || setInternalColumnVisibility,

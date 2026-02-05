@@ -1,4 +1,4 @@
-import { DataTableSearch } from "@/components/table/components/data-table-search"
+import { DataTableSearch } from "@/components/table"
 import { Label } from "@/components/ui/label"
 import {
 	Select,
@@ -12,18 +12,25 @@ import { UserGroupEnum, UserStatusEnum } from "../types"
 
 interface UsersFilterFormProps {
 	urlFilters: UsersFilters
+	onInputChange: (key: "username" | "email" | "phone", value: string) => void
 	onSelectChange: (key: "status" | "mfaEnabled" | "userGroups", value: string) => void
 }
 
-export function UsersFilterForm({ urlFilters, onSelectChange }: UsersFilterFormProps) {
+export function UsersFilterForm({
+	urlFilters,
+	onInputChange,
+	onSelectChange,
+}: UsersFilterFormProps) {
 	return (
 		<>
 			{/* Main filters - always visible */}
 			<div className="flex items-center gap-2">
 				<DataTableSearch
-					queryKey="username"
 					placeholder="搜索 ID / 名称 / 账号..."
 					className="w-64"
+					value={urlFilters.username ?? ""}
+					onValueChange={(value) => onInputChange("username", value)}
+					debounceMs={500}
 				/>
 
 				<Select
@@ -49,10 +56,15 @@ export function UsersFilterForm({ urlFilters, onSelectChange }: UsersFilterFormP
 
 interface UsersExtraFiltersProps {
 	urlFilters: UsersFilters
+	onInputChange: (key: "username" | "email" | "phone", value: string) => void
 	onSelectChange: (key: "status" | "mfaEnabled" | "userGroups", value: string) => void
 }
 
-export function UsersExtraFilters({ urlFilters, onSelectChange }: UsersExtraFiltersProps) {
+export function UsersExtraFilters({
+	urlFilters,
+	onInputChange,
+	onSelectChange,
+}: UsersExtraFiltersProps) {
 	return (
 		<>
 			<div className="space-y-2">
@@ -81,14 +93,24 @@ export function UsersExtraFilters({ urlFilters, onSelectChange }: UsersExtraFilt
 				<Label htmlFor="phone-filter" className="text-sm font-medium">
 					搜索手机号
 				</Label>
-				<DataTableSearch queryKey="phone" placeholder="输入手机号" />
+				<DataTableSearch
+					placeholder="输入手机号"
+					value={urlFilters.phone ?? ""}
+					onValueChange={(value) => onInputChange("phone", value)}
+					debounceMs={500}
+				/>
 			</div>
 
 			<div className="space-y-2">
 				<Label htmlFor="email-filter" className="text-sm font-medium">
 					搜索邮箱
 				</Label>
-				<DataTableSearch queryKey="email" placeholder="输入邮箱地址" />
+				<DataTableSearch
+					placeholder="输入邮箱地址"
+					value={urlFilters.email ?? ""}
+					onValueChange={(value) => onInputChange("email", value)}
+					debounceMs={500}
+				/>
 			</div>
 
 			<div className="space-y-2">

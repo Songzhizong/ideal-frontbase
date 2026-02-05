@@ -1,4 +1,4 @@
-import type { ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useCallback, useEffect, useMemo } from "react"
 import { useDebouncedCallback } from "use-debounce"
@@ -108,9 +108,10 @@ export function useDataTable<TData>({
 	// 2. Filter operations (auto-reset page to 1)
 	const setFilter = useCallback(
 		(key: string, value: unknown) => {
+			const normalizedValue = typeof value === "string" && value.length === 0 ? null : value
 			void setUrlState((old) => ({
 				...old,
-				[key]: value,
+				[key]: normalizedValue,
 				page: 1, // 🔥 Core: Auto-reset page when any filter changes
 			}))
 		},
@@ -177,6 +178,27 @@ export function useDataTable<TData>({
 		return params
 	}, [urlState])
 
+	const sorting = useMemo<SortingState>(() => {
+		if (!urlState.sort) return []
+		const [field, order] = urlState.sort.split(".")
+		if (!field || (order !== "asc" && order !== "desc")) return []
+		return [{ id: field, desc: order === "desc" }]
+	}, [urlState.sort])
+
+	const onSortingChange = useCallback<OnChangeFn<SortingState>>(
+		(updater) => {
+			const next = typeof updater === "function" ? updater(sorting) : updater
+			const first = next[0]
+			const sort = first ? `${first.id}.${first.desc ? "desc" : "asc"}` : null
+			void setUrlState((old) => ({
+				...old,
+				sort,
+				page: 1,
+			}))
+		},
+		[setUrlState, sorting],
+	)
+
 	// 6. Call underlying useTablePagination
 	// Exclude pagination params from the key since useTablePagination adds them
 	// but include all other business filters/sorting/search to trigger refetch
@@ -192,6 +214,8 @@ export function useDataTable<TData>({
 			void setUrlState({ page: pageNumber, size: pageSize })
 		},
 		enableServerSorting,
+		sorting,
+		onSortingChange,
 		...(getRowId && { getRowId }),
 	})
 

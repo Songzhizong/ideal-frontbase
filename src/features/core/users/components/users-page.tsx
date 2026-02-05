@@ -109,12 +109,14 @@ export function UsersPage() {
 								extraFilters={
 									<UsersExtraFilters
 										urlFilters={filters.state}
+										onInputChange={(key, value) => filters.set(key, value)}
 										onSelectChange={(key, value) => filters.set(key, value)}
 									/>
 								}
 							>
 								<UsersFilterForm
 									urlFilters={filters.state}
+									onInputChange={(key, value) => filters.set(key, value)}
 									onSelectChange={(key, value) => filters.set(key, value)}
 								/>
 							</DataTableFilterBar>
