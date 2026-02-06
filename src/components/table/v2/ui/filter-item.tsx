@@ -20,6 +20,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import type { FilterDefinition } from "../core"
+import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 type DateRangeValue = { from: Date | undefined; to: Date | undefined }
@@ -110,6 +111,7 @@ export function DataTableFilterItem<
 	K extends keyof TFilterSchema = keyof TFilterSchema,
 >({ definition, className }: DataTableFilterItemProps<TFilterSchema, K>) {
 	const dt = useDataTableInstance<unknown, TFilterSchema>()
+	const { i18n } = useDataTableConfig()
 	const value = dt.filters.state[definition.key]
 
 	const handleChange = (nextValue: TFilterSchema[K]) => {
@@ -156,7 +158,7 @@ export function DataTableFilterItem<
 				return (
 					<Select value={selectedKey} onValueChange={handleSelect}>
 						<SelectTrigger className="h-9 w-full">
-							<SelectValue placeholder={definition.placeholder ?? "请选择"} />
+							<SelectValue placeholder={definition.placeholder ?? i18n.filters.selectPlaceholder} />
 						</SelectTrigger>
 						<SelectContent>
 							{entries.map((entry) => (
@@ -185,7 +187,7 @@ export function DataTableFilterItem<
 				const triggerLabel =
 					selectedLabels.length > 0
 						? selectedLabels.join("、")
-						: (definition.placeholder ?? "请选择")
+						: (definition.placeholder ?? i18n.filters.selectPlaceholder)
 
 				return (
 					<DropdownMenu>
@@ -265,7 +267,7 @@ export function DataTableFilterItem<
 								const nextMin = parseNumberInput(event.target.value)
 								emitRange({ ...range, min: nextMin })
 							}}
-							placeholder="最小值"
+							placeholder={i18n.filters.numberRangeMinPlaceholder}
 							className="h-9"
 						/>
 						<span className="text-xs text-muted-foreground">-</span>
@@ -276,7 +278,7 @@ export function DataTableFilterItem<
 								const nextMax = parseNumberInput(event.target.value)
 								emitRange({ ...range, max: nextMax })
 							}}
-							placeholder="最大值"
+							placeholder={i18n.filters.numberRangeMaxPlaceholder}
 							className="h-9"
 						/>
 					</div>
@@ -292,7 +294,9 @@ export function DataTableFilterItem<
 								handleChange(Boolean(nextChecked) as TFilterSchema[K])
 							}}
 						/>
-						<span className="text-sm text-muted-foreground">{checked ? "是" : "否"}</span>
+						<span className="text-sm text-muted-foreground">
+							{checked ? i18n.filters.booleanTrueText : i18n.filters.booleanFalseText}
+						</span>
 					</div>
 				)
 			}

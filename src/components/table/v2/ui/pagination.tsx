@@ -14,7 +14,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { type DataTableI18nOverrides, useDataTableConfig } from "./config"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance, useDataTableLayout } from "./context"
 
 export interface DataTablePaginationProps {
@@ -104,14 +104,7 @@ export function DataTablePagination({
 
 	const items = useMemo(() => getPaginationItems(page, pageCount), [page, pageCount])
 	const i18n = useMemo(() => {
-		return {
-			...globalI18n,
-			...i18nOverrides,
-			pagination: {
-				...globalI18n.pagination,
-				...i18nOverrides?.pagination,
-			},
-		}
+		return mergeDataTableI18n(globalI18n, i18nOverrides)
 	}, [globalI18n, i18nOverrides])
 
 	const handlePageClick = (nextPage: number) => (event: MouseEvent<HTMLAnchorElement>) => {

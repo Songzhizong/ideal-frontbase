@@ -1,12 +1,14 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useDataTableConfig } from "../ui/config"
 
 export function expand<TData>(): ColumnDef<TData> {
 	return {
 		id: "__expand__",
 		header: () => null,
 		cell: ({ row }) => {
+			const { i18n } = useDataTableConfig()
 			if (!row.getCanExpand()) {
 				return <div className="h-9 w-9" />
 			}
@@ -20,7 +22,9 @@ export function expand<TData>(): ColumnDef<TData> {
 						event.stopPropagation()
 						row.toggleExpanded()
 					}}
-					aria-label={row.getIsExpanded() ? "收起" : "展开"}
+					aria-label={
+						row.getIsExpanded() ? i18n.rowExpansion.collapseLabel : i18n.rowExpansion.expandLabel
+					}
 				>
 					{row.getIsExpanded() ? (
 						<ChevronDown className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -25,6 +26,7 @@ export interface DataTableDensityToggleProps {
 
 export function DataTableDensityToggle({ className }: DataTableDensityToggleProps) {
 	const dt = useDataTableInstance()
+	const { i18n } = useDataTableConfig()
 
 	const density = getDensity(dt.table.options.meta)
 	const setDensity = getSetDensity(dt.table.options.meta)
@@ -44,7 +46,7 @@ export function DataTableDensityToggle({ className }: DataTableDensityToggleProp
 				className="h-7 px-2"
 				onClick={() => setDensity("compact")}
 			>
-				紧凑
+				{i18n.density.compactText}
 			</Button>
 			<Button
 				type="button"
@@ -53,7 +55,7 @@ export function DataTableDensityToggle({ className }: DataTableDensityToggleProp
 				className="h-7 px-2"
 				onClick={() => setDensity("comfortable")}
 			>
-				舒适
+				{i18n.density.comfortableText}
 			</Button>
 		</div>
 	)

@@ -25,7 +25,7 @@ import {
 	TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { type DataTableI18nOverrides, useDataTableConfig } from "./config"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance, useDataTableLayout } from "./context"
 import { DataTableDragSortRowProvider } from "./drag-handle"
 import { DataTableDropIndicator } from "./drop-indicator"
@@ -162,14 +162,7 @@ export function DataTableTable<TData>({
 	const stickyHeader = layout?.stickyHeader ?? false
 	const isStickyHeader = stickyHeader === true || typeof stickyHeader === "object"
 	const i18n = useMemo(() => {
-		return {
-			...globalI18n,
-			...i18nOverrides,
-			pagination: {
-				...globalI18n.pagination,
-				...i18nOverrides?.pagination,
-			},
-		}
+		return mergeDataTableI18n(globalI18n, i18nOverrides)
 	}, [globalI18n, i18nOverrides])
 
 	const tableMeta = dt.table.options.meta
@@ -261,9 +254,9 @@ export function DataTableTable<TData>({
 						cellDensityClass,
 						isPinned && "bg-background",
 						isBoundaryLeft &&
-							"relative after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
+							"relative after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
 						isBoundaryRight &&
-							"relative before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
+							"relative before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
 						cellMetaClass,
 					)}
 				>
@@ -618,10 +611,10 @@ export function DataTableTable<TData>({
 											header.column.getIsPinned() && "bg-background",
 											scrollEdges.left &&
 												header.column.id === lastLeftPinnedId &&
-												"after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
+												"after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
 											scrollEdges.right &&
 												header.column.id === firstRightPinnedId &&
-												"before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
+												"before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
 											getMetaClass(header.column.columnDef.meta, "headerClassName"),
 										)}
 									>

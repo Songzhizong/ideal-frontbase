@@ -127,17 +127,18 @@ function compareValues(left: string | number, right: string | number): number {
 
 function applySort(
 	rows: DemoRow[],
-	sort: { field: string; order: "asc" | "desc" } | null,
+	sort: { field: string; order: "asc" | "desc" }[],
 ): DemoRow[] {
-	if (!sort || !isSortableField(sort.field)) return rows
-
-	const direction = sort.order === "asc" ? 1 : -1
 	const sorted = [...rows]
-	const field = sort.field
 
 	sorted.sort((left, right) => {
-		const result = compareValues(left[field], right[field])
-		return result * direction
+		for (const item of sort) {
+			if (!isSortableField(item.field)) continue
+			const direction = item.order === "asc" ? 1 : -1
+			const result = compareValues(left[item.field], right[item.field])
+			if (result !== 0) return result * direction
+		}
+		return 0
 	})
 
 	return sorted
@@ -166,7 +167,7 @@ async function fetchDemoRows(args: {
 }): Promise<DemoResponse> {
 	await delay(650)
 	const filtered = applyFilters(DEMO_ROWS, args.filters)
-	const sorted = applySort(filtered, args.sort[0] ?? null)
+	const sorted = applySort(filtered, args.sort)
 	return paginate(sorted, args.page, args.size)
 }
 
@@ -174,7 +175,7 @@ function SortableHeader({
 	column,
 	label,
 }: {
-	column: Column<DemoRow, unknown>
+	column: Column<DemoRow>
 	label: string
 }) {
 	const canSort = column.getCanSort()

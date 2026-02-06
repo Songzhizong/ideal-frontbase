@@ -17,7 +17,7 @@ describe("local dataSource", () => {
 		const state = ds.use({
 			page: 1,
 			size: 2,
-			sort: { field: "age", order: "asc" },
+			sort: [{ field: "age", order: "asc" }],
 			filters: { status: "active" },
 		})
 
@@ -38,7 +38,7 @@ describe("local dataSource", () => {
 		const state = ds.use({
 			page: 1,
 			size: 10,
-			sort: null,
+			sort: [],
 			filters: { status: ["active", "pending"] },
 		})
 
@@ -54,7 +54,7 @@ describe("local dataSource", () => {
 		const state = ds.use({
 			page: 1,
 			size: 10,
-			sort: null,
+			sort: [],
 			filters: {},
 		})
 

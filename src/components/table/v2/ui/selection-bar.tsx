@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { DataTableSelection } from "../core"
-import { type DataTableI18nOverrides, useDataTableConfig } from "./config"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 export interface DataTableSelectionBarProps<TData> {
@@ -26,18 +26,7 @@ export function DataTableSelectionBar<TData>({
 	const { i18n: globalI18n } = useDataTableConfig()
 
 	const i18n = useMemo(() => {
-		return {
-			...globalI18n,
-			...i18nOverrides,
-			selectionBar: {
-				...globalI18n.selectionBar,
-				...i18nOverrides?.selectionBar,
-			},
-			pagination: {
-				...globalI18n.pagination,
-				...i18nOverrides?.pagination,
-			},
-		}
+		return mergeDataTableI18n(globalI18n, i18nOverrides)
 	}, [globalI18n, i18nOverrides])
 
 	if (!dt.selection.enabled) return null

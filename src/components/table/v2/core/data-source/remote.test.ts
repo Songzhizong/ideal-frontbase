@@ -9,6 +9,7 @@ const reactQueryMocks = vi.hoisted(() => {
 
 vi.mock("@tanstack/react-query", () => ({
 	useQuery: reactQueryMocks.useQuery,
+	keepPreviousData: (previousData: unknown) => previousData,
 }))
 
 describe("remote dataSource", () => {
@@ -41,7 +42,7 @@ describe("remote dataSource", () => {
 			a: 1,
 			createdAt: new Date("2026-01-30T00:00:00.000Z"),
 		}
-		const sort = { field: "name", order: "asc" as const }
+		const sort = [{ field: "name", order: "asc" as const }]
 
 		renderHook(() =>
 			ds.use({

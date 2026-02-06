@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, Loader2 } from "lucide-react"
 import type { ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -27,6 +28,7 @@ export function DataTableTreeCell<TData>({
 	className,
 }: DataTableTreeCellProps<TData>) {
 	const dt = useDataTableInstance<TData, unknown>()
+	const { i18n } = useDataTableConfig()
 	const indentSize = getIndentSize(dt.table.options.meta)
 	const paddingLeft = row.depth * indentSize
 	const isLoading = dt.tree.loadingRowIds.includes(row.id)
@@ -45,7 +47,9 @@ export function DataTableTreeCell<TData>({
 						dt.actions.toggleRowExpanded(row.id)
 					}}
 					disabled={isLoading}
-					aria-label={row.getIsExpanded() ? "收起" : "展开"}
+					aria-label={
+						row.getIsExpanded() ? i18n.rowExpansion.collapseLabel : i18n.rowExpansion.expandLabel
+					}
 				>
 					{isLoading ? (
 						<Loader2 className="h-4 w-4 animate-spin" />

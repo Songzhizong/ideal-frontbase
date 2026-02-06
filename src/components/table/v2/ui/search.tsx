@@ -3,7 +3,7 @@ import { type KeyboardEvent, useEffect, useMemo, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { type DataTableI18nOverrides, useDataTableConfig } from "./config"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 function toTextValue(value: unknown): string {
@@ -39,14 +39,7 @@ export function DataTableSearch<TFilterSchema>({
 	const [value, setValue] = useState(normalizedValue)
 
 	const i18n = useMemo(() => {
-		return {
-			...globalI18n,
-			...i18nOverrides,
-			pagination: {
-				...globalI18n.pagination,
-				...i18nOverrides?.pagination,
-			},
-		}
+		return mergeDataTableI18n(globalI18n, i18nOverrides)
 	}, [globalI18n, i18nOverrides])
 
 	const debouncedSetValue = useDebouncedCallback((nextValue: string) => {

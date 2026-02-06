@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { DataSource, DataTableQuery, RemoteDataSourceOptions } from "../types"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -26,7 +26,7 @@ function buildQueryKey<TFilterSchema>(
 		{
 			page: query.page,
 			size: query.size,
-			sort: stableStructure(query.sort ? [query.sort] : []),
+			sort: stableStructure(query.sort),
 			filters: stableStructure(query.filters),
 		},
 	]
@@ -38,16 +38,17 @@ export function remote<TData, TFilterSchema, TResponse>(
 	return {
 		use: (query) => {
 			const queryKey = buildQueryKey(options.queryKey, query)
-			const sort = query.sort ? [query.sort] : []
+			const enableKeepPreviousData = options.keepPreviousData !== false
 			const result = useQuery({
 				queryKey,
 				queryFn: () =>
 					options.queryFn({
 						page: query.page,
 						size: query.size,
-						sort,
+						sort: query.sort,
 						filters: query.filters,
 					}),
+				...(enableKeepPreviousData ? { placeholderData: keepPreviousData } : {}),
 			})
 			const refetch = async () => {
 				await result.refetch()

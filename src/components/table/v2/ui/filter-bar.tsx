@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { FilterDefinition } from "../core"
 import { DataTableActiveFilters } from "./active-filters"
+import { useDataTableConfig } from "./config"
 import { DataTableFilterItem } from "./filter-item"
 
 function buildCollapsedFilters<TFilterSchema>(
@@ -41,6 +42,7 @@ export function DataTableFilterBar<TFilterSchema>({
 	maxVisible = 3,
 	className,
 }: DataTableFilterBarProps<TFilterSchema>) {
+	const { i18n } = useDataTableConfig()
 	const [expanded, setExpanded] = useState(!collapsible)
 
 	const collapsedFilters = useMemo(
@@ -55,11 +57,7 @@ export function DataTableFilterBar<TFilterSchema>({
 		<div className={cn("flex flex-col gap-3", className)}>
 			<div className="flex flex-wrap items-end gap-3">
 				{visibleFilters.map((filter) => (
-					<DataTableFilterItem
-						key={String(filter.key)}
-						definition={filter}
-						className="min-w-[180px]"
-					/>
+					<DataTableFilterItem key={String(filter.key)} definition={filter} className="min-w-45" />
 				))}
 				{shouldCollapse && (
 					<Button
@@ -68,7 +66,7 @@ export function DataTableFilterBar<TFilterSchema>({
 						onClick={() => setExpanded((prev) => !prev)}
 						className="h-9 px-2 text-muted-foreground hover:text-foreground"
 					>
-						{expanded ? "收起" : "展开"}
+						{expanded ? i18n.filterBar.collapseText : i18n.filterBar.expandText}
 						{expanded ? (
 							<ChevronUp className="ml-1 h-4 w-4" />
 						) : (

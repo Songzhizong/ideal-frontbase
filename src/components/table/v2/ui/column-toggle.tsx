@@ -10,7 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import { type DataTableI18nOverrides, useDataTableConfig } from "./config"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 function getColumnLabel(column: {
@@ -41,18 +41,7 @@ export function DataTableColumnToggle({
 	const dt = useDataTableInstance()
 	const { i18n: globalI18n } = useDataTableConfig()
 	const i18n = useMemo(() => {
-		return {
-			...globalI18n,
-			...i18nOverrides,
-			selectionBar: {
-				...globalI18n.selectionBar,
-				...i18nOverrides?.selectionBar,
-			},
-			pagination: {
-				...globalI18n.pagination,
-				...i18nOverrides?.pagination,
-			},
-		}
+		return mergeDataTableI18n(globalI18n, i18nOverrides)
 	}, [globalI18n, i18nOverrides])
 
 	const columns = dt.table.getAllLeafColumns().filter((column) => column.getCanHide())
@@ -101,7 +90,7 @@ export function DataTableColumnToggle({
 						className="h-7 px-2 text-xs"
 						onClick={() => dt.actions.resetColumnVisibility()}
 					>
-						重置
+						{i18n.columnToggle.resetText}
 					</Button>
 				</div>
 				<DropdownMenuSeparator />
@@ -111,7 +100,7 @@ export function DataTableColumnToggle({
 						checked={allVisible || (someVisible && "indeterminate")}
 						onCheckedChange={(value) => handleToggleAll(Boolean(value))}
 					/>
-					<span className="text-sm text-muted-foreground">全选</span>
+					<span className="text-sm text-muted-foreground">{i18n.columnToggle.selectAllText}</span>
 				</div>
 
 				<DropdownMenuSeparator />

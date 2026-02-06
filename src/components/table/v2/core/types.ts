@@ -1,7 +1,7 @@
 import type { ColumnDef, ColumnMeta, Row, Table, TableOptions } from "@tanstack/react-table"
 import type { inferParserType, ParserMap } from "nuqs"
 import type { ReactNode } from "react"
-import type { PreferenceEnvelope, PreferenceMigration } from "./utils/preference-storage"
+import type { PreferenceEnvelope, PreferenceMigration } from "@/components/table/v2"
 
 export type {
 	PreferenceEnvelope,
@@ -165,7 +165,7 @@ export interface TableStateAdapter<TFilterSchema> {
 export interface DataTableQuery<TFilterSchema> {
 	page: number
 	size: number
-	sort: { field: string; order: "asc" | "desc" } | null
+	sort: TableSort[]
 	filters: TFilterSchema
 }
 
@@ -198,6 +198,7 @@ export interface RemoteDataSourceOptions<TData, TFilterSchema, TResponse> {
 		filters: TFilterSchema
 	}) => Promise<TResponse>
 	map: (response: TResponse) => DataTableDataResult<TData>
+	keepPreviousData?: boolean
 }
 
 export interface LocalDataSourceOptions<TData> {

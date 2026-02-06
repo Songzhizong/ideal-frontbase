@@ -51,12 +51,15 @@ function applyFilters<TData>(rows: TData[], filters: Record<string, unknown>): T
 }
 
 function applySort<TData>(rows: TData[], sort: DataTableQuery<unknown>["sort"]): TData[] {
-	if (!sort) return rows
-	const { field, order } = sort
+	if (sort.length === 0) return rows
 	const next = [...rows]
 	next.sort((a, b) => {
-		const result = compareValues(getRowValue(a, field), getRowValue(b, field))
-		return order === "asc" ? result : -result
+		for (const item of sort) {
+			const result = compareValues(getRowValue(a, item.field), getRowValue(b, item.field))
+			if (result === 0) continue
+			return item.order === "asc" ? result : -result
+		}
+		return 0
 	})
 	return next
 }

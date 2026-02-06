@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { FilterDefinition, FilterType } from "../core"
+import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
 type DateRangeValue = { from: Date | undefined; to: Date | undefined }
@@ -146,10 +147,11 @@ export function DataTableActiveFilters<TFilterSchema>({
 	filters,
 	className,
 	renderTag,
-	clearLabel = "清除全部",
+	clearLabel,
 	showClearAll = true,
 }: DataTableActiveFiltersProps<TFilterSchema>) {
 	const dt = useDataTableInstance<unknown, TFilterSchema>()
+	const { i18n } = useDataTableConfig()
 	const activeItems = filters
 		.map((filter) => ({
 			filter,
@@ -183,7 +185,7 @@ export function DataTableActiveFilters<TFilterSchema>({
 							size="icon-xs"
 							className="h-5 w-5"
 							onClick={handleRemove}
-							aria-label={`移除筛选 ${filter.label}`}
+							aria-label={i18n.filters.removeFilterAriaLabel(filter.label)}
 						>
 							<X className="h-3 w-3" />
 						</Button>
@@ -197,7 +199,7 @@ export function DataTableActiveFilters<TFilterSchema>({
 					onClick={() => dt.filters.reset()}
 					className="h-7 px-2 text-muted-foreground"
 				>
-					{clearLabel}
+					{clearLabel ?? i18n.filters.clearAllText}
 				</Button>
 			)}
 		</div>

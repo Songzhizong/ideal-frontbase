@@ -2,6 +2,7 @@ import { GripVertical } from "lucide-react"
 import type { ReactNode } from "react"
 import { createContext, useContext } from "react"
 import { cn } from "@/lib/utils"
+import { useDataTableConfig } from "./config"
 
 export interface DataTableDragSortRowContextValue {
 	handle: boolean
@@ -37,6 +38,7 @@ export interface DataTableDragHandleProps {
 
 export function DataTableDragHandle({ className }: DataTableDragHandleProps) {
 	const ctx = useDataTableDragSortRow()
+	const { i18n } = useDataTableConfig()
 	const icon = <GripVertical className="h-4 w-4 text-muted-foreground" />
 
 	if (!ctx) {
@@ -60,7 +62,7 @@ export function DataTableDragHandle({ className }: DataTableDragHandleProps) {
 				ctx.isDragging && "cursor-grabbing",
 				className,
 			)}
-			aria-label="拖拽排序"
+			aria-label={i18n.dragSort.handleLabel}
 			{...ctx.attributes}
 			{...ctx.listeners}
 		>

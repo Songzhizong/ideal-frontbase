@@ -142,7 +142,7 @@ export function useDataTable<TData, TFilterSchema>(
 		() => ({
 			page: snapshot.page,
 			size: snapshot.size,
-			sort: snapshot.sort[0] ?? null,
+			sort: snapshot.sort,
 			filters: snapshot.filters,
 		}),
 		[snapshot],
