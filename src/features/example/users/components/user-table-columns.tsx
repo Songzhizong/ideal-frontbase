@@ -135,7 +135,6 @@ function RowActions({ user }: { user: DemoUser }) {
 			<Button variant="ghost" size="sm" className="h-8 px-2" asChild>
 				<BaseLink to={`/example/users/${user.id}/edit`}>
 					<Pencil className="h-4 w-4" />
-					<span className="hidden sm:inline">编辑</span>
 				</BaseLink>
 			</Button>
 
