@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import type { ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import { DatePicker, DateRangePicker } from "@/components/ui/date-picker-rac"
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
-import type { FilterDefinition } from "../core"
+import type { FilterDefinition, FilterType } from "../core"
 import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
@@ -98,6 +98,24 @@ function parseDateRange(value: unknown): DateRangeValue | undefined {
   return undefined
 }
 
+function isEmptyFilterValue(value: unknown, type: FilterType): boolean {
+  if (value == null) return true
+  if (type === "text" && typeof value === "string") return value.trim() === ""
+  if (type === "multi-select") return !Array.isArray(value) || value.length === 0
+  if (type === "number-range") {
+    const range = parseNumberRange(value)
+    return range.min == null && range.max == null
+  }
+  if (type === "date-range") {
+    const range = parseDateRange(value)
+    return !range?.from && !range?.to
+  }
+  if (type === "date") return !isDateValue(value)
+  if (Array.isArray(value)) return value.length === 0
+  if (typeof value === "string") return value.trim() === ""
+  return false
+}
+
 export interface DataTableFilterItemProps<
   TFilterSchema,
   K extends keyof TFilterSchema = keyof TFilterSchema,
@@ -123,6 +141,7 @@ export function DataTableFilterItem<
   }
 
   const baseClassName = "flex min-w-[160px] flex-col gap-1"
+  const canClear = !isEmptyFilterValue(value, definition.type)
 
   const content = (() => {
     switch (definition.type) {
@@ -317,7 +336,21 @@ export function DataTableFilterItem<
 
   return (
     <div className={cn(baseClassName, className)}>
-      <Label className="text-xs text-muted-foreground">{definition.label}</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-xs text-muted-foreground">{definition.label}</Label>
+        {canClear ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="h-5 w-5"
+            onClick={handleRemove}
+            aria-label={i18n.filters.removeFilterAriaLabel(definition.label)}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        ) : null}
+      </div>
       {content as ReactNode}
     </div>
   )

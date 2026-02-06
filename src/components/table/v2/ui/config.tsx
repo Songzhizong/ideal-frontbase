@@ -7,6 +7,7 @@ export interface DataTableI18n {
   errorText: string
   retryText: string
   searchPlaceholder: string
+  clearSearchAriaLabel: string
   columnToggleLabel: string
   columnResizeHandleLabel: string
   selectionCheckboxLabel: string
@@ -17,6 +18,11 @@ export interface DataTableI18n {
   columnToggle: {
     resetText: string
     selectAllText: string
+  }
+  viewOptions: {
+    triggerAriaLabel: string
+    densityLabel: string
+    resetAllText: string
   }
   density: {
     compactText: string
@@ -56,6 +62,7 @@ export type DataTableI18nOverrides = Omit<
   Partial<DataTableI18n>,
   | "filterBar"
   | "columnToggle"
+  | "viewOptions"
   | "density"
   | "dragSort"
   | "filters"
@@ -65,6 +72,7 @@ export type DataTableI18nOverrides = Omit<
 > & {
   filterBar?: Partial<DataTableI18n["filterBar"]>
   columnToggle?: Partial<DataTableI18n["columnToggle"]>
+  viewOptions?: Partial<DataTableI18n["viewOptions"]>
   density?: Partial<DataTableI18n["density"]>
   dragSort?: Partial<DataTableI18n["dragSort"]>
   filters?: Partial<DataTableI18n["filters"]>
@@ -80,6 +88,7 @@ const defaultI18n: DataTableI18n = {
   errorText: "数据加载失败",
   retryText: "重试",
   searchPlaceholder: "搜索...",
+  clearSearchAriaLabel: "清空搜索",
   columnToggleLabel: "列设置",
   columnResizeHandleLabel: "调整列宽",
   selectionCheckboxLabel: "选择行",
@@ -90,6 +99,11 @@ const defaultI18n: DataTableI18n = {
   columnToggle: {
     resetText: "重置",
     selectAllText: "全选",
+  },
+  viewOptions: {
+    triggerAriaLabel: "更多选项",
+    densityLabel: "显示密度",
+    resetAllText: "恢复表格默认设置",
   },
   density: {
     compactText: "紧凑",
@@ -137,6 +151,7 @@ export function mergeDataTableI18n(
   const {
     filterBar,
     columnToggle,
+    viewOptions,
     density,
     dragSort,
     filters,
@@ -156,6 +171,10 @@ export function mergeDataTableI18n(
     columnToggle: {
       ...base.columnToggle,
       ...columnToggle,
+    },
+    viewOptions: {
+      ...base.viewOptions,
+      ...viewOptions,
     },
     density: {
       ...base.density,

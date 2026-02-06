@@ -620,13 +620,17 @@ export function DataTablePreset<TData, TFilterSchema>(props: {
   }) => ReactNode
 }): JSX.Element
 
-export function DataTableToolbar(props: { children?: ReactNode }): JSX.Element
+export function DataTableToolbar(props: { children?: ReactNode; actions?: ReactNode }): JSX.Element
 export function DataTableSearch(props: {
   filterKey?: string
   placeholder?: string
   debounceMs?: number
 }): JSX.Element
+export function DataTableViewOptions(props?: {
+  showResetAll?: boolean
+}): JSX.Element
 export function DataTableColumnToggle(): JSX.Element
+export function DataTableDensityToggle(): JSX.Element
 export function DataTableTable(props?: {
   renderEmpty?: () => ReactNode
   renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode
@@ -645,11 +649,14 @@ export function DataTableSelectionBar<TData>(props: {
 
 - 需要“一把梭”的标准 CRUD 列表，优先使用 `DataTablePreset`；需要深度定制时再回退到组合式（见 9.2）。
 - `DataTableSearch` 只更新 `dt.filters.set(filterKey, value)`，默认 `filterKey = "q"`。
+- `DataTableSearch` 内置输入尾部清空按钮；清空后立即写回空值，并取消 pending 的 debounce。
 - `DataTableSearch.debounceMs` 默认 300ms；URL 模式下由 state adapter 负责将“输入态”和“已提交态”统一为一个规范（UI 不直接操作 URL）。
 - `DataTablePagination` 调用 `dt.actions.setPage/setPageSize`，显示 `dt.pagination`。
 - `DataTableTable` 仅渲染 table（header/body/empty/error/loading），其状态来自 `dt.status`。
 - `DataTableSelectionBar` 以 `selectedRowIds` 为跨页批量的主入口；`selectedRowsCurrentPage` 仅用于“当前页批量”或展示选中摘要。
 - 当 `selection.mode = "cross-page"` 时，UI 建议遵循跨页选择的标准交互（见 26.2），避免用户误解“到底选了多少条”。
+- `DataTableViewOptions` 作为推荐的“低频视图配置入口”，统一承载密度切换、列设置与恢复默认操作。
+- `DataTableColumnToggle` 与 `DataTableDensityToggle` 保留为底层原子组件，用于高度定制页面。
 - `layout` 属于 UI 布局能力，不进入 core features；core 不感知滚动容器与 sticky 行为。
 
 ### 9.2 默认布局（一把梭用法）
@@ -677,9 +684,17 @@ return (
       stickyHeader: true,
     }}
   >
-    <DataTableToolbar>
+    <DataTableToolbar
+      actions={
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="outline" size="icon-sm" aria-label="刷新" onClick={dt.actions.refetch}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <DataTableViewOptions />
+        </div>
+      }
+    >
       <DataTableSearch filterKey="q" />
-      <DataTableColumnToggle />
     </DataTableToolbar>
     <DataTableTable />
     <DataTableSelectionBar
@@ -814,6 +829,8 @@ export function useDataTableSelector<TData, TFilterSchema, TSelected>(
 - pagination 文案
 - column toggle 文案
 - search placeholder
+- search 清空按钮 aria 文案
+- view options 文案（触发器、密度分组、恢复默认）
 
 组件允许局部覆盖，但不得硬编码默认值。
 
@@ -826,8 +843,14 @@ export interface DataTableI18n {
   refreshingText: string
   retryText: string
   searchPlaceholder: string
+  clearSearchAriaLabel: string
   columnToggleLabel: string
   selectionCheckboxLabel: string
+  viewOptions: {
+    triggerAriaLabel: string
+    densityLabel: string
+    resetAllText: string
+  }
   pagination: {
     prevPage: string
     nextPage: string
@@ -840,6 +863,7 @@ export interface DataTableI18n {
 ### 12.2 可访问性
 
 - icon-only button 必须有可访问性名称（`aria-label`），且默认从 i18n 提供。
+- 搜索清空按钮与 View Options 触发器必须提供可访问性名称（建议由 i18n 下发）。
 - selection checkbox 的 `aria-label` 统一配置，不在列定义里写死英文。
 
 ---
@@ -1006,10 +1030,9 @@ export interface SelectionFeatureOptions {
 
 ```
 DataTableToolbar
-├── DataTableSearch          # 全局搜索（默认 filterKey="q"）
+├── DataTableSearch          # 全局搜索（默认 filterKey="q"，内置清空）
 ├── DataTableFilterBar       # 筛选条容器
-│   ├── DataTableFilterItem  # 单个筛选项
-│   └── DataTableFilterReset # 重置筛选
+│   └── DataTableFilterItem  # 单个筛选项（内置清空）
 └── DataTableActiveFilters   # 已激活筛选标签展示
 ```
 
@@ -1039,6 +1062,7 @@ export interface FilterDefinition<TFilterSchema, K extends keyof TFilterSchema> 
   render?: (props: {
     value: TFilterSchema[K]
     onChange: (value: TFilterSchema[K]) => void
+    onRemove: () => void
   }) => ReactNode
 
   // 显示控制
@@ -1074,7 +1098,16 @@ function DataTableFilterItem<TFilterSchema, K extends keyof TFilterSchema>({
     // 注意：state adapter 会自动处理 resetPageOnFilterChange
   }
 
-  return renderFilterByType(definition.type, { value, onChange: handleChange })
+  // 通过 dt.filters.set(key, null) 清空单个筛选
+  const handleRemove = () => {
+    dt.filters.set(definition.key, null as TFilterSchema[K])
+  }
+
+  return renderFilterByType(definition.type, {
+    value,
+    onChange: handleChange,
+    onRemove: handleRemove,
+  })
 }
 ```
 
@@ -1095,6 +1128,12 @@ export function DataTableActiveFilters<TFilterSchema>(props: {
 - 只展示值不为 `null`/`undefined`/空字符串/空数组的筛选项
 - 以 Tag/Chip 形式展示，点击 X 可移除单个筛选
 - 支持"清除全部"操作
+
+### 20.5 清空交互约定
+
+- `DataTableSearch` 的清空行为应作为默认能力，不要求业务额外添加“重置筛选”按钮。
+- `DataTableFilterItem` 应支持单项清空（建议在标签区/标题区提供 X 按钮）。
+- 页面级“清空全部筛选”可通过 `DataTableActiveFilters` 或显式按钮触发 `dt.filters.reset()`。
 
 ---
 

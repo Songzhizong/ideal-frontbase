@@ -1,6 +1,7 @@
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useMemo, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
@@ -69,7 +70,14 @@ export function DataTableSearch<TFilterSchema>({
     debouncedSetValue.flush()
   }
 
+  const handleClear = () => {
+    setValue("")
+    debouncedSetValue.cancel()
+    dt.filters.set(key, "" as TFilterSchema[keyof TFilterSchema])
+  }
+
   const resolvedPlaceholder = placeholder ?? i18n.searchPlaceholder
+  const canClear = value.trim() !== ""
 
   return (
     <div className={cn("relative w-full max-w-sm", className)}>
@@ -79,8 +87,20 @@ export function DataTableSearch<TFilterSchema>({
         onChange={(event) => handleChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={resolvedPlaceholder}
-        className={cn("h-9 pl-9", inputClassName)}
+        className={cn("h-9 pl-9", canClear ? "pr-9" : undefined, inputClassName)}
       />
+      {canClear ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2"
+          onClick={handleClear}
+          aria-label={i18n.clearSearchAriaLabel}
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      ) : null}
     </div>
   )
 }

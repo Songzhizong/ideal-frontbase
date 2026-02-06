@@ -1,19 +1,8 @@
-import {
-  Activity,
-  AlertTriangle,
-  Download,
-  Plus,
-  RefreshCw,
-  RotateCcw,
-  UserPlus,
-  Users,
-} from "lucide-react"
+import { Activity, AlertTriangle, Download, Plus, RefreshCw, UserPlus, Users } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { PageContainer } from "@/components/common/page-container"
 import type { FilterDefinition } from "@/components/table/v2"
 import {
-  DataTableColumnToggle,
-  DataTableDensityToggle,
   DataTableFilterBar,
   DataTablePagination,
   DataTableRoot,
@@ -21,6 +10,7 @@ import {
   DataTableSelectionBar,
   DataTableTable,
   DataTableToolbar,
+  DataTableViewOptions,
   remote,
   stateInternal,
   useDataTable,
@@ -313,34 +303,14 @@ export function UserManagementPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    className="h-8 gap-2"
-                    onClick={() => dt.filters.reset()}
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    重置筛选
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-2"
-                    onClick={() => dt.actions.resetAll()}
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    重置状态
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-8 gap-2"
+                    size="icon-sm"
+                    className="h-8 w-8"
                     onClick={() => dt.actions.refetch()}
+                    aria-label="刷新"
                   >
                     <RefreshCw className="h-4 w-4" />
-                    刷新
                   </Button>
-                  <DataTableDensityToggle />
-                  <DataTableColumnToggle />
+                  <DataTableViewOptions />
                 </div>
               }
             >

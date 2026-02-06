@@ -17,6 +17,7 @@ export type {
   DataTableSelectionBarProps,
   DataTableToolbarProps,
   DataTableTreeCellProps,
+  DataTableViewOptionsProps,
 } from "./ui"
 export {
   DataTableActiveFilters,
@@ -35,4 +36,5 @@ export {
   DataTableTable,
   DataTableToolbar,
   DataTableTreeCell,
+  DataTableViewOptions,
 } from "./ui"
