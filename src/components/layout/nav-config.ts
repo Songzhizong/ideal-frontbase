@@ -26,7 +26,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
 			{
 				title: "表格",
 				to: "/example/table-v2-demo",
-				icon: Table, // Sub-items might not need icon, but type requires it currently
+				icon: Table,
 			},
 		],
 	},

@@ -2,6 +2,26 @@ import { act, renderHook } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { TableStateSnapshot } from "../types"
 
+const basePathMocks = vi.hoisted(() => {
+	let basePath = "/"
+	return {
+		setBasePath: (next: string) => {
+			basePath = next.endsWith("/") && next !== "/" ? next.slice(0, -1) : next
+		},
+		stripBasePath: (path: string) => {
+			if (basePath === "/") return path
+			if (path === basePath) return "/"
+			if (path.startsWith(`${basePath}/`)) return path.slice(basePath.length)
+			return path
+		},
+		withBasePath: (path: string) => {
+			const normalized = path.startsWith("/") ? path : `/${path}`
+			if (basePath === "/") return normalized
+			return `${basePath}${normalized}`
+		},
+	}
+})
+
 const urlMocks = vi.hoisted(() => {
 	const push = vi.fn()
 	const replace = vi.fn()
@@ -26,6 +46,11 @@ vi.mock("@tanstack/react-router", () => ({
 	useLocation: () => urlMocks.getLocation(),
 }))
 
+vi.mock("@/lib/base-path", () => ({
+	stripBasePath: basePathMocks.stripBasePath,
+	withBasePath: basePathMocks.withBasePath,
+}))
+
 function parseHref(href: string) {
 	return new URL(href, "http://localhost")
 }
@@ -35,6 +60,7 @@ describe("stateUrl", () => {
 		urlMocks.push.mockReset()
 		urlMocks.replace.mockReset()
 		urlMocks.setLocation({ searchStr: "", pathname: "/list", hash: "" })
+		basePathMocks.setBasePath("/")
 	})
 
 	it("getSnapshot 解析 page/size/sort/filters（含重复 key）", async () => {
@@ -145,5 +171,34 @@ describe("stateUrl", () => {
 
 		expect(urlMocks.replace).toHaveBeenCalledTimes(1)
 		expect(urlMocks.push).toHaveBeenCalledTimes(0)
+	})
+
+	it("在 basepath 场景下 push 的 URL 会保留 basepath", async () => {
+		basePathMocks.setBasePath("/idealtemplate")
+		urlMocks.setLocation({
+			pathname: "/list",
+			hash: "",
+			searchStr: "",
+		})
+
+		const { stateUrl } = await import("./url")
+		const { result } = renderHook(() => stateUrl({ key: "t" }))
+
+		act(() => {
+			result.current.setSnapshot(
+				{
+					page: 2,
+					size: 10,
+					sort: [],
+					filters: {},
+				},
+				"page",
+			)
+		})
+
+		expect(urlMocks.push).toHaveBeenCalledTimes(1)
+		const href = urlMocks.push.mock.calls[0]?.[0] as string
+		const url = parseHref(href)
+		expect(url.pathname).toBe("/idealtemplate/list")
 	})
 })

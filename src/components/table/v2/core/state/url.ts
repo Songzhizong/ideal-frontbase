@@ -1,6 +1,7 @@
 import { useLocation, useRouter } from "@tanstack/react-router"
 import type { ParserMap } from "nuqs"
 import { useCallback, useEffect, useMemo, useRef } from "react"
+import { stripBasePath, withBasePath } from "@/lib/base-path"
 import type {
 	InferParserValues,
 	TableSort,
@@ -315,7 +316,8 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
 			}
 			const nextSearchStr = buildSearchParams(searchRecord)
 			if (nextSearchStr === locationRef.current.searchStr) return
-			const nextHref = `${locationRef.current.pathname}${nextSearchStr}${locationRef.current.hash}`
+			const nextPathname = withBasePath(stripBasePath(locationRef.current.pathname))
+			const nextHref = `${nextPathname}${nextSearchStr}${locationRef.current.hash}`
 			const historyMode = behaviorRef.current?.history ?? "push"
 			if (historyMode === "replace") {
 				router.history.replace(nextHref)
