@@ -4,29 +4,29 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useEffect } from "react"
 
 export interface RouterContext {
-	queryClient: QueryClient
+  queryClient: QueryClient
 }
 
 function NotFoundRedirect() {
-	const navigate = useNavigate()
+  const navigate = useNavigate()
 
-	useEffect(() => {
-		void navigate({ to: "/errors/404", replace: true })
-	}, [navigate])
+  useEffect(() => {
+    void navigate({ to: "/errors/404", replace: true })
+  }, [navigate])
 
-	return null
+  return null
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-	component: RootComponent,
-	notFoundComponent: NotFoundRedirect,
+  component: RootComponent,
+  notFoundComponent: NotFoundRedirect,
 })
 
 function RootComponent() {
-	return (
-		<div className="relative min-h-screen">
-			<Outlet />
-			{import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
-		</div>
-	)
+  return (
+    <div className="relative min-h-screen">
+      <Outlet />
+      {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
+    </div>
+  )
 }

@@ -13,14 +13,14 @@ const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6, avatar7, 
  * 简单的哈希函数，将字符串映射为数字
  */
 function hashString(str: string): number {
-	let hash = 0
-	if (str.length === 0) return hash
-	for (let i = 0; i < str.length; i++) {
-		const char = str.charCodeAt(i)
-		hash = (hash << 5) - hash + char
-		hash |= 0 // 转换为 32 位整数
-	}
-	return Math.abs(hash)
+  let hash = 0
+  if (str.length === 0) return hash
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0 // 转换为 32 位整数
+  }
+  return Math.abs(hash)
 }
 
 /**
@@ -29,7 +29,7 @@ function hashString(str: string): number {
  * @returns 头像路径
  */
 export function getAvatarByHash(userId: string | undefined | null): string | undefined {
-	const hash = hashString(userId || "")
-	const index = hash % avatars.length
-	return avatars[index]
+  const hash = hashString(userId || "")
+  const index = hash % avatars.length
+  return avatars[index]
 }

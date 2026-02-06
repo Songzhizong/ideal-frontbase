@@ -1,29 +1,29 @@
 import {
-	Activity,
-	AlertTriangle,
-	Download,
-	Plus,
-	RefreshCw,
-	RotateCcw,
-	UserPlus,
-	Users,
+  Activity,
+  AlertTriangle,
+  Download,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  UserPlus,
+  Users,
 } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { PageContainer } from "@/components/common/page-container"
 import type { FilterDefinition } from "@/components/table/v2"
 import {
-	DataTableColumnToggle,
-	DataTableDensityToggle,
-	DataTableFilterBar,
-	DataTablePagination,
-	DataTableRoot,
-	DataTableSearch,
-	DataTableSelectionBar,
-	DataTableTable,
-	DataTableToolbar,
-	remote,
-	stateInternal,
-	useDataTable,
+  DataTableColumnToggle,
+  DataTableDensityToggle,
+  DataTableFilterBar,
+  DataTablePagination,
+  DataTableRoot,
+  DataTableSearch,
+  DataTableSelectionBar,
+  DataTableTable,
+  DataTableToolbar,
+  remote,
+  stateInternal,
+  useDataTable,
 } from "@/components/table/v2"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,349 +31,349 @@ import { StatsCard } from "@/features/dashboard/components/stats-card"
 import { useBaseNavigate } from "@/hooks/use-base-navigate"
 import { DEMO_USERS, fetchDemoUsers } from "../demo/users"
 import {
-	DEMO_USER_DEPARTMENTS,
-	DEMO_USER_ROLES,
-	DEMO_USER_STATUSES,
-	type DemoUser,
-	type DemoUserFilters,
+  DEMO_USER_DEPARTMENTS,
+  DEMO_USER_ROLES,
+  DEMO_USER_STATUSES,
+  type DemoUser,
+  type DemoUserFilters,
 } from "../types"
 import { demoUserTableColumns } from "./user-table-columns"
 
 const ROLE_LABEL: Record<(typeof DEMO_USER_ROLES)[number], string> = {
-	super_admin: "超级管理员",
-	employee: "普通员工",
-	partner: "外部伙伴",
+  super_admin: "超级管理员",
+  employee: "普通员工",
+  partner: "外部伙伴",
 }
 
 const STATUS_LABEL: Record<(typeof DEMO_USER_STATUSES)[number], string> = {
-	active: "激活",
-	disabled: "禁用",
-	locked: "锁定",
+  active: "激活",
+  disabled: "禁用",
+  locked: "锁定",
 }
 
 function buildCsvCell(value: string): string {
-	const normalized = value.replaceAll('"', '""')
-	return `"${normalized}"`
+  const normalized = value.replaceAll('"', '""')
+  return `"${normalized}"`
 }
 
 function downloadCsv(args: { filename: string; rows: string[][] }) {
-	const csv = args.rows.map((row) => row.map(buildCsvCell).join(",")).join("\n")
-	const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
-	const url = URL.createObjectURL(blob)
-	const link = document.createElement("a")
-	link.href = url
-	link.download = args.filename
-	link.click()
-	URL.revokeObjectURL(url)
+  const csv = args.rows.map((row) => row.map(buildCsvCell).join(",")).join("\n")
+  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = args.filename
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 export function UserManagementPage() {
-	const navigate = useBaseNavigate()
+  const navigate = useBaseNavigate()
 
-	const state = stateInternal<DemoUserFilters>({
-		initial: {
-			page: 1,
-			size: 10,
-			sort: [],
-			filters: {
-				q: "",
-				status: null,
-				role: null,
-				department: null,
-			},
-		},
-	})
+  const state = stateInternal<DemoUserFilters>({
+    initial: {
+      page: 1,
+      size: 10,
+      sort: [],
+      filters: {
+        q: "",
+        status: null,
+        role: null,
+        department: null,
+      },
+    },
+  })
 
-	const dataSource = useMemo(() => {
-		return remote<DemoUser, DemoUserFilters, Awaited<ReturnType<typeof fetchDemoUsers>>>({
-			queryKey: ["example-users-management-v2"],
-			queryFn: fetchDemoUsers,
-			map: (response) => response,
-		})
-	}, [])
+  const dataSource = useMemo(() => {
+    return remote<DemoUser, DemoUserFilters, Awaited<ReturnType<typeof fetchDemoUsers>>>({
+      queryKey: ["example-users-management-v2"],
+      queryFn: fetchDemoUsers,
+      map: (response) => response,
+    })
+  }, [])
 
-	const dt = useDataTable<DemoUser, DemoUserFilters>({
-		columns: demoUserTableColumns,
-		dataSource,
-		state,
-		getRowId: (row) => row.id,
-		features: {
-			selection: {
-				enabled: true,
-				mode: "page",
-			},
-			columnVisibility: {
-				enabled: true,
-				storageKey: "example_users_v2_visibility",
-			},
-			columnSizing: {
-				enabled: true,
-				storageKey: "example_users_v2_sizing",
-			},
-			density: {
-				enabled: true,
-				storageKey: "example_users_v2_density",
-				default: "comfortable",
-			},
-			pinning: {
-				enabled: true,
-				left: ["__select__", "name"],
-				right: ["__actions__"],
-			},
-		},
-	})
+  const dt = useDataTable<DemoUser, DemoUserFilters>({
+    columns: demoUserTableColumns,
+    dataSource,
+    state,
+    getRowId: (row) => row.id,
+    features: {
+      selection: {
+        enabled: true,
+        mode: "page",
+      },
+      columnVisibility: {
+        enabled: true,
+        storageKey: "example_users_v2_visibility",
+      },
+      columnSizing: {
+        enabled: true,
+        storageKey: "example_users_v2_sizing",
+      },
+      density: {
+        enabled: true,
+        storageKey: "example_users_v2_density",
+        default: "comfortable",
+      },
+      pinning: {
+        enabled: true,
+        left: ["__select__", "name"],
+        right: ["__actions__"],
+      },
+    },
+  })
 
-	const filterDefinitions = useMemo<
-		Array<FilterDefinition<DemoUserFilters, keyof DemoUserFilters>>
-	>(() => {
-		return [
-			{
-				key: "status",
-				label: "状态",
-				type: "select",
-				placeholder: "全部",
-				options: DEMO_USER_STATUSES.map((status) => ({
-					label: STATUS_LABEL[status],
-					value: status,
-				})),
-				alwaysVisible: true,
-			},
-			{
-				key: "role",
-				label: "角色",
-				type: "select",
-				placeholder: "全部",
-				options: DEMO_USER_ROLES.map((role) => ({
-					label: ROLE_LABEL[role],
-					value: role,
-				})),
-				defaultVisible: true,
-			},
-			{
-				key: "department",
-				label: "部门",
-				type: "select",
-				placeholder: "全部",
-				options: DEMO_USER_DEPARTMENTS.map((department) => ({
-					label: department,
-					value: department,
-				})),
-				defaultVisible: true,
-			},
-		]
-	}, [])
+  const filterDefinitions = useMemo<
+    Array<FilterDefinition<DemoUserFilters, keyof DemoUserFilters>>
+  >(() => {
+    return [
+      {
+        key: "status",
+        label: "状态",
+        type: "select",
+        placeholder: "全部",
+        options: DEMO_USER_STATUSES.map((status) => ({
+          label: STATUS_LABEL[status],
+          value: status,
+        })),
+        alwaysVisible: true,
+      },
+      {
+        key: "role",
+        label: "角色",
+        type: "select",
+        placeholder: "全部",
+        options: DEMO_USER_ROLES.map((role) => ({
+          label: ROLE_LABEL[role],
+          value: role,
+        })),
+        defaultVisible: true,
+      },
+      {
+        key: "department",
+        label: "部门",
+        type: "select",
+        placeholder: "全部",
+        options: DEMO_USER_DEPARTMENTS.map((department) => ({
+          label: department,
+          value: department,
+        })),
+        defaultVisible: true,
+      },
+    ]
+  }, [])
 
-	const metrics = useMemo(() => {
-		const totalUsers = DEMO_USERS.length
-		const onlineUsers = DEMO_USERS.filter((user) => user.isOnline).length
-		const lockedUsers = DEMO_USERS.filter((user) => user.status === "locked").length
-		const disabledUsers = DEMO_USERS.filter((user) => user.status === "disabled").length
-		const abnormalUsers = lockedUsers + disabledUsers
+  const metrics = useMemo(() => {
+    const totalUsers = DEMO_USERS.length
+    const onlineUsers = DEMO_USERS.filter((user) => user.isOnline).length
+    const lockedUsers = DEMO_USERS.filter((user) => user.status === "locked").length
+    const disabledUsers = DEMO_USERS.filter((user) => user.status === "disabled").length
+    const abnormalUsers = lockedUsers + disabledUsers
 
-		const now = Date.now()
-		const weekStart = now - 7 * 24 * 60 * 60 * 1000
-		const newThisWeek = DEMO_USERS.filter((user) => {
-			const time = Date.parse(user.createdAt)
-			return Number.isFinite(time) && time >= weekStart
-		}).length
+    const now = Date.now()
+    const weekStart = now - 7 * 24 * 60 * 60 * 1000
+    const newThisWeek = DEMO_USERS.filter((user) => {
+      const time = Date.parse(user.createdAt)
+      return Number.isFinite(time) && time >= weekStart
+    }).length
 
-		return [
-			{
-				title: "总用户数",
-				value: totalUsers.toLocaleString(),
-				hint: "系统注册用户总数",
-				icon: Users,
-				accentClass: "text-info bg-info-subtle border-info/20",
-			},
-			{
-				title: "当前在线",
-				value: onlineUsers.toLocaleString(),
-				hint: "模拟在线状态（mock）",
-				icon: Activity,
-				accentClass: "text-success bg-success-subtle border-success/20",
-			},
-			{
-				title: "本周新增",
-				value: newThisWeek.toLocaleString(),
-				hint: "最近 7 天创建的用户",
-				icon: UserPlus,
-				accentClass: "text-primary bg-primary/10 border-primary/20",
-			},
-			{
-				title: "异常账号",
-				value: abnormalUsers.toLocaleString(),
-				hint: "锁定 + 禁用（mock）",
-				icon: AlertTriangle,
-				accentClass: "text-error bg-error-subtle border-error/20",
-			},
-		]
-	}, [])
+    return [
+      {
+        title: "总用户数",
+        value: totalUsers.toLocaleString(),
+        hint: "系统注册用户总数",
+        icon: Users,
+        accentClass: "text-info bg-info-subtle border-info/20",
+      },
+      {
+        title: "当前在线",
+        value: onlineUsers.toLocaleString(),
+        hint: "模拟在线状态（mock）",
+        icon: Activity,
+        accentClass: "text-success bg-success-subtle border-success/20",
+      },
+      {
+        title: "本周新增",
+        value: newThisWeek.toLocaleString(),
+        hint: "最近 7 天创建的用户",
+        icon: UserPlus,
+        accentClass: "text-primary bg-primary/10 border-primary/20",
+      },
+      {
+        title: "异常账号",
+        value: abnormalUsers.toLocaleString(),
+        hint: "锁定 + 禁用（mock）",
+        icon: AlertTriangle,
+        accentClass: "text-error bg-error-subtle border-error/20",
+      },
+    ]
+  }, [])
 
-	const handleCreate = useCallback(() => {
-		void navigate({ to: "/example/users/new" })
-	}, [navigate])
+  const handleCreate = useCallback(() => {
+    void navigate({ to: "/example/users/new" })
+  }, [navigate])
 
-	const handleExportCurrentPage = useCallback(() => {
-		const rows = dt.table.getRowModel().rows.map((row) => row.original)
-		const filename = `users_page_${dt.pagination.page}_size_${dt.pagination.size}.csv`
-		downloadCsv({
-			filename,
-			rows: [
-				["ID", "姓名", "邮箱", "手机号", "角色", "部门", "状态", "最后登录"],
-				...rows.map((user) => [
-					user.id,
-					user.name,
-					user.email,
-					user.phone,
-					ROLE_LABEL[user.role],
-					user.department,
-					STATUS_LABEL[user.status],
-					user.lastLoginAt,
-				]),
-			],
-		})
-	}, [dt.pagination.page, dt.pagination.size, dt.table])
+  const handleExportCurrentPage = useCallback(() => {
+    const rows = dt.table.getRowModel().rows.map((row) => row.original)
+    const filename = `users_page_${dt.pagination.page}_size_${dt.pagination.size}.csv`
+    downloadCsv({
+      filename,
+      rows: [
+        ["ID", "姓名", "邮箱", "手机号", "角色", "部门", "状态", "最后登录"],
+        ...rows.map((user) => [
+          user.id,
+          user.name,
+          user.email,
+          user.phone,
+          ROLE_LABEL[user.role],
+          user.department,
+          STATUS_LABEL[user.status],
+          user.lastLoginAt,
+        ]),
+      ],
+    })
+  }, [dt.pagination.page, dt.pagination.size, dt.table])
 
-	const handleExportSelectedCurrentPage = useCallback((selectedRowsCurrentPage: DemoUser[]) => {
-		if (selectedRowsCurrentPage.length === 0) return
-		const filename = `users_selected_${selectedRowsCurrentPage.length}.csv`
-		downloadCsv({
-			filename,
-			rows: [
-				["ID", "姓名", "邮箱", "手机号", "角色", "部门", "状态", "最后登录"],
-				...selectedRowsCurrentPage.map((user) => [
-					user.id,
-					user.name,
-					user.email,
-					user.phone,
-					ROLE_LABEL[user.role],
-					user.department,
-					STATUS_LABEL[user.status],
-					user.lastLoginAt,
-				]),
-			],
-		})
-	}, [])
+  const handleExportSelectedCurrentPage = useCallback((selectedRowsCurrentPage: DemoUser[]) => {
+    if (selectedRowsCurrentPage.length === 0) return
+    const filename = `users_selected_${selectedRowsCurrentPage.length}.csv`
+    downloadCsv({
+      filename,
+      rows: [
+        ["ID", "姓名", "邮箱", "手机号", "角色", "部门", "状态", "最后登录"],
+        ...selectedRowsCurrentPage.map((user) => [
+          user.id,
+          user.name,
+          user.email,
+          user.phone,
+          ROLE_LABEL[user.role],
+          user.department,
+          STATUS_LABEL[user.status],
+          user.lastLoginAt,
+        ]),
+      ],
+    })
+  }, [])
 
-	return (
-		<PageContainer className="flex flex-col gap-6">
-			<section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-				<div className="space-y-2">
-					<h1 className="text-3xl font-semibold text-foreground">用户管理</h1>
-					<p className="text-sm text-muted-foreground">
-						用于验证 DataTable V2 的搜索、防抖筛选、分页与表格特性（选择/列显隐/列宽/Pin/Density）。
-					</p>
-				</div>
-				<div className="flex flex-wrap items-center gap-2">
-					<Button
-						type="button"
-						variant="outline"
-						className="gap-2"
-						onClick={handleExportCurrentPage}
-					>
-						<Download className="h-4 w-4" />
-						导出当前页 CSV
-					</Button>
-					<Button type="button" className="gap-2" onClick={handleCreate}>
-						<Plus className="h-4 w-4" />
-						新增用户
-					</Button>
-				</div>
-			</section>
+  return (
+    <PageContainer className="flex flex-col gap-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold text-foreground">用户管理</h1>
+          <p className="text-sm text-muted-foreground">
+            用于验证 DataTable V2 的搜索、防抖筛选、分页与表格特性（选择/列显隐/列宽/Pin/Density）。
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={handleExportCurrentPage}
+          >
+            <Download className="h-4 w-4" />
+            导出当前页 CSV
+          </Button>
+          <Button type="button" className="gap-2" onClick={handleCreate}>
+            <Plus className="h-4 w-4" />
+            新增用户
+          </Button>
+        </div>
+      </section>
 
-			<section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				{metrics.map((metric) => (
-					<StatsCard
-						key={metric.title}
-						title={metric.title}
-						value={metric.value}
-						hint={metric.hint}
-						icon={metric.icon}
-						accentClass={metric.accentClass}
-					/>
-				))}
-			</section>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <StatsCard
+            key={metric.title}
+            title={metric.title}
+            value={metric.value}
+            hint={metric.hint}
+            icon={metric.icon}
+            accentClass={metric.accentClass}
+          />
+        ))}
+      </section>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>用户列表（Table V2）</CardTitle>
-					<CardDescription>
-						内置 220 条 mock 用户数据，支持搜索（姓名/邮箱/手机号）与分页，模拟远程请求。
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<DataTableRoot
-						dt={dt}
-						layout={{ stickyHeader: true, stickyPagination: true }}
-						className="rounded-md border border-border/50"
-					>
-						<DataTableToolbar
-							actions={
-								<div className="flex flex-wrap gap-2">
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										className="h-8 gap-2"
-										onClick={() => dt.filters.reset()}
-									>
-										<RotateCcw className="h-4 w-4" />
-										重置筛选
-									</Button>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										className="h-8 gap-2"
-										onClick={() => dt.actions.resetAll()}
-									>
-										<RotateCcw className="h-4 w-4" />
-										重置状态
-									</Button>
-									<Button
-										type="button"
-										size="sm"
-										className="h-8 gap-2"
-										onClick={() => dt.actions.refetch()}
-									>
-										<RefreshCw className="h-4 w-4" />
-										刷新
-									</Button>
-									<DataTableDensityToggle />
-									<DataTableColumnToggle />
-								</div>
-							}
-						>
-							<DataTableSearch<DemoUserFilters> placeholder="搜索姓名 / 邮箱 / 手机号" />
-						</DataTableToolbar>
+      <Card>
+        <CardHeader>
+          <CardTitle>用户列表（Table V2）</CardTitle>
+          <CardDescription>
+            内置 220 条 mock 用户数据，支持搜索（姓名/邮箱/手机号）与分页，模拟远程请求。
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <DataTableRoot
+            dt={dt}
+            layout={{ stickyHeader: true, stickyPagination: true }}
+            className="rounded-md border border-border/50"
+          >
+            <DataTableToolbar
+              actions={
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-2"
+                    onClick={() => dt.filters.reset()}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置筛选
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-2"
+                    onClick={() => dt.actions.resetAll()}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置状态
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-8 gap-2"
+                    onClick={() => dt.actions.refetch()}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    刷新
+                  </Button>
+                  <DataTableDensityToggle />
+                  <DataTableColumnToggle />
+                </div>
+              }
+            >
+              <DataTableSearch<DemoUserFilters> placeholder="搜索姓名 / 邮箱 / 手机号" />
+            </DataTableToolbar>
 
-						<div className="border-b border-border/50 bg-background px-3 py-3">
-							<DataTableFilterBar filters={filterDefinitions} />
-						</div>
+            <div className="border-b border-border/50 bg-background px-3 py-3">
+              <DataTableFilterBar filters={filterDefinitions} />
+            </div>
 
-						<div className="overflow-x-auto">
-							<DataTableTable<DemoUser> renderEmpty={() => "暂无匹配用户"} />
-						</div>
+            <div className="overflow-x-auto">
+              <DataTableTable<DemoUser> renderEmpty={() => "暂无匹配用户"} />
+            </div>
 
-						<DataTableSelectionBar<DemoUser>
-							actions={({ selectedRowsCurrentPage }) => (
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									className="h-8 gap-2"
-									onClick={() => handleExportSelectedCurrentPage(selectedRowsCurrentPage)}
-								>
-									<Download className="h-4 w-4" />
-									导出已选（当前页）
-								</Button>
-							)}
-						/>
+            <DataTableSelectionBar<DemoUser>
+              actions={({ selectedRowsCurrentPage }) => (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-2"
+                  onClick={() => handleExportSelectedCurrentPage(selectedRowsCurrentPage)}
+                >
+                  <Download className="h-4 w-4" />
+                  导出已选（当前页）
+                </Button>
+              )}
+            />
 
-						<DataTablePagination />
-					</DataTableRoot>
-				</CardContent>
-			</Card>
-		</PageContainer>
-	)
+            <DataTablePagination />
+          </DataTableRoot>
+        </CardContent>
+      </Card>
+    </PageContainer>
+  )
 }

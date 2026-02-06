@@ -10,56 +10,56 @@ import { api } from "@/lib/api-client"
  * Token Interface - 访问令牌信息
  */
 export interface VisibleToken {
-	token_type: string
-	access_token: string
+  token_type: string
+  access_token: string
 }
 
 /**
  * Factor Type Enum - 多因素认证方式
  */
 export enum FactorType {
-	TOTP = "TOTP", // 手机令牌(One-Time Password)
-	SMS = "SMS", // 短信验证码
-	EMAIL = "EMAIL", // 邮件验证码
-	RECOVERY_CODE = "RECOVERY_CODE", // 一次性恢复码
+  TOTP = "TOTP", // 手机令牌(One-Time Password)
+  SMS = "SMS", // 短信验证码
+  EMAIL = "EMAIL", // 邮件验证码
+  RECOVERY_CODE = "RECOVERY_CODE", // 一次性恢复码
 }
 
 /**
  * MFA Ticket Interface - 多因素认证票据
  */
 export interface MfaTicket {
-	ticket: string
-	methods: FactorType[]
+  ticket: string
+  methods: FactorType[]
 }
 
 /**
  * Change Password Ticket Interface - 修改密码票据
  */
 export interface ChangePasswordTicket {
-	ticket: string
-	userId: string // Long 类型使用字符串接收
+  ticket: string
+  userId: string // Long 类型使用字符串接收
 }
 
 /**
  * Selectable Account Interface - 可选择的账号
  */
 export interface SelectableAccount {
-	uid: string // Long 类型使用字符串接收
-	account: string
-	phone: string
-	email: string
-	registrationTime: number
-	lastActiveTime: number | null
-	blocked: boolean
-	accountExpired: boolean
+  uid: string // Long 类型使用字符串接收
+  account: string
+  phone: string
+  email: string
+  registrationTime: number
+  lastActiveTime: number | null
+  blocked: boolean
+  accountExpired: boolean
 }
 
 /**
  * Select Account Ticket Interface - 选择账号票据
  */
 export interface SelectAccountTicket {
-	ticket: string
-	accounts: SelectableAccount[]
+  ticket: string
+  accounts: SelectableAccount[]
 }
 
 /**
@@ -71,22 +71,22 @@ export interface SelectAccountTicket {
  * - PASSWORD_EXPIRED、PASSWORD_ILLEGAL：代表需要修改密码，此时显示修改密码窗口，输入完毕后调用修改密码并登录接口
  */
 export enum LoginResponseType {
-	TOKEN = "TOKEN", // 成功执行登录
-	NEED_MFA = "NEED_MFA", // 需要多因素认证
-	SELECT_ACCOUNT = "SELECT_ACCOUNT", // 需要选择账号
-	PASSWORD_EXPIRED = "PASSWORD_EXPIRED", // 密码已过期
-	PASSWORD_ILLEGAL = "PASSWORD_ILLEGAL", // 密码不合规
+  TOKEN = "TOKEN", // 成功执行登录
+  NEED_MFA = "NEED_MFA", // 需要多因素认证
+  SELECT_ACCOUNT = "SELECT_ACCOUNT", // 需要选择账号
+  PASSWORD_EXPIRED = "PASSWORD_EXPIRED", // 密码已过期
+  PASSWORD_ILLEGAL = "PASSWORD_ILLEGAL", // 密码不合规
 }
 
 /**
  * Login Response Interface - 登录响应
  */
 export interface LoginResponse {
-	type: LoginResponseType
-	token?: VisibleToken | null
-	mfaTicket?: MfaTicket | null
-	passwordTicket?: ChangePasswordTicket | null
-	selectAccountTicket?: SelectAccountTicket | null
+  type: LoginResponseType
+  token?: VisibleToken | null
+  mfaTicket?: MfaTicket | null
+  passwordTicket?: ChangePasswordTicket | null
+  selectAccountTicket?: SelectAccountTicket | null
 }
 
 // ============================================================================
@@ -94,10 +94,10 @@ export interface LoginResponse {
 // ============================================================================
 
 export const PasswordLoginRequestSchema = z.object({
-	username: z.string().min(1, "Username is required"),
-	password: z.string().min(6, "Password must be at least 6 characters"),
-	certificate: z.string(),
-	captcha: z.string().optional(), // JSON string: {"captchaCode":"lJfY"}
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  certificate: z.string(),
+  captcha: z.string().optional(), // JSON string: {"captchaCode":"lJfY"}
 })
 
 export type PasswordLoginRequest = z.infer<typeof PasswordLoginRequestSchema>
@@ -107,17 +107,17 @@ export type PasswordLoginRequest = z.infer<typeof PasswordLoginRequestSchema>
  * 支持处理 2xx 成功响应以及包含有效 LoginResponse 的 4xx 响应（如 MFA、密码过期等）
  */
 export const handleLoginResponse = async (response: Response): Promise<LoginResponse> => {
-	const data = await response.json()
-	return data as LoginResponse
+  const data = await response.json()
+  return data as LoginResponse
 }
 
 const passwordLogin = async (credentials: PasswordLoginRequest): Promise<LoginResponse> => {
-	const response = await api.withAuthClientId().post("nexus-api/iam/login/password", {
-		json: credentials,
-		throwHttpErrors: false, // 我们手动处理错误以支持 sub-flow
-	})
+  const response = await api.withAuthClientId().post("nexus-api/iam/login/password", {
+    json: credentials,
+    throwHttpErrors: false, // 我们手动处理错误以支持 sub-flow
+  })
 
-	return handleLoginResponse(response)
+  return handleLoginResponse(response)
 }
 
 /**
@@ -132,9 +132,9 @@ const passwordLogin = async (credentials: PasswordLoginRequest): Promise<LoginRe
  * })
  */
 export const usePasswordLogin = () => {
-	return useMutation({
-		mutationFn: (credentials: PasswordLoginRequest) => passwordLogin(credentials),
-	})
+  return useMutation({
+    mutationFn: (credentials: PasswordLoginRequest) => passwordLogin(credentials),
+  })
 }
 
 // ============================================================================
@@ -142,20 +142,20 @@ export const usePasswordLogin = () => {
 // ============================================================================
 
 export const SendSmsCodeRequestSchema = z.object({
-	phone: z.string().min(1, "Phone number is required"),
-	certificate: z.string(),
-	captcha: z.string(), // JSON string: {"captchaCode":"riMW"}
+  phone: z.string().min(1, "Phone number is required"),
+  certificate: z.string(),
+  captcha: z.string(), // JSON string: {"captchaCode":"riMW"}
 })
 
 export type SendSmsCodeRequest = z.infer<typeof SendSmsCodeRequestSchema>
 
 const sendSmsLoginCode = async (request: SendSmsCodeRequest): Promise<void> => {
-	await api
-		.withAuthClientId()
-		.post("nexus-api/iam/login/sms-code/send", {
-			json: request,
-		})
-		.json()
+  await api
+    .withAuthClientId()
+    .post("nexus-api/iam/login/sms-code/send", {
+      json: request,
+    })
+    .json()
 }
 
 /**
@@ -169,9 +169,9 @@ const sendSmsLoginCode = async (request: SendSmsCodeRequest): Promise<void> => {
  * })
  */
 export const useSendSmsLoginCode = () => {
-	return useMutation({
-		mutationFn: (request: SendSmsCodeRequest) => sendSmsLoginCode(request),
-	})
+  return useMutation({
+    mutationFn: (request: SendSmsCodeRequest) => sendSmsLoginCode(request),
+  })
 }
 
 // ============================================================================
@@ -179,19 +179,19 @@ export const useSendSmsLoginCode = () => {
 // ============================================================================
 
 export const SmsCodeLoginRequestSchema = z.object({
-	phone: z.string().min(1, "Phone number is required"),
-	code: z.string().min(1, "Verification code is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  code: z.string().min(1, "Verification code is required"),
 })
 
 export type SmsCodeLoginRequest = z.infer<typeof SmsCodeLoginRequestSchema>
 
 const smsCodeLogin = async (request: SmsCodeLoginRequest): Promise<LoginResponse> => {
-	const response = await api.withAuthClientId().post("nexus-api/iam/login/sms-code", {
-		json: request,
-		throwHttpErrors: false,
-	})
+  const response = await api.withAuthClientId().post("nexus-api/iam/login/sms-code", {
+    json: request,
+    throwHttpErrors: false,
+  })
 
-	return handleLoginResponse(response)
+  return handleLoginResponse(response)
 }
 
 /**
@@ -204,9 +204,9 @@ const smsCodeLogin = async (request: SmsCodeLoginRequest): Promise<LoginResponse
  * })
  */
 export const useSmsCodeLogin = () => {
-	return useMutation({
-		mutationFn: (request: SmsCodeLoginRequest) => smsCodeLogin(request),
-	})
+  return useMutation({
+    mutationFn: (request: SmsCodeLoginRequest) => smsCodeLogin(request),
+  })
 }
 
 // ============================================================================
@@ -214,19 +214,19 @@ export const useSmsCodeLogin = () => {
 // ============================================================================
 
 export const SelectAccountRequestSchema = z.object({
-	uid: z.string(), // Long 类型使用字符串接收
-	ticket: z.string(),
+  uid: z.string(), // Long 类型使用字符串接收
+  ticket: z.string(),
 })
 
 export type SelectAccountRequest = z.infer<typeof SelectAccountRequestSchema>
 
 const selectAccount = async (request: SelectAccountRequest): Promise<LoginResponse> => {
-	const response = await api.post("nexus-api/iam/login/select-account", {
-		json: request,
-		throwHttpErrors: false,
-	})
+  const response = await api.post("nexus-api/iam/login/select-account", {
+    json: request,
+    throwHttpErrors: false,
+  })
 
-	return handleLoginResponse(response)
+  return handleLoginResponse(response)
 }
 
 /**
@@ -240,9 +240,9 @@ const selectAccount = async (request: SelectAccountRequest): Promise<LoginRespon
  * })
  */
 export const useSelectAccount = () => {
-	return useMutation({
-		mutationFn: selectAccount,
-	})
+  return useMutation({
+    mutationFn: selectAccount,
+  })
 }
 
 // ============================================================================
@@ -250,20 +250,20 @@ export const useSelectAccount = () => {
 // ============================================================================
 
 export const SendMfaSmsCodeRequestSchema = z.object({
-	ticket: z.string(),
+  ticket: z.string(),
 })
 
 export type SendMfaSmsCodeRequest = z.infer<typeof SendMfaSmsCodeRequestSchema>
 
 const sendMfaSmsCode = async (ticket: string): Promise<void> => {
-	await api
-		.post("nexus-api/iam/login/multifactor/send-sms-code", {
-			body: new URLSearchParams({ ticket }),
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.json()
+  await api
+    .post("nexus-api/iam/login/multifactor/send-sms-code", {
+      body: new URLSearchParams({ ticket }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+    .json()
 }
 
 /**
@@ -273,9 +273,9 @@ const sendMfaSmsCode = async (ticket: string): Promise<void> => {
  * sendMfaSmsMutation.mutate(mfaTicket.ticket)
  */
 export const useSendMfaSmsCode = () => {
-	return useMutation({
-		mutationFn: sendMfaSmsCode,
-	})
+  return useMutation({
+    mutationFn: sendMfaSmsCode,
+  })
 }
 
 // ============================================================================
@@ -283,14 +283,14 @@ export const useSendMfaSmsCode = () => {
 // ============================================================================
 
 const sendMfaEmailCode = async (ticket: string): Promise<void> => {
-	await api
-		.post("nexus-api/iam/login/multifactor/send-email-code", {
-			body: new URLSearchParams({ ticket }),
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-		})
-		.json()
+  await api
+    .post("nexus-api/iam/login/multifactor/send-email-code", {
+      body: new URLSearchParams({ ticket }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+    .json()
 }
 
 /**
@@ -300,9 +300,9 @@ const sendMfaEmailCode = async (ticket: string): Promise<void> => {
  * sendMfaEmailMutation.mutate(mfaTicket.ticket)
  */
 export const useSendMfaEmailCode = () => {
-	return useMutation({
-		mutationFn: sendMfaEmailCode,
-	})
+  return useMutation({
+    mutationFn: sendMfaEmailCode,
+  })
 }
 
 // ============================================================================
@@ -310,20 +310,20 @@ export const useSendMfaEmailCode = () => {
 // ============================================================================
 
 export const MultifactorLoginRequestSchema = z.object({
-	ticket: z.string(),
-	method: z.nativeEnum(FactorType),
-	code: z.string().min(1, "Verification code is required"),
+  ticket: z.string(),
+  method: z.nativeEnum(FactorType),
+  code: z.string().min(1, "Verification code is required"),
 })
 
 export type MultifactorLoginRequest = z.infer<typeof MultifactorLoginRequestSchema>
 
 const multifactorLogin = async (request: MultifactorLoginRequest): Promise<LoginResponse> => {
-	const response = await api.post("nexus-api/iam/login/multifactor", {
-		json: request,
-		throwHttpErrors: false,
-	})
+  const response = await api.post("nexus-api/iam/login/multifactor", {
+    json: request,
+    throwHttpErrors: false,
+  })
 
-	return handleLoginResponse(response)
+  return handleLoginResponse(response)
 }
 
 /**
@@ -338,9 +338,9 @@ const multifactorLogin = async (request: MultifactorLoginRequest): Promise<Login
  * })
  */
 export const useMultifactorLogin = () => {
-	return useMutation({
-		mutationFn: multifactorLogin,
-	})
+  return useMutation({
+    mutationFn: multifactorLogin,
+  })
 }
 
 // ============================================================================
@@ -348,19 +348,19 @@ export const useMultifactorLogin = () => {
 // ============================================================================
 
 export const ChangePasswordLoginRequestSchema = z.object({
-	ticket: z.string(),
-	newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  ticket: z.string(),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
 })
 
 export type ChangePasswordLoginRequest = z.infer<typeof ChangePasswordLoginRequestSchema>
 
 const changePasswordLogin = async (request: ChangePasswordLoginRequest): Promise<LoginResponse> => {
-	const response = await api.post("nexus-api/iam/login/change-password", {
-		json: request,
-		throwHttpErrors: false,
-	})
+  const response = await api.post("nexus-api/iam/login/change-password", {
+    json: request,
+    throwHttpErrors: false,
+  })
 
-	return handleLoginResponse(response)
+  return handleLoginResponse(response)
 }
 
 /**
@@ -374,7 +374,7 @@ const changePasswordLogin = async (request: ChangePasswordLoginRequest): Promise
  * })
  */
 export const useChangePasswordLogin = () => {
-	return useMutation({
-		mutationFn: changePasswordLogin,
-	})
+  return useMutation({
+    mutationFn: changePasswordLogin,
+  })
 }

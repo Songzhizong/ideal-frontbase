@@ -4,17 +4,17 @@ import { getBasePath } from "@/lib/base-path"
 import { routeTree } from "@/routeTree.gen"
 
 export const router = createRouter({
-	routeTree,
-	basepath: getBasePath(),
-	context: {
-		queryClient,
-	},
-	defaultPreload: "intent",
-	defaultPreloadStaleTime: 0,
+  routeTree,
+  basepath: getBasePath(),
+  context: {
+    queryClient,
+  },
+  defaultPreload: "intent",
+  defaultPreloadStaleTime: 0,
 })
 
 declare module "@tanstack/react-router" {
-	interface Register {
-		router: typeof router
-	}
+  interface Register {
+    router: typeof router
+  }
 }

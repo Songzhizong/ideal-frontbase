@@ -13,11 +13,11 @@
  * globals.css        → Add the new font in the @theme block and @layer base.
  */
 export const fonts = [
-	"inter",
-	"manrope",
-	"MiSans",
-	"HarmonyOS Sans SC",
-	"PingFang SC",
-	"Microsoft YaHei",
-	"system-ui",
+  "inter",
+  "manrope",
+  "MiSans",
+  "HarmonyOS Sans SC",
+  "PingFang SC",
+  "Microsoft YaHei",
+  "system-ui",
 ] as const

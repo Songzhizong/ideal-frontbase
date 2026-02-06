@@ -1,11 +1,12 @@
 import type { ThemePreset } from "@/types/theme"
 
 export const coreBlue: ThemePreset = {
-  "key": "core-blue",
-  "name": "基石蓝",
-  "description": "一种冷静、可信赖的系统级蓝色，用于承载默认交互与关键信息，强调稳定性、专业感与长期可用性，适合作为企业级产品与管理后台的基础主色。",
-  "schemes": {
-    "light": {
+  key: "core-blue",
+  name: "基石蓝",
+  description:
+    "一种冷静、可信赖的系统级蓝色，用于承载默认交互与关键信息，强调稳定性、专业感与长期可用性，适合作为企业级产品与管理后台的基础主色。",
+  schemes: {
+    light: {
       /* ----------------------------------
        * 1. 品牌 & 破坏性操作
        * ---------------------------------- */
@@ -264,7 +265,7 @@ export const coreBlue: ThemePreset = {
         },
       },
     },
-    "dark": {
+    dark: {
       brand: {
         primary: {
           default: "#2563eb",
@@ -467,8 +468,7 @@ export const coreBlue: ThemePreset = {
           md: "0 8px 24px rgba(0,0,0,0.55)",
           lg: "0 16px 48px rgba(0,0,0,0.65)",
         },
-        glow:
-          "0 0 0 1px rgba(37,99,235,0.28), 0 0 28px rgba(37,99,235,0.35)",
+        glow: "0 0 0 1px rgba(37,99,235,0.28), 0 0 28px rgba(37,99,235,0.35)",
       },
 
       charts: {
@@ -493,6 +493,6 @@ export const coreBlue: ThemePreset = {
           warning: "#fbbf24",
         },
       },
-    }
-  }
+    },
+  },
 }

@@ -26,516 +26,516 @@ import { type BreadcrumbItem, FileToolbar } from "./file-toolbar"
 import { FileUploadWidget } from "./file-upload-widget"
 
 export function FileManagerPage() {
-	const headerHeight = useThemeStore((state) => state.layout.headerHeight)
-	const queryClient = useQueryClient()
-	const bizType = FILE_MANAGER_BIZ_TYPE
+  const headerHeight = useThemeStore((state) => state.layout.headerHeight)
+  const queryClient = useQueryClient()
+  const bizType = FILE_MANAGER_BIZ_TYPE
 
-	// 1. Params & State
-	const {
-		setCatalogId,
-		viewMode,
-		setViewMode,
-		selectedCatalogId,
-		setSelectedCatalogId,
-		setScope,
-		setScopeStore,
-		isRecycleBin,
-		deferredCatalogId,
-		deferredScope,
-		isDeferredRecycleBin,
-		pageState,
-		debouncedSearchValue,
-	} = useFileManagerParams()
+  // 1. Params & State
+  const {
+    setCatalogId,
+    viewMode,
+    setViewMode,
+    selectedCatalogId,
+    setSelectedCatalogId,
+    setScope,
+    setScopeStore,
+    isRecycleBin,
+    deferredCatalogId,
+    deferredScope,
+    isDeferredRecycleBin,
+    pageState,
+    debouncedSearchValue,
+  } = useFileManagerParams()
 
-	// 2. Data Query
-	const {
-		catalogTrees,
-		catalogLoading,
-		refetchCatalogs,
-		fileQuery,
-		treeNodes,
-		items,
-		deferredItems,
-	} = useFileManagerQuery({
-		bizType,
-		deferredScope,
-		deferredCatalogId,
-		debouncedSearchValue,
-		pageSize: pageState.size,
-		isDeferredRecycleBin,
-		isRecycleBin,
-	})
+  // 2. Data Query
+  const {
+    catalogTrees,
+    catalogLoading,
+    refetchCatalogs,
+    fileQuery,
+    treeNodes,
+    items,
+    deferredItems,
+  } = useFileManagerQuery({
+    bizType,
+    deferredScope,
+    deferredCatalogId,
+    debouncedSearchValue,
+    pageSize: pageState.size,
+    isDeferredRecycleBin,
+    isRecycleBin,
+  })
 
-	// 3. Selection
-	const {
-		selectedIds,
-		setSelectedIds,
-		deferredSelectedIds,
-		previewItem,
-		setPreviewItem,
-		selectedItems,
-		startTransition,
-	} = useFileManagerSelection(deferredItems)
+  // 3. Selection
+  const {
+    selectedIds,
+    setSelectedIds,
+    deferredSelectedIds,
+    previewItem,
+    setPreviewItem,
+    selectedItems,
+    startTransition,
+  } = useFileManagerSelection(deferredItems)
 
-	// 4. File Upload (Core)
-	const {
-		startUploads,
-		pauseUpload,
-		cancelUpload,
-		resumeUpload,
-		retryUpload,
-		pauseAllUploads,
-		resumeAllUploads,
-		cancelAllUploads,
-	} = useFileUploadManager({
-		bizType,
-		catalogId: selectedCatalogId,
-		onCompleted: () => {
-			void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
-		},
-	})
-	const uploadTasks = useUploadStore((state) => state.uploadTasks)
-	const [pendingLocate, setPendingLocate] = useState<{
-		fileId: string
-		catalogId: string | null
-	} | null>(null)
-	const getCatalogPath = useCallback(
-		(catalogId: string | null) => {
-			if (!catalogId) return "/"
-			const path = findCatalogPath(treeNodes, catalogId)
-			if (!path || path.length === 0) return "/"
-			return `/${path.map((node) => node.name).join("/")}/`
-		},
-		[treeNodes],
-	)
+  // 4. File Upload (Core)
+  const {
+    startUploads,
+    pauseUpload,
+    cancelUpload,
+    resumeUpload,
+    retryUpload,
+    pauseAllUploads,
+    resumeAllUploads,
+    cancelAllUploads,
+  } = useFileUploadManager({
+    bizType,
+    catalogId: selectedCatalogId,
+    onCompleted: () => {
+      void queryClient.invalidateQueries({ queryKey: ["fss-files", bizType] })
+    },
+  })
+  const uploadTasks = useUploadStore((state) => state.uploadTasks)
+  const [pendingLocate, setPendingLocate] = useState<{
+    fileId: string
+    catalogId: string | null
+  } | null>(null)
+  const getCatalogPath = useCallback(
+    (catalogId: string | null) => {
+      if (!catalogId) return "/"
+      const path = findCatalogPath(treeNodes, catalogId)
+      if (!path || path.length === 0) return "/"
+      return `/${path.map((node) => node.name).join("/")}/`
+    },
+    [treeNodes],
+  )
 
-	// 5. Upload UI Logic
-	const {
-		setPendingUploadFiles,
-		uploadDialogOpen,
-		setUploadDialogOpen,
-		uploadTargetId,
-		setUploadTargetId,
-		uploadFileInputRef,
-		handleUploadFiles,
-		handleConfirmUpload,
-		handleUploadFilesClick,
-		handleUploadFolderClick,
-		handleTriggerUpload,
-		handleFileInputChange,
-		handleFolderInputChange,
-		setFolderInputRef,
-	} = useFileManagerUpload({
-		isRecycleBin,
-		selectedCatalogId,
-		getCatalogPath,
-		startUploads,
-	})
+  // 5. Upload UI Logic
+  const {
+    setPendingUploadFiles,
+    uploadDialogOpen,
+    setUploadDialogOpen,
+    uploadTargetId,
+    setUploadTargetId,
+    uploadFileInputRef,
+    handleUploadFiles,
+    handleConfirmUpload,
+    handleUploadFilesClick,
+    handleUploadFolderClick,
+    handleTriggerUpload,
+    handleFileInputChange,
+    handleFolderInputChange,
+    setFolderInputRef,
+  } = useFileManagerUpload({
+    isRecycleBin,
+    selectedCatalogId,
+    getCatalogPath,
+    startUploads,
+  })
 
-	// 6. Actions & Dialogs
-	const actions = useFileManagerActions({
-		bizType,
-		selectedCatalogId,
-		refetchCatalogs,
-		selectedItems,
-		setSelectedIds,
-		setCatalogId,
-		setSelectedCatalogId,
-		startTransition,
-		items,
-		treeNodes,
-		setPreviewItem,
-	})
+  // 6. Actions & Dialogs
+  const actions = useFileManagerActions({
+    bizType,
+    selectedCatalogId,
+    refetchCatalogs,
+    selectedItems,
+    setSelectedIds,
+    setCatalogId,
+    setSelectedCatalogId,
+    startTransition,
+    items,
+    treeNodes,
+    setPreviewItem,
+  })
 
-	// 7. Sidebar Control
-	const sidebarRef = useRef<ImperativePanelHandle>(null)
-	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-	const [locateTrigger, setLocateTrigger] = useState(0)
+  // 7. Sidebar Control
+  const sidebarRef = useRef<ImperativePanelHandle>(null)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [locateTrigger, setLocateTrigger] = useState(0)
 
-	const handleToggleSidebar = useCallback(() => {
-		const panel = sidebarRef.current
-		if (!panel) return
-		if (panel.isCollapsed()) {
-			panel.expand()
-		} else {
-			panel.collapse()
-		}
-	}, [])
+  const handleToggleSidebar = useCallback(() => {
+    const panel = sidebarRef.current
+    if (!panel) return
+    if (panel.isCollapsed()) {
+      panel.expand()
+    } else {
+      panel.collapse()
+    }
+  }, [])
 
-	const handleLocateCatalog = useCallback(() => {
-		let targetCatalogId = selectedCatalogId
+  const handleLocateCatalog = useCallback(() => {
+    let targetCatalogId = selectedCatalogId
 
-		// If no catalog selected but we have a single selected file (e.g. in search results)
-		if (!targetCatalogId && selectedItems.length === 1 && selectedItems[0]?.kind === "file") {
-			const item = selectedItems[0]
-			// Use type guard or check property
-			if (
-				item &&
-				"raw" in item &&
-				"catalogId" in (item.raw as unknown as Record<string, unknown>)
-			) {
-				const cid = (item.raw as { catalogId: string }).catalogId
-				if (cid) {
-					targetCatalogId = cid
-					// Important: Update the view to show this catalog
-					setSelectedCatalogId(cid)
-					// Exit search scope if needed (assuming "active" scope for normal viewing)
-					setScopeStore("active")
-					startTransition(() => {
-						setCatalogId(cid)
-						setScope("active")
-					})
-				}
-			}
-		}
+    // If no catalog selected but we have a single selected file (e.g. in search results)
+    if (!targetCatalogId && selectedItems.length === 1 && selectedItems[0]?.kind === "file") {
+      const item = selectedItems[0]
+      // Use type guard or check property
+      if (
+        item &&
+        "raw" in item &&
+        "catalogId" in (item.raw as unknown as Record<string, unknown>)
+      ) {
+        const cid = (item.raw as { catalogId: string }).catalogId
+        if (cid) {
+          targetCatalogId = cid
+          // Important: Update the view to show this catalog
+          setSelectedCatalogId(cid)
+          // Exit search scope if needed (assuming "active" scope for normal viewing)
+          setScopeStore("active")
+          startTransition(() => {
+            setCatalogId(cid)
+            setScope("active")
+          })
+        }
+      }
+    }
 
-		if (!targetCatalogId) return
+    if (!targetCatalogId) return
 
-		// Ensure sidebar is expanded
-		if (sidebarRef.current?.isCollapsed()) {
-			sidebarRef.current.expand()
-		}
+    // Ensure sidebar is expanded
+    if (sidebarRef.current?.isCollapsed()) {
+      sidebarRef.current.expand()
+    }
 
-		// Trigger tree expansion via state
-		setLocateTrigger((prev) => prev + 1)
+    // Trigger tree expansion via state
+    setLocateTrigger((prev) => prev + 1)
 
-		setTimeout(() => {
-			const element = document.querySelector(`[data-catalog-id="${targetCatalogId}"]`)
-			if (element) {
-				element.scrollIntoView({ behavior: "smooth", block: "center" })
-				// Add a subtle flash effect
-				element.classList.add("bg-primary/20", "transition-colors", "duration-500")
-				setTimeout(() => element.classList.remove("bg-primary/20"), 1000)
-			}
-		}, 300)
-	}, [
-		selectedCatalogId,
-		selectedItems,
-		setCatalogId,
-		setSelectedCatalogId,
-		startTransition,
-		setScopeStore,
-		setScope,
-	])
+    setTimeout(() => {
+      const element = document.querySelector(`[data-catalog-id="${targetCatalogId}"]`)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" })
+        // Add a subtle flash effect
+        element.classList.add("bg-primary/20", "transition-colors", "duration-500")
+        setTimeout(() => element.classList.remove("bg-primary/20"), 1000)
+      }
+    }, 300)
+  }, [
+    selectedCatalogId,
+    selectedItems,
+    setCatalogId,
+    setSelectedCatalogId,
+    startTransition,
+    setScopeStore,
+    setScope,
+  ])
 
-	// 8. EventHandlers & Helpers
-	const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
-		if (isRecycleBin) {
-			return [{ id: null, name: "回收站" }]
-		}
-		const base: BreadcrumbItem[] = [{ id: null, name: "全部文件" }]
-		if (!selectedCatalogId) return base
-		const path = findCatalogPath(treeNodes, selectedCatalogId)
-		if (!path) return base
-		return [...base, ...path.map((node) => ({ id: node.id, name: node.name }))]
-	}, [isRecycleBin, selectedCatalogId, treeNodes])
+  // 8. EventHandlers & Helpers
+  const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
+    if (isRecycleBin) {
+      return [{ id: null, name: "回收站" }]
+    }
+    const base: BreadcrumbItem[] = [{ id: null, name: "全部文件" }]
+    if (!selectedCatalogId) return base
+    const path = findCatalogPath(treeNodes, selectedCatalogId)
+    if (!path) return base
+    return [...base, ...path.map((node) => ({ id: node.id, name: node.name }))]
+  }, [isRecycleBin, selectedCatalogId, treeNodes])
 
-	const pathIds = useMemo(() => {
-		if (!selectedCatalogId) return new Set<string>()
-		const path = findCatalogPath(treeNodes, selectedCatalogId)
-		return new Set(path?.map((node) => node.id) ?? [])
-	}, [selectedCatalogId, treeNodes])
+  const pathIds = useMemo(() => {
+    if (!selectedCatalogId) return new Set<string>()
+    const path = findCatalogPath(treeNodes, selectedCatalogId)
+    return new Set(path?.map((node) => node.id) ?? [])
+  }, [selectedCatalogId, treeNodes])
 
-	const handleSelectCatalog = useCallback(
-		(id: string | null) => {
-			setSelectedCatalogId(id)
-			startTransition(() => {
-				void setCatalogId(id)
-			})
-		},
-		[setCatalogId, setSelectedCatalogId, startTransition],
-	)
+  const handleSelectCatalog = useCallback(
+    (id: string | null) => {
+      setSelectedCatalogId(id)
+      startTransition(() => {
+        void setCatalogId(id)
+      })
+    },
+    [setCatalogId, setSelectedCatalogId, startTransition],
+  )
 
-	const handleToggleRecycle = useCallback(
-		(value: boolean) => {
-			setSelectedCatalogId(null)
-			setScopeStore(value ? "recycle" : "active")
-			startTransition(() => {
-				void setScope(value ? "recycle" : "active")
-				void setCatalogId(null)
-			})
-		},
-		[setCatalogId, setScope, setScopeStore, setSelectedCatalogId, startTransition],
-	)
+  const handleToggleRecycle = useCallback(
+    (value: boolean) => {
+      setSelectedCatalogId(null)
+      setScopeStore(value ? "recycle" : "active")
+      startTransition(() => {
+        void setScope(value ? "recycle" : "active")
+        void setCatalogId(null)
+      })
+    },
+    [setCatalogId, setScope, setScopeStore, setSelectedCatalogId, startTransition],
+  )
 
-	const handleToolbarRefresh = useCallback(() => {
-		void refetchCatalogs()
-		void fileQuery.refetch()
-	}, [fileQuery, refetchCatalogs])
+  const handleToolbarRefresh = useCallback(() => {
+    void refetchCatalogs()
+    void fileQuery.refetch()
+  }, [fileQuery, refetchCatalogs])
 
-	const handleViewModeChange = useCallback(
-		(mode: "grid" | "list") => {
-			void setViewMode(mode)
-		},
-		[setViewMode],
-	)
+  const handleViewModeChange = useCallback(
+    (mode: "grid" | "list") => {
+      void setViewMode(mode)
+    },
+    [setViewMode],
+  )
 
-	const handleBreadcrumbClick = useCallback(
-		(id: string | null) => {
-			void setCatalogId(id)
-		},
-		[setCatalogId],
-	)
+  const handleBreadcrumbClick = useCallback(
+    (id: string | null) => {
+      void setCatalogId(id)
+    },
+    [setCatalogId],
+  )
 
-	const handleRefreshFiles = useCallback(() => {
-		void fileQuery.refetch()
-	}, [fileQuery])
+  const handleRefreshFiles = useCallback(() => {
+    void fileQuery.refetch()
+  }, [fileQuery])
 
-	const handleLoadMore = useCallback(() => {
-		void fileQuery.fetchNextPage()
-	}, [fileQuery])
+  const handleLoadMore = useCallback(() => {
+    void fileQuery.fetchNextPage()
+  }, [fileQuery])
 
-	const handlePreviewOpenChange = useCallback(
-		(open: boolean) => {
-			if (!open) setPreviewItem(null)
-		},
-		[setPreviewItem],
-	)
+  const handlePreviewOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) setPreviewItem(null)
+    },
+    [setPreviewItem],
+  )
 
-	const handleCancelUpload = useCallback(
-		(id: string, uploadId?: string) => {
-			void cancelUpload(id, uploadId)
-		},
-		[cancelUpload],
-	)
+  const handleCancelUpload = useCallback(
+    (id: string, uploadId?: string) => {
+      void cancelUpload(id, uploadId)
+    },
+    [cancelUpload],
+  )
 
-	const handleResumeUpload = useCallback(
-		(id: string, file: File, uploadId?: string, targetId?: string | null) => {
-			void resumeUpload(id, file, uploadId, targetId)
-		},
-		[resumeUpload],
-	)
+  const handleResumeUpload = useCallback(
+    (id: string, file: File, uploadId?: string, targetId?: string | null) => {
+      void resumeUpload(id, file, uploadId, targetId)
+    },
+    [resumeUpload],
+  )
 
-	const handleLocateUpload = useCallback(
-		(task: { fileId?: string; catalogId: string | null }) => {
-			if (!task.fileId) return
-			setPendingLocate({ fileId: task.fileId, catalogId: task.catalogId })
-			setSelectedCatalogId(task.catalogId)
-			startTransition(() => {
-				void setCatalogId(task.catalogId)
-			})
-		},
-		[setCatalogId, setSelectedCatalogId, startTransition],
-	)
+  const handleLocateUpload = useCallback(
+    (task: { fileId?: string; catalogId: string | null }) => {
+      if (!task.fileId) return
+      setPendingLocate({ fileId: task.fileId, catalogId: task.catalogId })
+      setSelectedCatalogId(task.catalogId)
+      startTransition(() => {
+        void setCatalogId(task.catalogId)
+      })
+    },
+    [setCatalogId, setSelectedCatalogId, startTransition],
+  )
 
-	useEffect(() => {
-		if (!pendingLocate) return
-		const match = deferredItems.find(
-			(item) => item.kind === "file" && item.id === pendingLocate.fileId,
-		)
-		if (match) {
-			setSelectedIds([match.id])
-			setPendingLocate(null)
-		}
-	}, [deferredItems, pendingLocate, setSelectedIds])
+  useEffect(() => {
+    if (!pendingLocate) return
+    const match = deferredItems.find(
+      (item) => item.kind === "file" && item.id === pendingLocate.fileId,
+    )
+    if (match) {
+      setSelectedIds([match.id])
+      setPendingLocate(null)
+    }
+  }, [deferredItems, pendingLocate, setSelectedIds])
 
-	useEffect(() => {
-		const hasActiveUploads = uploadTasks.some(
-			(task) => task.status === "uploading" || task.status === "pending",
-		)
-		if (!hasActiveUploads) return
-		const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-			event.preventDefault()
-			event.returnValue = ""
-		}
-		window.addEventListener("beforeunload", handleBeforeUnload)
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload)
-	}, [uploadTasks])
+  useEffect(() => {
+    const hasActiveUploads = uploadTasks.some(
+      (task) => task.status === "uploading" || task.status === "pending",
+    )
+    if (!hasActiveUploads) return
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ""
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [uploadTasks])
 
-	const { getRootProps, isDragActive } = useDropzone({
-		onDrop: (acceptedFiles: File[]) => {
-			if (acceptedFiles.length === 0) return
-			handleUploadFiles(acceptedFiles)
-		},
-		noClick: true,
-		disabled: isRecycleBin,
-	})
+  const { getRootProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return
+      handleUploadFiles(acceptedFiles)
+    },
+    noClick: true,
+    disabled: isRecycleBin,
+  })
 
-	const folderCount = deferredItems.filter((item) => item.kind === "folder").length
-	const totalFileCount = fileQuery.data?.pages[0]?.totalElements ?? 0
-	const fileSummary = folderCount + totalFileCount
+  const folderCount = deferredItems.filter((item) => item.kind === "folder").length
+  const totalFileCount = fileQuery.data?.pages[0]?.totalElements ?? 0
+  const fileSummary = folderCount + totalFileCount
 
-	return (
-		<div
-			{...getRootProps({ className: "p-4 h-full" })}
-			style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}
-		>
-			{isDragActive && !isRecycleBin && (
-				<div className="pointer-events-none fixed inset-0 z-40 border-2 border-dashed border-primary/40 bg-primary/5" />
-			)}
-			<FileManagerLayout
-				sidebar={
-					<FileSidebar
-						nodes={treeNodes}
-						selectedId={selectedCatalogId}
-						pathIds={pathIds}
-						isRecycleBin={isRecycleBin}
-						onSelectCatalog={handleSelectCatalog}
-						onToggleRecycle={handleToggleRecycle}
-						{...(!isRecycleBin
-							? {
-									onDropFilesToCatalog: actions.handleBatchMoveToCatalog,
-								}
-							: {})}
-						onTreeAction={actions.handleTreeAction}
-						onLocate={handleLocateCatalog}
-						loading={catalogLoading}
-						locateTrigger={locateTrigger}
-						allowLocate={Boolean(
-							selectedCatalogId ||
-								(selectedItems.length === 1 && selectedItems[0]?.kind === "file"),
-						)}
-					/>
-				}
-				sidebarRef={sidebarRef}
-				onCollapse={() => setIsSidebarCollapsed(true)}
-				onExpand={() => setIsSidebarCollapsed(false)}
-			>
-				<div className="flex h-full flex-col">
-					<FileToolbar
-						breadcrumbs={breadcrumbs}
-						onRefresh={handleToolbarRefresh}
-						isRecycleBin={isRecycleBin}
-						viewMode={viewMode === "grid" ? "grid" : "list"}
-						onViewModeChange={handleViewModeChange}
-						selectedCount={selectedIds.length}
-						onUploadFiles={handleUploadFilesClick}
-						onUploadFolder={handleUploadFolderClick}
-						onCreateFolder={actions.handleCreateFolder}
-						onDownloadSelected={actions.handleDownloadSelected}
-						onMoveSelected={actions.handleMoveSelected}
-						onDeleteSelected={actions.handleBatchDelete}
-						onRecoverSelected={actions.handleBatchRecover}
-						onHardDeleteSelected={actions.handleBatchHardDelete}
-						onClearRecycle={actions.handleClearRecycle}
-						onBreadcrumbClick={handleBreadcrumbClick}
-						sidebarVisible={!isSidebarCollapsed}
-						onToggleSidebar={handleToggleSidebar}
-					/>
+  return (
+    <div
+      {...getRootProps({ className: "p-4 h-full" })}
+      style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}
+    >
+      {isDragActive && !isRecycleBin && (
+        <div className="pointer-events-none fixed inset-0 z-40 border-2 border-dashed border-primary/40 bg-primary/5" />
+      )}
+      <FileManagerLayout
+        sidebar={
+          <FileSidebar
+            nodes={treeNodes}
+            selectedId={selectedCatalogId}
+            pathIds={pathIds}
+            isRecycleBin={isRecycleBin}
+            onSelectCatalog={handleSelectCatalog}
+            onToggleRecycle={handleToggleRecycle}
+            {...(!isRecycleBin
+              ? {
+                  onDropFilesToCatalog: actions.handleBatchMoveToCatalog,
+                }
+              : {})}
+            onTreeAction={actions.handleTreeAction}
+            onLocate={handleLocateCatalog}
+            loading={catalogLoading}
+            locateTrigger={locateTrigger}
+            allowLocate={Boolean(
+              selectedCatalogId ||
+                (selectedItems.length === 1 && selectedItems[0]?.kind === "file"),
+            )}
+          />
+        }
+        sidebarRef={sidebarRef}
+        onCollapse={() => setIsSidebarCollapsed(true)}
+        onExpand={() => setIsSidebarCollapsed(false)}
+      >
+        <div className="flex h-full flex-col">
+          <FileToolbar
+            breadcrumbs={breadcrumbs}
+            onRefresh={handleToolbarRefresh}
+            isRecycleBin={isRecycleBin}
+            viewMode={viewMode === "grid" ? "grid" : "list"}
+            onViewModeChange={handleViewModeChange}
+            selectedCount={selectedIds.length}
+            onUploadFiles={handleUploadFilesClick}
+            onUploadFolder={handleUploadFolderClick}
+            onCreateFolder={actions.handleCreateFolder}
+            onDownloadSelected={actions.handleDownloadSelected}
+            onMoveSelected={actions.handleMoveSelected}
+            onDeleteSelected={actions.handleBatchDelete}
+            onRecoverSelected={actions.handleBatchRecover}
+            onHardDeleteSelected={actions.handleBatchHardDelete}
+            onClearRecycle={actions.handleClearRecycle}
+            onBreadcrumbClick={handleBreadcrumbClick}
+            sidebarVisible={!isSidebarCollapsed}
+            onToggleSidebar={handleToggleSidebar}
+          />
 
-					{isRecycleBin && (
-						<div className="mx-4 mt-3 flex items-center gap-2 rounded-lg border border-border/30 bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-							<AlertTriangle className="size-4 text-primary" />
-							回收站中的文件将在 30 天后自动清除
-						</div>
-					)}
+          {isRecycleBin && (
+            <div className="mx-4 mt-3 flex items-center gap-2 rounded-lg border border-border/30 bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+              <AlertTriangle className="size-4 text-primary" />
+              回收站中的文件将在 30 天后自动清除
+            </div>
+          )}
 
-					<div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-						<FileBrowserPane
-							items={deferredItems}
-							viewMode={viewMode === "grid" ? "grid" : "list"}
-							selectedIds={deferredSelectedIds}
-							onSelectionChange={setSelectedIds}
-							onOpenItem={actions.handleOpenItem}
-							onRenameItem={actions.handleRenameItem}
-							onMoveItem={actions.handleMoveItem}
-							onMoveItemToCatalog={actions.handleBatchMoveToCatalog}
-							onDeleteItem={actions.handleDeleteItem}
-							onRecoverItem={actions.handleRecoverItem}
-							onHardDeleteItem={actions.handleHardDeleteItem}
-							onCopyLink={actions.handleCopyLink}
-							onDownloadItem={actions.handleDownloadItem}
-							onCreateFolder={actions.handleCreateFolder}
-							onRefresh={handleRefreshFiles}
-							onUploadFiles={handleUploadFiles}
-							onTriggerUpload={handleTriggerUpload}
-							isRecycleBin={isRecycleBin}
-							loading={fileQuery.isLoading}
-							isFetchingNextPage={fileQuery.isFetchingNextPage}
-							hasNextPage={fileQuery.hasNextPage}
-							onLoadMore={handleLoadMore}
-							getPreviewUrl={actions.handlePreviewUrl}
-						/>
-					</div>
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <FileBrowserPane
+              items={deferredItems}
+              viewMode={viewMode === "grid" ? "grid" : "list"}
+              selectedIds={deferredSelectedIds}
+              onSelectionChange={setSelectedIds}
+              onOpenItem={actions.handleOpenItem}
+              onRenameItem={actions.handleRenameItem}
+              onMoveItem={actions.handleMoveItem}
+              onMoveItemToCatalog={actions.handleBatchMoveToCatalog}
+              onDeleteItem={actions.handleDeleteItem}
+              onRecoverItem={actions.handleRecoverItem}
+              onHardDeleteItem={actions.handleHardDeleteItem}
+              onCopyLink={actions.handleCopyLink}
+              onDownloadItem={actions.handleDownloadItem}
+              onCreateFolder={actions.handleCreateFolder}
+              onRefresh={handleRefreshFiles}
+              onUploadFiles={handleUploadFiles}
+              onTriggerUpload={handleTriggerUpload}
+              isRecycleBin={isRecycleBin}
+              loading={fileQuery.isLoading}
+              isFetchingNextPage={fileQuery.isFetchingNextPage}
+              hasNextPage={fileQuery.hasNextPage}
+              onLoadMore={handleLoadMore}
+              getPreviewUrl={actions.handlePreviewUrl}
+            />
+          </div>
 
-					<div className="flex items-center justify-between border-t border-border/30 px-4 py-2 text-sm text-muted-foreground">
-						<span>
-							{fileSummary} 个项目 · 已选 {deferredSelectedIds.length} 项
-						</span>
-					</div>
-				</div>
-			</FileManagerLayout>
+          <div className="flex items-center justify-between border-t border-border/30 px-4 py-2 text-sm text-muted-foreground">
+            <span>
+              {fileSummary} 个项目 · 已选 {deferredSelectedIds.length} 项
+            </span>
+          </div>
+        </div>
+      </FileManagerLayout>
 
-			<input
-				ref={uploadFileInputRef}
-				type="file"
-				className="hidden"
-				multiple
-				onChange={handleFileInputChange}
-			/>
-			<input
-				ref={setFolderInputRef}
-				type="file"
-				className="hidden"
-				multiple
-				onChange={handleFolderInputChange}
-			/>
+      <input
+        ref={uploadFileInputRef}
+        type="file"
+        className="hidden"
+        multiple
+        onChange={handleFileInputChange}
+      />
+      <input
+        ref={setFolderInputRef}
+        type="file"
+        className="hidden"
+        multiple
+        onChange={handleFolderInputChange}
+      />
 
-			<FilePreviewDialog
-				item={previewItem}
-				open={Boolean(previewItem)}
-				onOpenChange={handlePreviewOpenChange}
-				getPreviewUrl={actions.handlePreviewUrl}
-				onDownload={actions.handleDownloadItem}
-			/>
+      <FilePreviewDialog
+        item={previewItem}
+        open={Boolean(previewItem)}
+        onOpenChange={handlePreviewOpenChange}
+        getPreviewUrl={actions.handlePreviewUrl}
+        onDownload={actions.handleDownloadItem}
+      />
 
-			<FileUploadWidget
-				onPause={pauseUpload}
-				onCancel={handleCancelUpload}
-				onResume={handleResumeUpload}
-				onRetry={retryUpload}
-				onPauseAll={pauseAllUploads}
-				onResumeAll={resumeAllUploads}
-				onCancelAll={cancelAllUploads}
-				onLocate={handleLocateUpload}
-			/>
+      <FileUploadWidget
+        onPause={pauseUpload}
+        onCancel={handleCancelUpload}
+        onResume={handleResumeUpload}
+        onRetry={retryUpload}
+        onPauseAll={pauseAllUploads}
+        onResumeAll={resumeAllUploads}
+        onCancelAll={cancelAllUploads}
+        onLocate={handleLocateUpload}
+      />
 
-			<FolderDialog
-				open={actions.dialogMode !== null}
-				mode={actions.dialogMode}
-				form={actions.folderForm}
-				onSubmit={actions.handleSubmitFolder}
-				target={actions.dialogTarget ?? null}
-				onOpenChange={(open) => {
-					if (!open) {
-						actions.setDialogMode(null)
-						actions.setDialogTarget(null)
-					}
-				}}
-			/>
+      <FolderDialog
+        open={actions.dialogMode !== null}
+        mode={actions.dialogMode}
+        form={actions.folderForm}
+        onSubmit={actions.handleSubmitFolder}
+        target={actions.dialogTarget ?? null}
+        onOpenChange={(open) => {
+          if (!open) {
+            actions.setDialogMode(null)
+            actions.setDialogTarget(null)
+          }
+        }}
+      />
 
-			<MoveDialog
-				open={actions.moveDialogOpen}
-				onOpenChange={(open) => {
-					actions.setMoveDialogOpen(open)
-					if (!open) {
-						actions.setMoveTargets([])
-						actions.setTargetCatalogId(null)
-					}
-				}}
-				nodes={catalogTrees?.active ?? []}
-				selectedId={actions.targetCatalogId}
-				onSelect={actions.setTargetCatalogId}
-				disabledIds={actions.moveDisabledIds}
-				onConfirm={actions.handleConfirmMove}
-			/>
+      <MoveDialog
+        open={actions.moveDialogOpen}
+        onOpenChange={(open) => {
+          actions.setMoveDialogOpen(open)
+          if (!open) {
+            actions.setMoveTargets([])
+            actions.setTargetCatalogId(null)
+          }
+        }}
+        nodes={catalogTrees?.active ?? []}
+        selectedId={actions.targetCatalogId}
+        onSelect={actions.setTargetCatalogId}
+        disabledIds={actions.moveDisabledIds}
+        onConfirm={actions.handleConfirmMove}
+      />
 
-			<MoveDialog
-				open={uploadDialogOpen}
-				onOpenChange={(open) => {
-					setUploadDialogOpen(open)
-					if (!open) {
-						setPendingUploadFiles([])
-						setUploadTargetId(null)
-					}
-				}}
-				title="上传文件到"
-				nodes={catalogTrees?.active ?? []}
-				selectedId={uploadTargetId}
-				onSelect={setUploadTargetId}
-				disabledIds={[]}
-				onConfirm={handleConfirmUpload}
-			/>
-		</div>
-	)
+      <MoveDialog
+        open={uploadDialogOpen}
+        onOpenChange={(open) => {
+          setUploadDialogOpen(open)
+          if (!open) {
+            setPendingUploadFiles([])
+            setUploadTargetId(null)
+          }
+        }}
+        title="上传文件到"
+        nodes={catalogTrees?.active ?? []}
+        selectedId={uploadTargetId}
+        onSelect={setUploadTargetId}
+        disabledIds={[]}
+        onConfirm={handleConfirmUpload}
+      />
+    </div>
+  )
 }

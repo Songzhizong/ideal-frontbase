@@ -13,21 +13,21 @@ let isUnauthorizedHandling = false
  * 处理未授权后的重定向逻辑
  */
 function handleUnauthorizedRedirect() {
-	authStore.getState().logout()
-	const currentPath = getAppLocationPath()
-	if (!currentPath.includes("/login")) {
-		// 不重置标志位，让页面刷新后自动重置
-		// 这样可以防止在跳转过程中再次触发弹框
-		void router.navigate({
-			to: "/login",
-			search: {
-				redirect: currentPath,
-			},
-		})
-	} else {
-		// 如果已经在登录页，重置标志位
-		isUnauthorizedHandling = false
-	}
+  authStore.getState().logout()
+  const currentPath = getAppLocationPath()
+  if (!currentPath.includes("/login")) {
+    // 不重置标志位，让页面刷新后自动重置
+    // 这样可以防止在跳转过程中再次触发弹框
+    void router.navigate({
+      to: "/login",
+      search: {
+        redirect: currentPath,
+      },
+    })
+  } else {
+    // 如果已经在登录页，重置标志位
+    isUnauthorizedHandling = false
+  }
 }
 
 /**
@@ -40,33 +40,33 @@ function handleUnauthorizedRedirect() {
  * @returns 防抖后的未授权处理函数
  */
 export function createDebouncedUnauthorizedHandler(debounceMs = 300) {
-	return () => {
-		// 如果已经在登录页，不需要处理
-		if (window.location.pathname.includes("/login")) {
-			return
-		}
+  return () => {
+    // 如果已经在登录页，不需要处理
+    if (window.location.pathname.includes("/login")) {
+      return
+    }
 
-		// 如果已经在处理中，直接返回
-		if (isUnauthorizedHandling) {
-			return
-		}
+    // 如果已经在处理中，直接返回
+    if (isUnauthorizedHandling) {
+      return
+    }
 
-		// 清除之前的定时器
-		if (unauthorizedTimer) {
-			clearTimeout(unauthorizedTimer)
-		}
+    // 清除之前的定时器
+    if (unauthorizedTimer) {
+      clearTimeout(unauthorizedTimer)
+    }
 
-		// 设置新的定时器，debounceMs 内的多次调用只执行一次
-		unauthorizedTimer = setTimeout(async () => {
-			isUnauthorizedHandling = true
+    // 设置新的定时器，debounceMs 内的多次调用只执行一次
+    unauthorizedTimer = setTimeout(async () => {
+      isUnauthorizedHandling = true
 
-			// 显示模态框并等待用户确认
-			await showUnauthorizedDialog({
-				title: "登录已过期",
-				description: "您的登录状态已过期，请重新登录。",
-				confirmText: "确认",
-				onConfirm: handleUnauthorizedRedirect,
-			})
-		}, debounceMs)
-	}
+      // 显示模态框并等待用户确认
+      await showUnauthorizedDialog({
+        title: "登录已过期",
+        description: "您的登录状态已过期，请重新登录。",
+        confirmText: "确认",
+        onConfirm: handleUnauthorizedRedirect,
+      })
+    }, debounceMs)
+  }
 }

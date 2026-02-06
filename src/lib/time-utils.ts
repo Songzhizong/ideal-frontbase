@@ -10,21 +10,21 @@ export type TimestampInput = number | string | null | undefined
  * 将多种类型的输入解析为 Date 对象（仅支持时间戳）
  */
 function timestampToDate(input: TimestampInput): Date | null {
-	if (input === null || input === undefined) return null
+  if (input === null || input === undefined) return null
 
-	let date: Date
+  let date: Date
 
-	if (typeof input === "number") {
-		// 毫秒时间戳
-		date = new Date(input)
-	} else if (/^\d+$/.test(input)) {
-		// 数字字符串时间戳
-		date = new Date(Number.parseInt(input, 10))
-	} else {
-		return null
-	}
+  if (typeof input === "number") {
+    // 毫秒时间戳
+    date = new Date(input)
+  } else if (/^\d+$/.test(input)) {
+    // 数字字符串时间戳
+    date = new Date(Number.parseInt(input, 10))
+  } else {
+    return null
+  }
 
-	return Number.isNaN(date.getTime()) ? null : date
+  return Number.isNaN(date.getTime()) ? null : date
 }
 
 /**
@@ -32,9 +32,9 @@ function timestampToDate(input: TimestampInput): Date | null {
  * @example 2026-01-30
  */
 export function formatTimestampToDate(input: TimestampInput): string {
-	const date = timestampToDate(input)
-	if (!date) return "-"
-	return format(date, "yyyy-MM-dd")
+  const date = timestampToDate(input)
+  if (!date) return "-"
+  return format(date, "yyyy-MM-dd")
 }
 
 /**
@@ -42,9 +42,9 @@ export function formatTimestampToDate(input: TimestampInput): string {
  * @example 2026-01-30 14:02:32
  */
 export function formatTimestampToDateTime(input: TimestampInput): string {
-	const date = timestampToDate(input)
-	if (!date) return "-"
-	return format(date, "yyyy-MM-dd HH:mm:ss")
+  const date = timestampToDate(input)
+  if (!date) return "-"
+  return format(date, "yyyy-MM-dd HH:mm:ss")
 }
 
 /**
@@ -52,28 +52,28 @@ export function formatTimestampToDateTime(input: TimestampInput): string {
  * @example 刚刚、2分钟前、1天前
  */
 export function formatTimestampToRelativeTime(input: TimestampInput): string {
-	const date = timestampToDate(input)
-	if (!date) return "-"
+  const date = timestampToDate(input)
+  if (!date) return "-"
 
-	const now = new Date()
-	const diff = now.getTime() - date.getTime()
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
 
-	// 如果时间差小于 1 分钟，返回“刚刚”
-	if (diff >= 0 && diff < 60000) {
-		return "刚刚"
-	}
+  // 如果时间差小于 1 分钟，返回“刚刚”
+  if (diff >= 0 && diff < 60000) {
+    return "刚刚"
+  }
 
-	return formatDistanceToNow(date, {
-		addSuffix: true,
-		locale: zhCN,
-	})
+  return formatDistanceToNow(date, {
+    addSuffix: true,
+    locale: zhCN,
+  })
 }
 
 /**
  * 导出统一的工具对象方便使用
  */
 export const timeUtils = {
-	formatTimestampToDate: formatTimestampToDate,
-	formatTimestampToDateTime: formatTimestampToDateTime,
-	formatTimestampToRelativeTime: formatTimestampToRelativeTime,
+  formatTimestampToDate: formatTimestampToDate,
+  formatTimestampToDateTime: formatTimestampToDateTime,
+  formatTimestampToRelativeTime: formatTimestampToRelativeTime,
 }

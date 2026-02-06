@@ -8,7 +8,7 @@ type OnUnauthorizedFn = () => void
 let onUnauthorized: OnUnauthorizedFn = () => {}
 
 export function configureQueryClient(options: { onUnauthorized: OnUnauthorizedFn }) {
-	onUnauthorized = options.onUnauthorized
+  onUnauthorized = options.onUnauthorized
 }
 
 /**
@@ -16,29 +16,29 @@ export function configureQueryClient(options: { onUnauthorized: OnUnauthorizedFn
  * @returns 是否已识别并处理该错误
  */
 export function handleApiError(error: unknown): boolean {
-	if (!isApiError(error)) return false
+  if (!isApiError(error)) return false
 
-	if (isUnauthorizedError(error)) {
-		onUnauthorized()
-		return true
-	}
+  if (isUnauthorizedError(error)) {
+    onUnauthorized()
+    return true
+  }
 
-	toast.error(getApiErrorMessage(error))
-	return true
+  toast.error(getApiErrorMessage(error))
+  return true
 }
 
 export const queryClient = new QueryClient({
-	queryCache: new QueryCache({
-		onError: handleApiError,
-	}),
-	mutationCache: new MutationCache({
-		onError: handleApiError,
-	}),
-	defaultOptions: {
-		queries: {
-			staleTime: 60_000,
-			retry: 1,
-			refetchOnWindowFocus: false,
-		},
-	},
+  queryCache: new QueryCache({
+    onError: handleApiError,
+  }),
+  mutationCache: new MutationCache({
+    onError: handleApiError,
+  }),
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
 })

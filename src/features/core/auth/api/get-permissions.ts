@@ -13,10 +13,10 @@ export type PermissionIdents = string[]
  * 需要在请求头中携带 x-tenant-id
  */
 const getPermissions = async (): Promise<PermissionIdents> => {
-	const appId = env.VITE_APP_ID
-	const url = `nexus-api/iam/front/apps/${appId}/available-permission-idents`
-	const json = await api.withTenantId().get(url).json()
-	return json as PermissionIdents
+  const appId = env.VITE_APP_ID
+  const url = `nexus-api/iam/front/apps/${appId}/available-permission-idents`
+  const json = await api.withTenantId().get(url).json()
+  return json as PermissionIdents
 }
 
 /**
@@ -28,13 +28,13 @@ const getPermissions = async (): Promise<PermissionIdents> => {
  * const handleRefresh = () => refetch()
  */
 export const usePermissions = (options?: { enabled?: boolean }) => {
-	return useQuery({
-		queryKey: ["auth", "permissions"],
-		queryFn: getPermissions,
-		staleTime: 60 * 1000, // 1分钟内不重新请求
-		retry: false, // 401 时不重试
-		enabled: options?.enabled ?? false, // 默认不自动执行
-	})
+  return useQuery({
+    queryKey: ["auth", "permissions"],
+    queryFn: getPermissions,
+    staleTime: 60 * 1000, // 1分钟内不重新请求
+    retry: false, // 401 时不重试
+    enabled: options?.enabled ?? false, // 默认不自动执行
+  })
 }
 
 /**

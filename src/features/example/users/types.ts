@@ -5,33 +5,33 @@ export const DEMO_USER_ROLES = ["super_admin", "employee", "partner"] as const
 export type DemoUserRole = (typeof DEMO_USER_ROLES)[number]
 
 export const DEMO_USER_DEPARTMENTS = [
-	"技术部",
-	"产品部",
-	"市场部",
-	"运营部",
-	"财务部",
-	"人力资源",
-	"安全合规",
-	"供应商",
+  "技术部",
+  "产品部",
+  "市场部",
+  "运营部",
+  "财务部",
+  "人力资源",
+  "安全合规",
+  "供应商",
 ] as const
 export type DemoUserDepartment = (typeof DEMO_USER_DEPARTMENTS)[number]
 
 export interface DemoUser {
-	id: string
-	name: string
-	email: string
-	phone: string
-	role: DemoUserRole
-	department: DemoUserDepartment
-	status: DemoUserStatus
-	isOnline: boolean
-	createdAt: string
-	lastLoginAt: string
+  id: string
+  name: string
+  email: string
+  phone: string
+  role: DemoUserRole
+  department: DemoUserDepartment
+  status: DemoUserStatus
+  isOnline: boolean
+  createdAt: string
+  lastLoginAt: string
 }
 
 export interface DemoUserFilters {
-	q: string
-	status: string | null
-	role: string | null
-	department: string | null
+  q: string
+  status: string | null
+  role: string | null
+  department: string | null
 }

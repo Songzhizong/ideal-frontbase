@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge"
 import type { z } from "zod"
 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs))
 }
 
 /**
@@ -14,13 +14,13 @@ export function cn(...inputs: ClassValue[]) {
  * @returns 校验成功返回解析后的数据，失败返回 null
  */
 export function validateWithToast<T extends z.ZodTypeAny>(
-	schema: T,
-	data: unknown,
+  schema: T,
+  data: unknown,
 ): z.infer<T> | null {
-	const result = schema.safeParse(data)
-	if (!result.success) {
-		toast.error(result.error.issues[0]?.message || "验证失败")
-		return null
-	}
-	return result.data
+  const result = schema.safeParse(data)
+  if (!result.success) {
+    toast.error(result.error.issues[0]?.message || "验证失败")
+    return null
+  }
+  return result.data
 }

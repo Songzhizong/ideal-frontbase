@@ -2,77 +2,77 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useCallback } from "react"
 
 export interface UsersFilters {
-	username?: string
-	email?: string
-	phone?: string
-	status?: string
-	mfaEnabled?: string
-	userGroups?: string
-	page?: number
-	pageSize?: number
+  username?: string
+  email?: string
+  phone?: string
+  status?: string
+  mfaEnabled?: string
+  userGroups?: string
+  page?: number
+  pageSize?: number
 }
 
 const filtersParser = {
-	username: parseAsString.withDefault(""),
-	email: parseAsString.withDefault(""),
-	phone: parseAsString.withDefault(""),
-	status: parseAsString.withDefault("all"),
-	mfaEnabled: parseAsString.withDefault("all"),
-	userGroups: parseAsString.withDefault("all"),
-	page: parseAsInteger.withDefault(1),
-	pageSize: parseAsInteger.withDefault(10),
+  username: parseAsString.withDefault(""),
+  email: parseAsString.withDefault(""),
+  phone: parseAsString.withDefault(""),
+  status: parseAsString.withDefault("all"),
+  mfaEnabled: parseAsString.withDefault("all"),
+  userGroups: parseAsString.withDefault("all"),
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(10),
 }
 
 export function useUsersFilters() {
-	// URL state for filtering (used by API and DataTableSearch components)
-	const [urlFilters, setUrlFilters] = useQueryStates(filtersParser, {
-		shallow: false,
-	})
+  // URL state for filtering (used by API and DataTableSearch components)
+  const [urlFilters, setUrlFilters] = useQueryStates(filtersParser, {
+    shallow: false,
+  })
 
-	// Update select filters immediately (no debounce needed)
-	const updateSelectFilter = useCallback(
-		(key: "status" | "mfaEnabled" | "userGroups", value: string) => {
-			setUrlFilters({ [key]: value, page: 1 })
-		},
-		[setUrlFilters],
-	)
+  // Update select filters immediately (no debounce needed)
+  const updateSelectFilter = useCallback(
+    (key: "status" | "mfaEnabled" | "userGroups", value: string) => {
+      setUrlFilters({ [key]: value, page: 1 })
+    },
+    [setUrlFilters],
+  )
 
-	const resetFilters = useCallback(() => {
-		const resetValues = {
-			username: "",
-			email: "",
-			phone: "",
-			status: "all",
-			mfaEnabled: "all",
-			userGroups: "all",
-			page: 1,
-			pageSize: 10,
-		}
-		setUrlFilters(resetValues)
-	}, [setUrlFilters])
+  const resetFilters = useCallback(() => {
+    const resetValues = {
+      username: "",
+      email: "",
+      phone: "",
+      status: "all",
+      mfaEnabled: "all",
+      userGroups: "all",
+      page: 1,
+      pageSize: 10,
+    }
+    setUrlFilters(resetValues)
+  }, [setUrlFilters])
 
-	const getApiFilters = useCallback(() => {
-		const apiFilters: Record<string, string> = {}
+  const getApiFilters = useCallback(() => {
+    const apiFilters: Record<string, string> = {}
 
-		if (urlFilters.username) apiFilters.username = urlFilters.username
-		if (urlFilters.email) apiFilters.email = urlFilters.email
-		if (urlFilters.phone) apiFilters.phone = urlFilters.phone
-		if (urlFilters.status && urlFilters.status !== "all") apiFilters.status = urlFilters.status
-		if (urlFilters.mfaEnabled && urlFilters.mfaEnabled !== "all")
-			apiFilters.mfaEnabled = urlFilters.mfaEnabled
-		if (urlFilters.userGroups && urlFilters.userGroups !== "all")
-			apiFilters.userGroups = urlFilters.userGroups
+    if (urlFilters.username) apiFilters.username = urlFilters.username
+    if (urlFilters.email) apiFilters.email = urlFilters.email
+    if (urlFilters.phone) apiFilters.phone = urlFilters.phone
+    if (urlFilters.status && urlFilters.status !== "all") apiFilters.status = urlFilters.status
+    if (urlFilters.mfaEnabled && urlFilters.mfaEnabled !== "all")
+      apiFilters.mfaEnabled = urlFilters.mfaEnabled
+    if (urlFilters.userGroups && urlFilters.userGroups !== "all")
+      apiFilters.userGroups = urlFilters.userGroups
 
-		return apiFilters
-	}, [urlFilters])
+    return apiFilters
+  }, [urlFilters])
 
-	return {
-		// URL state for selects and API
-		urlFilters,
-		setUrlFilters,
-		updateSelectFilter,
-		// Actions
-		resetFilters,
-		getApiFilters,
-	}
+  return {
+    // URL state for selects and API
+    urlFilters,
+    setUrlFilters,
+    updateSelectFilter,
+    // Actions
+    resetFilters,
+    getApiFilters,
+  }
 }

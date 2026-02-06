@@ -5,27 +5,27 @@ import { useLayoutEffect, useRef, useState } from "react"
  * Useful for calculating sticky offsets or dynamic layouts.
  */
 export function useElementSize<T extends HTMLElement>() {
-	const ref = useRef<T>(null)
-	const [size, setSize] = useState({ width: 0, height: 0 })
+  const ref = useRef<T>(null)
+  const [size, setSize] = useState({ width: 0, height: 0 })
 
-	useLayoutEffect(() => {
-		if (ref.current) {
-			const updateSize = () => {
-				if (ref.current) {
-					const rect = ref.current.getBoundingClientRect()
-					setSize({ width: rect.width, height: rect.height })
-				}
-			}
+  useLayoutEffect(() => {
+    if (ref.current) {
+      const updateSize = () => {
+        if (ref.current) {
+          const rect = ref.current.getBoundingClientRect()
+          setSize({ width: rect.width, height: rect.height })
+        }
+      }
 
-			// Measure immediately
-			updateSize()
+      // Measure immediately
+      updateSize()
 
-			const resizeObserver = new ResizeObserver(updateSize)
-			resizeObserver.observe(ref.current)
+      const resizeObserver = new ResizeObserver(updateSize)
+      resizeObserver.observe(ref.current)
 
-			return () => resizeObserver.disconnect()
-		}
-	}, [])
+      return () => resizeObserver.disconnect()
+    }
+  }, [])
 
-	return [ref, size] as const
+  return [ref, size] as const
 }

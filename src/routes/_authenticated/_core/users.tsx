@@ -4,16 +4,16 @@ import { UsersPage } from "@/features/core/users"
 import { authStore } from "@/lib/auth-store"
 
 export const Route = createFileRoute("/_authenticated/_core/users")({
-	beforeLoad: () => {
-		const { hasPermission } = authStore.getState()
-		if (!hasPermission(PERMISSIONS.USERS_READ)) {
-			throw redirect({
-				to: "/errors/403",
-			})
-		}
-	},
-	component: UsersPage,
-	staticData: {
-		title: "用户管理",
-	},
+  beforeLoad: () => {
+    const { hasPermission } = authStore.getState()
+    if (!hasPermission(PERMISSIONS.USERS_READ)) {
+      throw redirect({
+        to: "/errors/403",
+      })
+    }
+  },
+  component: UsersPage,
+  staticData: {
+    title: "用户管理",
+  },
 })

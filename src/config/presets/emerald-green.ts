@@ -1,11 +1,11 @@
 import type { ThemePreset } from "@/types/theme"
 
 export const emeraldGreen: ThemePreset = {
-  "key": "emerald-green",
-  "name": "翡翠绿",
-  "description": "沉稳自然的绿色主题，专业且护眼",
-  "schemes": {
-    "light": {
+  key: "emerald-green",
+  name: "翡翠绿",
+  description: "沉稳自然的绿色主题，专业且护眼",
+  schemes: {
+    light: {
       /* ----------------------------------
        * 1. 品牌 & 破坏性操作
        * ---------------------------------- */
@@ -264,15 +264,15 @@ export const emeraldGreen: ThemePreset = {
         },
       },
     },
-    "dark": {
+    dark: {
       /* ----------------------------------
        * 1. 品牌 & 破坏性操作
        * ---------------------------------- */
       brand: {
         primary: {
           default: "#059669", // emerald-600
-          hover: "#10b981",   // emerald-500
-          active: "#047857",  // emerald-700
+          hover: "#10b981", // emerald-500
+          active: "#047857", // emerald-700
           pressed: "#065f46", // emerald-800
           fg: "#ecfdf5",
 
@@ -522,6 +522,6 @@ export const emeraldGreen: ThemePreset = {
           warning: "#f59e0b",
         },
       },
-    }
-  }
+    },
+  },
 }

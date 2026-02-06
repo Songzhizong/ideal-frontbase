@@ -1,3 +1,3 @@
 export function buildDragPayload(ids: string[]) {
-	return JSON.stringify(ids)
+  return JSON.stringify(ids)
 }

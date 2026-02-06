@@ -6,8 +6,8 @@ import type { UserProfile } from "@/types/auth.ts"
  * Fetcher - 获取当前登录用户个人信息
  */
 const getUserProfile = async (): Promise<UserProfile> => {
-	const json = await api.get("nexus-api/iam/me/profile").json()
-	return json as UserProfile
+  const json = await api.get("nexus-api/iam/me/profile").json()
+  return json as UserProfile
 }
 
 /**
@@ -19,13 +19,13 @@ const getUserProfile = async (): Promise<UserProfile> => {
  * const handleRefresh = () => refetch()
  */
 export const useUserProfile = (options?: { enabled?: boolean }) => {
-	return useQuery({
-		queryKey: ["auth", "user-profile"],
-		queryFn: getUserProfile,
-		staleTime: 60 * 1000, // 1分钟内不重新请求
-		retry: false, // 401 时不重试
-		enabled: options?.enabled ?? true, // 默认不自动执行
-	})
+  return useQuery({
+    queryKey: ["auth", "user-profile"],
+    queryFn: getUserProfile,
+    staleTime: 60 * 1000, // 1分钟内不重新请求
+    retry: false, // 401 时不重试
+    enabled: options?.enabled ?? true, // 默认不自动执行
+  })
 }
 
 /**

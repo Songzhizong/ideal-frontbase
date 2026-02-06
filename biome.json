@@ -1,58 +1,62 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
-	"files": {
-		"ignoreUnknown": false,
-		"includes": [
-			"src/app/**",
-			"src/components/auth/**",
-			"src/components/common/**",
-			"src/components/errors/**",
-			"src/components/layout/**",
-			"src/components/table/**",
-			"src/components/theme/**",
-			"src/features/**",
-			"src/hooks/**",
-			"src/lib/**",
-			"src/mocks/**",
-			"src/routes/**",
-			"src/test/**",
-			"src/types/**"
-		]
-	},
-	"formatter": {
-		"enabled": true,
-		"indentStyle": "tab",
-		"lineWidth": 100
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"trailingCommas": "all",
-			"semicolons": "asNeeded"
-		}
-	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
-	},
-	"assist": {
-		"enabled": true,
-		"actions": {
-			"source": {
-				"organizeImports": "on"
-			}
-		}
-	}
+  "$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "src/app/**",
+      "src/components/auth/**",
+      "src/components/common/**",
+      "src/components/errors/**",
+      "src/components/layout/**",
+      "src/components/table/**",
+      "src/components/theme/**",
+      "src/config/**",
+      "src/context/**",
+      "src/features/**",
+      "src/hooks/**",
+      "src/lib/**",
+      "src/mocks/**",
+      "src/routes/**",
+      "src/test/**",
+      "src/types/**"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
 }

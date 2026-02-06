@@ -15,10 +15,10 @@ export const PermissionSchema = z.string()
  * 租户信息
  */
 export interface TenantInfo {
-	id: string
-	name: string
-	abbreviation: string
-	blocked: boolean
+  id: string
+  name: string
+  abbreviation: string
+  blocked: boolean
 }
 
 /**
@@ -26,15 +26,15 @@ export interface TenantInfo {
  * 用户个人信息
  */
 export interface UserProfile {
-	userId: string
-	containerId: string | null
-	name: string
-	account: string | null
-	phone: string | null
-	email: string | null
-	mfaEnabled: boolean
-	tenantId: string | null
-	tenantName: string | null
-	tenantAbbreviation: string | null
-	accessibleTenants: TenantInfo[]
+  userId: string
+  containerId: string | null
+  name: string
+  account: string | null
+  phone: string | null
+  email: string | null
+  mfaEnabled: boolean
+  tenantId: string | null
+  tenantName: string | null
+  tenantAbbreviation: string | null
+  accessibleTenants: TenantInfo[]
 }

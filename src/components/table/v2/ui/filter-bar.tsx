@@ -8,74 +8,74 @@ import { useDataTableConfig } from "./config"
 import { DataTableFilterItem } from "./filter-item"
 
 function buildCollapsedFilters<TFilterSchema>(
-	filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>,
-	maxVisible: number,
+  filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>,
+  maxVisible: number,
 ) {
-	const alwaysVisible = filters.filter((filter) => filter.alwaysVisible)
-	const rest = filters.filter((filter) => !filter.alwaysVisible)
-	const preferred = rest.filter((filter) => filter.defaultVisible)
-	const remaining = rest.filter((filter) => !filter.defaultVisible)
+  const alwaysVisible = filters.filter((filter) => filter.alwaysVisible)
+  const rest = filters.filter((filter) => !filter.alwaysVisible)
+  const preferred = rest.filter((filter) => filter.defaultVisible)
+  const remaining = rest.filter((filter) => !filter.defaultVisible)
 
-	const limit = Math.max(maxVisible, alwaysVisible.length)
-	const collapsed: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>> = [...alwaysVisible]
+  const limit = Math.max(maxVisible, alwaysVisible.length)
+  const collapsed: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>> = [...alwaysVisible]
 
-	for (const filter of [...preferred, ...remaining]) {
-		if (collapsed.length >= limit) break
-		collapsed.push(filter)
-	}
+  for (const filter of [...preferred, ...remaining]) {
+    if (collapsed.length >= limit) break
+    collapsed.push(filter)
+  }
 
-	return collapsed
+  return collapsed
 }
 
 export interface DataTableFilterBarProps<TFilterSchema> {
-	filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
-	showActiveFilters?: boolean
-	collapsible?: boolean
-	maxVisible?: number
-	className?: string
+  filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
+  showActiveFilters?: boolean
+  collapsible?: boolean
+  maxVisible?: number
+  className?: string
 }
 
 export function DataTableFilterBar<TFilterSchema>({
-	filters,
-	showActiveFilters = true,
-	collapsible = true,
-	maxVisible = 3,
-	className,
+  filters,
+  showActiveFilters = true,
+  collapsible = true,
+  maxVisible = 3,
+  className,
 }: DataTableFilterBarProps<TFilterSchema>) {
-	const { i18n } = useDataTableConfig()
-	const [expanded, setExpanded] = useState(!collapsible)
+  const { i18n } = useDataTableConfig()
+  const [expanded, setExpanded] = useState(!collapsible)
 
-	const collapsedFilters = useMemo(
-		() => buildCollapsedFilters(filters, maxVisible),
-		[filters, maxVisible],
-	)
+  const collapsedFilters = useMemo(
+    () => buildCollapsedFilters(filters, maxVisible),
+    [filters, maxVisible],
+  )
 
-	const shouldCollapse = collapsible && collapsedFilters.length < filters.length
-	const visibleFilters = expanded || !shouldCollapse ? filters : collapsedFilters
+  const shouldCollapse = collapsible && collapsedFilters.length < filters.length
+  const visibleFilters = expanded || !shouldCollapse ? filters : collapsedFilters
 
-	return (
-		<div className={cn("flex flex-col gap-3", className)}>
-			<div className="flex flex-wrap items-end gap-3">
-				{visibleFilters.map((filter) => (
-					<DataTableFilterItem key={String(filter.key)} definition={filter} className="min-w-45" />
-				))}
-				{shouldCollapse && (
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => setExpanded((prev) => !prev)}
-						className="h-9 px-2 text-muted-foreground hover:text-foreground"
-					>
-						{expanded ? i18n.filterBar.collapseText : i18n.filterBar.expandText}
-						{expanded ? (
-							<ChevronUp className="ml-1 h-4 w-4" />
-						) : (
-							<ChevronDown className="ml-1 h-4 w-4" />
-						)}
-					</Button>
-				)}
-			</div>
-			{showActiveFilters && <DataTableActiveFilters filters={filters} />}
-		</div>
-	)
+  return (
+    <div className={cn("flex flex-col gap-3", className)}>
+      <div className="flex flex-wrap items-end gap-3">
+        {visibleFilters.map((filter) => (
+          <DataTableFilterItem key={String(filter.key)} definition={filter} className="min-w-45" />
+        ))}
+        {shouldCollapse && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded((prev) => !prev)}
+            className="h-9 px-2 text-muted-foreground hover:text-foreground"
+          >
+            {expanded ? i18n.filterBar.collapseText : i18n.filterBar.expandText}
+            {expanded ? (
+              <ChevronUp className="ml-1 h-4 w-4" />
+            ) : (
+              <ChevronDown className="ml-1 h-4 w-4" />
+            )}
+          </Button>
+        )}
+      </div>
+      {showActiveFilters && <DataTableActiveFilters filters={filters} />}
+    </div>
+  )
 }

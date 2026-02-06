@@ -7,38 +7,38 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 export interface DataTableToolbarProps {
-	/**
-	 * Search input placeholder
-	 */
-	filterPlaceholder?: string
-	/**
-	 * Search value
-	 */
-	filterValue?: string
-	/**
-	 * Search change handler
-	 */
-	onFilterChange?: (value: string) => void
-	/**
-	 * Refresh handler
-	 */
-	onRefresh?: () => void | Promise<void>
-	/**
-	 * Additional action buttons (slot pattern)
-	 */
-	actions?: ReactNode
-	/**
-	 * Custom filter components (slot pattern)
-	 */
-	filters?: ReactNode
-	/**
-	 * Additional class names
-	 */
-	className?: string
-	/**
-	 * Hide column toggle
-	 */
-	hideColumnToggle?: boolean
+  /**
+   * Search input placeholder
+   */
+  filterPlaceholder?: string
+  /**
+   * Search value
+   */
+  filterValue?: string
+  /**
+   * Search change handler
+   */
+  onFilterChange?: (value: string) => void
+  /**
+   * Refresh handler
+   */
+  onRefresh?: () => void | Promise<void>
+  /**
+   * Additional action buttons (slot pattern)
+   */
+  actions?: ReactNode
+  /**
+   * Custom filter components (slot pattern)
+   */
+  filters?: ReactNode
+  /**
+   * Additional class names
+   */
+  className?: string
+  /**
+   * Hide column toggle
+   */
+  hideColumnToggle?: boolean
 }
 
 /**
@@ -48,57 +48,57 @@ export interface DataTableToolbarProps {
  * For complex multi-field filters with expand/collapse, use `DataTableFilterBar` instead
  */
 export function DataTableToolbar({
-	filterPlaceholder = "Search...",
-	filterValue = "",
-	onFilterChange,
-	onRefresh,
-	actions,
-	filters,
-	className,
-	hideColumnToggle = false,
+  filterPlaceholder = "Search...",
+  filterValue = "",
+  onFilterChange,
+  onRefresh,
+  actions,
+  filters,
+  className,
+  hideColumnToggle = false,
 }: DataTableToolbarProps) {
-	const { table } = useTableContext()
-	const [isRefreshing, setIsRefreshing] = useState(false)
+  const { table } = useTableContext()
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
-	const handleRefresh = async () => {
-		if (!onRefresh || isRefreshing) return
+  const handleRefresh = async () => {
+    if (!onRefresh || isRefreshing) return
 
-		setIsRefreshing(true)
-		try {
-			await onRefresh()
-		} finally {
-			setIsRefreshing(false)
-		}
-	}
+    setIsRefreshing(true)
+    try {
+      await onRefresh()
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
-	return (
-		<div className={`flex items-center justify-between gap-2 ${className || ""}`}>
-			<div className="flex flex-1 items-center gap-2">
-				{onFilterChange && (
-					<Input
-						placeholder={filterPlaceholder}
-						value={filterValue}
-						onChange={(e) => onFilterChange(e.target.value)}
-						className="h-9 w-50 lg:w-75"
-					/>
-				)}
-				{filters}
-			</div>
-			<div className="flex items-center gap-2">
-				{actions}
-				{onRefresh && (
-					<Button
-						variant="outline"
-						size="sm"
-						className="h-8"
-						onClick={handleRefresh}
-						disabled={isRefreshing}
-					>
-						<RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-					</Button>
-				)}
-				{!hideColumnToggle && <DataTableColumnToggle table={table} />}
-			</div>
-		</div>
-	)
+  return (
+    <div className={`flex items-center justify-between gap-2 ${className || ""}`}>
+      <div className="flex flex-1 items-center gap-2">
+        {onFilterChange && (
+          <Input
+            placeholder={filterPlaceholder}
+            value={filterValue}
+            onChange={(e) => onFilterChange(e.target.value)}
+            className="h-9 w-50 lg:w-75"
+          />
+        )}
+        {filters}
+      </div>
+      <div className="flex items-center gap-2">
+        {actions}
+        {onRefresh && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+          </Button>
+        )}
+        {!hideColumnToggle && <DataTableColumnToggle table={table} />}
+      </div>
+    </div>
+  )
 }

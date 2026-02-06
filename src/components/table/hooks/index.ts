@@ -4,10 +4,10 @@ export type { UseTableInstanceOptions } from "./use-table-instance"
 export { useTableInstance } from "./use-table-instance"
 // Table hooks
 export type {
-	FilterParams,
-	PaginationState,
-	SortingParams,
-	UseTablePaginationOptions,
+  FilterParams,
+  PaginationState,
+  SortingParams,
+  UseTablePaginationOptions,
 } from "./use-table-pagination"
 export { useTablePagination } from "./use-table-pagination"
 export type { UseTableQueryOptions } from "./use-table-query"

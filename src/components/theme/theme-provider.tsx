@@ -6,41 +6,41 @@ import { useThemeStore } from "@/hooks/use-theme-store"
 type Theme = "dark" | "light" | "system"
 
 type ThemeProviderProps = {
-	children: React.ReactNode
-	defaultTheme?: Theme
-	storageKey?: string
+  children: React.ReactNode
+  defaultTheme?: Theme
+  storageKey?: string
 }
 
 type ThemeProviderState = {
-	theme: Theme
-	setTheme: (theme: Theme) => void
+  theme: Theme
+  setTheme: (theme: Theme) => void
 }
 
 const initialState: ThemeProviderState = {
-	theme: "system",
-	setTheme: () => null,
+  theme: "system",
+  setTheme: () => null,
 }
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-	const { mode, setMode } = useThemeStore()
-	// useThemeEffects 现在处理所有主题相关的 DOM 更新（包括类名和 CSS 变量）
-	useThemeEffects()
+  const { mode, setMode } = useThemeStore()
+  // useThemeEffects 现在处理所有主题相关的 DOM 更新（包括类名和 CSS 变量）
+  useThemeEffects()
 
-	// noinspection JSUnusedGlobalSymbols
-	const value = {
-		theme: mode as Theme,
-		setTheme: (theme: Theme) => {
-			setMode(theme)
-		},
-	}
-	return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>
+  // noinspection JSUnusedGlobalSymbols
+  const value = {
+    theme: mode as Theme,
+    setTheme: (theme: Theme) => {
+      setMode(theme)
+    },
+  }
+  return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>
 }
 export const useTheme = () => {
-	const context = useContext(ThemeProviderContext)
+  const context = useContext(ThemeProviderContext)
 
-	if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider")
+  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider")
 
-	return context
+  return context
 }

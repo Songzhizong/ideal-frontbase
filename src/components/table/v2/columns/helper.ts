@@ -7,13 +7,13 @@ import { expand } from "./expand"
 import { select } from "./select"
 
 export function createColumnHelper<TData>() {
-	const helper = createTanstackColumnHelper<TData>()
-	return {
-		accessor: helper.accessor,
-		display: helper.display,
-		select: () => select<TData>(),
-		expand: () => expand<TData>(),
-		dragHandle: () => dragHandle<TData>(),
-		actions: (render: (row: Row<TData>) => ReactNode) => actions<TData>(render),
-	}
+  const helper = createTanstackColumnHelper<TData>()
+  return {
+    accessor: helper.accessor,
+    display: helper.display,
+    select: () => select<TData>(),
+    expand: () => expand<TData>(),
+    dragHandle: () => dragHandle<TData>(),
+    actions: (render: (row: Row<TData>) => ReactNode) => actions<TData>(render),
+  }
 }

@@ -9,16 +9,16 @@ import { GlobalConfirmDialog } from "@/components/common/global-confirm-dialog"
 import { ThemeProvider } from "@/components/theme/theme-provider"
 
 export function AppProvider() {
-	return (
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-				<NuqsAdapter>
-					<RouterProvider router={router} />
-				</NuqsAdapter>
-				<GlobalConfirmDialog />
-				<Toaster position="top-center" richColors />
-				{import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
-			</ThemeProvider>
-		</QueryClientProvider>
-	)
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <NuqsAdapter>
+          <RouterProvider router={router} />
+        </NuqsAdapter>
+        <GlobalConfirmDialog />
+        <Toaster position="top-center" richColors />
+        {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+      </ThemeProvider>
+    </QueryClientProvider>
+  )
 }

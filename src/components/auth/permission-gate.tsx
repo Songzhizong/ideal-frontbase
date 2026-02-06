@@ -3,10 +3,10 @@ import { useAuthStore } from "@/lib/auth-store"
 import type { Permission } from "@/types/auth"
 
 interface PermissionGateProps {
-	permission: Permission | Permission[]
-	mode?: "AND" | "OR"
-	fallback?: React.ReactNode
-	children: React.ReactNode
+  permission: Permission | Permission[]
+  mode?: "AND" | "OR"
+  fallback?: React.ReactNode
+  children: React.ReactNode
 }
 
 /**
@@ -18,17 +18,17 @@ interface PermissionGateProps {
  * </PermissionGate>
  */
 export function PermissionGate({
-	permission,
-	mode = "OR",
-	fallback = null,
-	children,
+  permission,
+  mode = "OR",
+  fallback = null,
+  children,
 }: PermissionGateProps) {
-	const hasPermission = useAuthStore((state) => state.hasPermission)
-	const isAllowed = hasPermission(permission, mode)
+  const hasPermission = useAuthStore((state) => state.hasPermission)
+  const isAllowed = hasPermission(permission, mode)
 
-	if (!isAllowed) {
-		return <>{fallback}</>
-	}
+  if (!isAllowed) {
+    return <>{fallback}</>
+  }
 
-	return <>{children}</>
+  return <>{children}</>
 }

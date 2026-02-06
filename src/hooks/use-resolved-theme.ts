@@ -8,28 +8,28 @@ import type { ThemeMode } from "@/types/theme"
  * Handles "system" mode by listening to system preference changes
  */
 export function useResolvedTheme(): ThemeMode {
-	const mode = useThemeStore((state) => state.mode)
-	const isBrowser = typeof window !== "undefined"
+  const mode = useThemeStore((state) => state.mode)
+  const isBrowser = typeof window !== "undefined"
 
-	const subscribe = React.useCallback(
-		(onStoreChange: () => void) => {
-			if (!isBrowser) {
-				return () => {}
-			}
-			const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-			mediaQuery.addEventListener("change", onStoreChange)
-			return () => mediaQuery.removeEventListener("change", onStoreChange)
-		},
-		[isBrowser],
-	)
+  const subscribe = React.useCallback(
+    (onStoreChange: () => void) => {
+      if (!isBrowser) {
+        return () => {}
+      }
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+      mediaQuery.addEventListener("change", onStoreChange)
+      return () => mediaQuery.removeEventListener("change", onStoreChange)
+    },
+    [isBrowser],
+  )
 
-	const getSnapshot = React.useCallback((): ThemeMode => {
-		if (!isBrowser) {
-			return "light"
-		}
-		return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-	}, [isBrowser])
+  const getSnapshot = React.useCallback((): ThemeMode => {
+    if (!isBrowser) {
+      return "light"
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  }, [isBrowser])
 
-	const systemTheme = React.useSyncExternalStore<ThemeMode>(subscribe, getSnapshot, () => "light")
-	return mode === "system" ? systemTheme : resolveThemeMode(mode)
+  const systemTheme = React.useSyncExternalStore<ThemeMode>(subscribe, getSnapshot, () => "light")
+  return mode === "system" ? systemTheme : resolveThemeMode(mode)
 }

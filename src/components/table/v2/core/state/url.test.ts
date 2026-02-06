@@ -3,202 +3,202 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { TableStateSnapshot } from "../types"
 
 const basePathMocks = vi.hoisted(() => {
-	let basePath = "/"
-	return {
-		setBasePath: (next: string) => {
-			basePath = next.endsWith("/") && next !== "/" ? next.slice(0, -1) : next
-		},
-		stripBasePath: (path: string) => {
-			if (basePath === "/") return path
-			if (path === basePath) return "/"
-			if (path.startsWith(`${basePath}/`)) return path.slice(basePath.length)
-			return path
-		},
-		withBasePath: (path: string) => {
-			const normalized = path.startsWith("/") ? path : `/${path}`
-			if (basePath === "/") return normalized
-			return `${basePath}${normalized}`
-		},
-	}
+  let basePath = "/"
+  return {
+    setBasePath: (next: string) => {
+      basePath = next.endsWith("/") && next !== "/" ? next.slice(0, -1) : next
+    },
+    stripBasePath: (path: string) => {
+      if (basePath === "/") return path
+      if (path === basePath) return "/"
+      if (path.startsWith(`${basePath}/`)) return path.slice(basePath.length)
+      return path
+    },
+    withBasePath: (path: string) => {
+      const normalized = path.startsWith("/") ? path : `/${path}`
+      if (basePath === "/") return normalized
+      return `${basePath}${normalized}`
+    },
+  }
 })
 
 const urlMocks = vi.hoisted(() => {
-	const push = vi.fn()
-	const replace = vi.fn()
-	let location = { searchStr: "", pathname: "/list", hash: "" }
-	return {
-		push,
-		replace,
-		getLocation: () => location,
-		setLocation: (next: { searchStr: string; pathname: string; hash: string }) => {
-			location = next
-		},
-	}
+  const push = vi.fn()
+  const replace = vi.fn()
+  let location = { searchStr: "", pathname: "/list", hash: "" }
+  return {
+    push,
+    replace,
+    getLocation: () => location,
+    setLocation: (next: { searchStr: string; pathname: string; hash: string }) => {
+      location = next
+    },
+  }
 })
 
 vi.mock("@tanstack/react-router", () => ({
-	useRouter: () => ({
-		history: {
-			push: urlMocks.push,
-			replace: urlMocks.replace,
-		},
-	}),
-	useLocation: () => urlMocks.getLocation(),
+  useRouter: () => ({
+    history: {
+      push: urlMocks.push,
+      replace: urlMocks.replace,
+    },
+  }),
+  useLocation: () => urlMocks.getLocation(),
 }))
 
 vi.mock("@/lib/base-path", () => ({
-	stripBasePath: basePathMocks.stripBasePath,
-	withBasePath: basePathMocks.withBasePath,
+  stripBasePath: basePathMocks.stripBasePath,
+  withBasePath: basePathMocks.withBasePath,
 }))
 
 function parseHref(href: string) {
-	return new URL(href, "http://localhost")
+  return new URL(href, "http://localhost")
 }
 
 describe("stateUrl", () => {
-	beforeEach(() => {
-		urlMocks.push.mockReset()
-		urlMocks.replace.mockReset()
-		urlMocks.setLocation({ searchStr: "", pathname: "/list", hash: "" })
-		basePathMocks.setBasePath("/")
-	})
+  beforeEach(() => {
+    urlMocks.push.mockReset()
+    urlMocks.replace.mockReset()
+    urlMocks.setLocation({ searchStr: "", pathname: "/list", hash: "" })
+    basePathMocks.setBasePath("/")
+  })
 
-	it("getSnapshot 解析 page/size/sort/filters（含重复 key）", async () => {
-		urlMocks.setLocation({
-			pathname: "/list",
-			hash: "",
-			searchStr: "?t_page=2&t_size=20&t_sort=name.asc|age.desc&t_status=active&t_status=pending",
-		})
+  it("getSnapshot 解析 page/size/sort/filters（含重复 key）", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "?t_page=2&t_size=20&t_sort=name.asc|age.desc&t_status=active&t_status=pending",
+    })
 
-		const { stateUrl } = await import("./url")
-		const { result } = renderHook(() => stateUrl({ key: "t" }))
-		const snapshot = result.current.getSnapshot()
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() => stateUrl({ key: "t" }))
+    const snapshot = result.current.getSnapshot()
 
-		expect(snapshot.page).toBe(2)
-		expect(snapshot.size).toBe(20)
-		expect(snapshot.sort).toEqual([
-			{ field: "name", order: "asc" },
-			{ field: "age", order: "desc" },
-		])
-		expect(snapshot.filters).toEqual({
-			status: ["active", "pending"],
-		})
-	})
+    expect(snapshot.page).toBe(2)
+    expect(snapshot.size).toBe(20)
+    expect(snapshot.sort).toEqual([
+      { field: "name", order: "asc" },
+      { field: "age", order: "desc" },
+    ])
+    expect(snapshot.filters).toEqual({
+      status: ["active", "pending"],
+    })
+  })
 
-	it("getSnapshot 会应用 defaults", async () => {
-		urlMocks.setLocation({
-			pathname: "/list",
-			hash: "",
-			searchStr: "?t_page=1",
-		})
+  it("getSnapshot 会应用 defaults", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "?t_page=1",
+    })
 
-		const { stateUrl } = await import("./url")
-		const { result } = renderHook(() =>
-			stateUrl({
-				key: "t",
-				defaults: { status: "all" },
-			}),
-		)
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        defaults: { status: "all" },
+      }),
+    )
 
-		expect(result.current.getSnapshot().filters).toEqual({ status: "all" })
-	})
+    expect(result.current.getSnapshot().filters).toEqual({ status: "all" })
+  })
 
-	it("setSnapshot 会序列化并 push URL（filters 重置 page=1，数组使用重复 key）", async () => {
-		urlMocks.setLocation({
-			pathname: "/list",
-			hash: "#h",
-			searchStr: "?x=1&t_page=9",
-		})
+  it("setSnapshot 会序列化并 push URL（filters 重置 page=1，数组使用重复 key）", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "#h",
+      searchStr: "?x=1&t_page=9",
+    })
 
-		const { stateUrl } = await import("./url")
-		const { result } = renderHook(() => stateUrl({ key: "t" }))
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() => stateUrl({ key: "t" }))
 
-		const next: TableStateSnapshot<Record<string, unknown>> = {
-			page: 9,
-			size: 50,
-			sort: [{ field: "name", order: "asc" }],
-			filters: {
-				q: "hello",
-				status: ["a", "b"],
-			},
-		}
+    const next: TableStateSnapshot<Record<string, unknown>> = {
+      page: 9,
+      size: 50,
+      sort: [{ field: "name", order: "asc" }],
+      filters: {
+        q: "hello",
+        status: ["a", "b"],
+      },
+    }
 
-		act(() => {
-			result.current.setSnapshot(next, "filters")
-		})
+    act(() => {
+      result.current.setSnapshot(next, "filters")
+    })
 
-		expect(urlMocks.push).toHaveBeenCalledTimes(1)
-		const href = urlMocks.push.mock.calls[0]?.[0] as string
-		const url = parseHref(href)
-		const params = url.searchParams
+    expect(urlMocks.push).toHaveBeenCalledTimes(1)
+    const href = urlMocks.push.mock.calls[0]?.[0] as string
+    const url = parseHref(href)
+    const params = url.searchParams
 
-		expect(url.pathname).toBe("/list")
-		expect(url.hash).toBe("#h")
-		expect(params.get("x")).toBe("1")
-		expect(params.get("t_page")).toBe("1")
-		expect(params.get("t_size")).toBe("50")
-		expect(params.get("t_sort")).toBe("name.asc")
-		expect(params.get("t_q")).toBe("hello")
-		expect(params.getAll("t_status")).toEqual(["a", "b"])
-	})
+    expect(url.pathname).toBe("/list")
+    expect(url.hash).toBe("#h")
+    expect(params.get("x")).toBe("1")
+    expect(params.get("t_page")).toBe("1")
+    expect(params.get("t_size")).toBe("50")
+    expect(params.get("t_sort")).toBe("name.asc")
+    expect(params.get("t_q")).toBe("hello")
+    expect(params.getAll("t_status")).toEqual(["a", "b"])
+  })
 
-	it("behavior.history=replace 时使用 replace", async () => {
-		urlMocks.setLocation({
-			pathname: "/list",
-			hash: "",
-			searchStr: "",
-		})
+  it("behavior.history=replace 时使用 replace", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "",
+    })
 
-		const { stateUrl } = await import("./url")
-		const { result } = renderHook(() =>
-			stateUrl({
-				key: "t",
-				behavior: { history: "replace" },
-			}),
-		)
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        behavior: { history: "replace" },
+      }),
+    )
 
-		act(() => {
-			result.current.setSnapshot(
-				{
-					page: 2,
-					size: 10,
-					sort: [],
-					filters: {},
-				},
-				"page",
-			)
-		})
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 2,
+          size: 10,
+          sort: [],
+          filters: {},
+        },
+        "page",
+      )
+    })
 
-		expect(urlMocks.replace).toHaveBeenCalledTimes(1)
-		expect(urlMocks.push).toHaveBeenCalledTimes(0)
-	})
+    expect(urlMocks.replace).toHaveBeenCalledTimes(1)
+    expect(urlMocks.push).toHaveBeenCalledTimes(0)
+  })
 
-	it("在 basepath 场景下 push 的 URL 会保留 basepath", async () => {
-		basePathMocks.setBasePath("/idealtemplate")
-		urlMocks.setLocation({
-			pathname: "/list",
-			hash: "",
-			searchStr: "",
-		})
+  it("在 basepath 场景下 push 的 URL 会保留 basepath", async () => {
+    basePathMocks.setBasePath("/idealtemplate")
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "",
+    })
 
-		const { stateUrl } = await import("./url")
-		const { result } = renderHook(() => stateUrl({ key: "t" }))
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() => stateUrl({ key: "t" }))
 
-		act(() => {
-			result.current.setSnapshot(
-				{
-					page: 2,
-					size: 10,
-					sort: [],
-					filters: {},
-				},
-				"page",
-			)
-		})
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 2,
+          size: 10,
+          sort: [],
+          filters: {},
+        },
+        "page",
+      )
+    })
 
-		expect(urlMocks.push).toHaveBeenCalledTimes(1)
-		const href = urlMocks.push.mock.calls[0]?.[0] as string
-		const url = parseHref(href)
-		expect(url.pathname).toBe("/idealtemplate/list")
-	})
+    expect(urlMocks.push).toHaveBeenCalledTimes(1)
+    const href = urlMocks.push.mock.calls[0]?.[0] as string
+    const url = parseHref(href)
+    expect(url.pathname).toBe("/idealtemplate/list")
+  })
 })
