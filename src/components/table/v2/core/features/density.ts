@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react"
+import {
+  applyPreferenceMigrations,
+  usePreference,
+  useStableCallback,
+  useStableObject,
+} from "@/components/table/v2"
 import type {
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
   DensityFeatureOptions,
-  PreferenceEnvelope,
 } from "../types"
-import {
-  applyPreferenceMigrations,
-  createJsonLocalStoragePreferenceStorage,
-} from "../utils/preference-storage"
-import { useStableCallback, useStableObject } from "../utils/reference-stability"
 
 type DensityValue = "compact" | "comfortable"
 
@@ -33,52 +33,19 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
   const schemaVersion = args.feature?.schemaVersion ?? 1
   const defaultDensity: DensityValue = args.feature?.default ?? "compact"
 
-  const storage = useMemo(() => {
-    if (!enabled) return args.feature?.storage
-    if (args.feature?.storage) return args.feature.storage
-    return createJsonLocalStoragePreferenceStorage<DensityValue>({
-      schemaVersion,
-      parse: parseDensityValue,
-    })
-  }, [enabled, args.feature?.storage, schemaVersion])
-
-  const [preferencesReady, setPreferencesReady] = useState(
-    () => !enabled || Boolean(storage?.getSync),
-  )
-
-  const [envelope, setEnvelope] = useState<PreferenceEnvelope<DensityValue> | null>(() => {
-    if (!enabled) return null
-    if (!storage?.getSync) return null
-    return storage.getSync(storageKey)
+  const {
+    envelope,
+    preferencesReady,
+    storage,
+    persist,
+    remove: removeStorage,
+  } = usePreference({
+    enabled,
+    storageKey,
+    schemaVersion,
+    storage: args.feature?.storage,
+    parse: parseDensityValue,
   })
-
-  useEffect(() => {
-    if (!enabled) return
-    if (!storage) return
-    if (storage.getSync) {
-      setPreferencesReady(true)
-      setEnvelope(storage.getSync(storageKey))
-      return
-    }
-
-    let cancelled = false
-    setPreferencesReady(false)
-    void storage
-      .get(storageKey)
-      .then((value) => {
-        if (cancelled) return
-        setEnvelope(value)
-        setPreferencesReady(true)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setEnvelope(null)
-        setPreferencesReady(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [enabled, storageKey, storage])
 
   const mergedDensity = useMemo<DensityValue>(() => {
     if (!enabled) return defaultDensity
@@ -100,18 +67,6 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
     setDensity(mergedDensity)
   }, [enabled, mergedDensity])
 
-  const persist = useStableCallback(async (nextDensity: DensityValue) => {
-    if (!enabled) return
-    if (!storage) return
-    const nextEnvelope: PreferenceEnvelope<DensityValue> = {
-      schemaVersion,
-      updatedAt: Date.now(),
-      value: nextDensity,
-    }
-    setEnvelope(nextEnvelope)
-    await storage.set(storageKey, nextEnvelope)
-  })
-
   const setDensityPreference = useStableCallback((nextDensity: DensityValue) => {
     if (!enabled) return
     setDensity(nextDensity)
@@ -121,11 +76,11 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
   const resetDensity = useStableCallback(() => {
     if (!enabled) return
     setDensityPreference(defaultDensity)
-    setEnvelope(null)
-    if (!storage) return
-    if (storage.remove) {
-      void storage.remove(storageKey)
-    }
+    void removeStorage().then(() => {
+      if (!storage?.remove) {
+        void persist(defaultDensity)
+      }
+    })
   })
 
   const runtime: DataTableFeatureRuntime<TData, TFilterSchema> = useStableObject({

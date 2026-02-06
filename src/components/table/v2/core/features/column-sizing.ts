@@ -2,9 +2,9 @@ import type { ColumnSizingState, OnChangeFn } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
 import {
   applyPreferenceMigrations,
-  createJsonLocalStoragePreferenceStorage,
   mergeRecordPreference,
   shallowEqual,
+  usePreference,
   useStableCallback,
   useStableObject,
 } from "@/components/table/v2"
@@ -13,7 +13,6 @@ import type {
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
-  PreferenceEnvelope,
 } from "../types"
 
 function isFeatureEnabled(feature?: { enabled?: boolean }): boolean {
@@ -82,54 +81,19 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
     return next
   }, [args.columns, args.feature?.defaultSizing])
 
-  const storage = useMemo(() => {
-    if (!enabled) return args.feature?.storage
-    if (args.feature?.storage) return args.feature.storage
-    return createJsonLocalStoragePreferenceStorage<Record<string, number>>({
-      schemaVersion,
-      parse: parseSizingRecord,
-    })
-  }, [enabled, args.feature?.storage, schemaVersion])
-
-  const [preferencesReady, setPreferencesReady] = useState(
-    () => !enabled || Boolean(storage?.getSync),
-  )
-
-  const [envelope, setEnvelope] = useState<PreferenceEnvelope<Record<string, number>> | null>(
-    () => {
-      if (!enabled) return null
-      if (!storage?.getSync) return null
-      return storage.getSync(storageKey)
-    },
-  )
-
-  useEffect(() => {
-    if (!enabled) return
-    if (!storage) return
-    if (storage.getSync) {
-      setPreferencesReady(true)
-      setEnvelope(storage.getSync(storageKey))
-      return
-    }
-
-    let cancelled = false
-    setPreferencesReady(false)
-    void storage
-      .get(storageKey)
-      .then((value) => {
-        if (cancelled) return
-        setEnvelope(value)
-        setPreferencesReady(true)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setEnvelope(null)
-        setPreferencesReady(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [enabled, storageKey, storage])
+  const {
+    envelope,
+    preferencesReady,
+    storage,
+    persist: persistEnvelope,
+    remove: removeStorage,
+  } = usePreference({
+    enabled,
+    storageKey,
+    schemaVersion,
+    storage: args.feature?.storage,
+    parse: parseSizingRecord,
+  })
 
   const mergedSizing = useMemo<ColumnSizingState>(() => {
     if (!enabled) return {}
@@ -175,7 +139,6 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
 
   const persist = useStableCallback(async (nextSizing: ColumnSizingState) => {
     if (!enabled) return
-    if (!storage) return
     const merged = mergeRecordPreference({
       stored: nextSizing,
       defaults,
@@ -195,13 +158,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
         return numeric
       },
     })
-    const nextEnvelope: PreferenceEnvelope<Record<string, number>> = {
-      schemaVersion,
-      updatedAt: Date.now(),
-      value: merged,
-    }
-    setEnvelope(nextEnvelope)
-    await storage.set(storageKey, nextEnvelope)
+    await persistEnvelope(merged)
   })
 
   const onColumnSizingChange: OnChangeFn<ColumnSizingState> = useStableCallback((updater) => {
@@ -216,13 +173,11 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
   const resetColumnSizing = useStableCallback(() => {
     if (!enabled) return
     setColumnSizing(defaults)
-    setEnvelope(null)
-    if (!storage) return
-    if (storage.remove) {
-      void storage.remove(storageKey)
-      return
-    }
-    void persist(defaults)
+    void removeStorage().then(() => {
+      if (!storage?.remove) {
+        void persist(defaults)
+      }
+    })
   })
 
   const runtime: DataTableFeatureRuntime<TData, TFilterSchema> = useStableObject({

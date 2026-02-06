@@ -2,9 +2,9 @@ import type { OnChangeFn, VisibilityState } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
 import {
   applyPreferenceMigrations,
-  createJsonLocalStoragePreferenceStorage,
   mergeRecordPreference,
   shallowEqual,
+  usePreference,
   useStableCallback,
   useStableObject,
 } from "@/components/table/v2"
@@ -13,7 +13,6 @@ import type {
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
-  PreferenceEnvelope,
 } from "../types"
 
 function isFeatureEnabled(feature?: { enabled?: boolean }): boolean {
@@ -54,54 +53,19 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
     return next
   }, [args.columnIds, args.feature?.defaultVisible])
 
-  const storage = useMemo(() => {
-    if (!enabled) return args.feature?.storage
-    if (args.feature?.storage) return args.feature.storage
-    return createJsonLocalStoragePreferenceStorage<Record<string, boolean>>({
-      schemaVersion,
-      parse: parseVisibilityRecord,
-    })
-  }, [enabled, args.feature?.storage, schemaVersion])
-
-  const [preferencesReady, setPreferencesReady] = useState(
-    () => !enabled || Boolean(storage?.getSync),
-  )
-
-  const [envelope, setEnvelope] = useState<PreferenceEnvelope<Record<string, boolean>> | null>(
-    () => {
-      if (!enabled) return null
-      if (!storage?.getSync) return null
-      return storage.getSync(storageKey)
-    },
-  )
-
-  useEffect(() => {
-    if (!enabled) return
-    if (!storage) return
-    if (storage.getSync) {
-      setPreferencesReady(true)
-      setEnvelope(storage.getSync(storageKey))
-      return
-    }
-
-    let cancelled = false
-    setPreferencesReady(false)
-    void storage
-      .get(storageKey)
-      .then((value) => {
-        if (cancelled) return
-        setEnvelope(value)
-        setPreferencesReady(true)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setEnvelope(null)
-        setPreferencesReady(true)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [enabled, storageKey, storage])
+  const {
+    envelope,
+    preferencesReady,
+    storage,
+    persist: persistEnvelope,
+    remove: removeStorage,
+  } = usePreference({
+    enabled,
+    storageKey,
+    schemaVersion,
+    storage: args.feature?.storage,
+    parse: parseVisibilityRecord,
+  })
 
   const mergedVisibility = useMemo<VisibilityState>(() => {
     if (!enabled) return {}
@@ -134,19 +98,12 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
 
   const persist = useStableCallback(async (nextVisibility: VisibilityState) => {
     if (!enabled) return
-    if (!storage) return
     const merged = mergeRecordPreference({
       stored: nextVisibility,
       defaults,
       ctx: { columnIds: args.columnIds },
     })
-    const nextEnvelope: PreferenceEnvelope<Record<string, boolean>> = {
-      schemaVersion,
-      updatedAt: Date.now(),
-      value: merged,
-    }
-    setEnvelope(nextEnvelope)
-    await storage.set(storageKey, nextEnvelope)
+    await persistEnvelope(merged)
   })
 
   const onColumnVisibilityChange: OnChangeFn<VisibilityState> = useStableCallback((updater) => {
@@ -161,13 +118,11 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
   const resetColumnVisibility = useStableCallback(() => {
     if (!enabled) return
     setColumnVisibility(defaults)
-    setEnvelope(null)
-    if (!storage) return
-    if (storage.remove) {
-      void storage.remove(storageKey)
-      return
-    }
-    void persist(defaults)
+    void removeStorage().then(() => {
+      if (!storage?.remove) {
+        void persistEnvelope(defaults)
+      }
+    })
   })
 
   const runtime: DataTableFeatureRuntime<TData, TFilterSchema> = useStableObject({
