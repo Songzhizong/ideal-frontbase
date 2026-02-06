@@ -230,7 +230,7 @@ export function Stage3FeaturesTableDemo() {
           <DataTableRoot
             dt={dt}
             layout={{ stickyHeader: true, stickyPagination: true }}
-            className="rounded-md border border-border/50"
+            className="overflow-hidden rounded-md border border-border/50"
           >
             <DataTableToolbar
               actions={
@@ -289,9 +289,7 @@ export function Stage3FeaturesTableDemo() {
               </div>
             </DataTableToolbar>
 
-            <div className="overflow-x-auto">
-              <DataTableTable<DemoInvoiceRow> renderSubComponent={renderExpandedRow} />
-            </div>
+            <DataTableTable<DemoInvoiceRow> renderSubComponent={renderExpandedRow} />
 
             <DataTableSelectionBar<DemoInvoiceRow> />
 

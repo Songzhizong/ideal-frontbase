@@ -40,6 +40,21 @@ function getMetaClass(meta: unknown, key: "headerClassName" | "cellClassName"): 
   return typeof value === "string" && value.trim() !== "" ? value : undefined
 }
 
+function normalizeAlign(value: unknown): "left" | "center" | "right" | undefined {
+  if (value === "left" || value === "center" || value === "right") {
+    return value
+  }
+  return undefined
+}
+
+function getMetaAlign(meta: unknown, target: "header" | "cell"): "left" | "center" | "right" {
+  if (!isRecord(meta)) return "left"
+  const specificKey = target === "header" ? "headerAlign" : "cellAlign"
+  const specificAlign = normalizeAlign(meta[specificKey])
+  if (specificAlign) return specificAlign
+  return normalizeAlign(meta.align) ?? "left"
+}
+
 function getDensity(meta: unknown): "compact" | "comfortable" {
   if (!isRecord(meta)) return "compact"
   return meta.dtDensity === "comfortable" ? "comfortable" : "compact"
@@ -210,7 +225,7 @@ export function DataTableTable<TData>({
   const isFetching = dt.activity.isFetching
 
   const headerClassName = cn(
-    isStickyHeader && "sticky top-[var(--dt-sticky-top,0px)] z-10 bg-background",
+    isStickyHeader && "sticky top-[var(--dt-sticky-top,0px)] z-10 bg-table-header",
     "[&_tr]:border-border/50",
   )
 
@@ -237,6 +252,7 @@ export function DataTableTable<TData>({
       const isBoundaryLeft = scrollEdges.left && cell.column.id === lastLeftPinnedId
       const isBoundaryRight = scrollEdges.right && cell.column.id === firstRightPinnedId
       const cellMetaClass = getMetaClass(cell.column.columnDef.meta, "cellClassName")
+      const cellAlign = getMetaAlign(cell.column.columnDef.meta, "cell")
       return (
         <TableCell
           key={cell.id}
@@ -252,11 +268,13 @@ export function DataTableTable<TData>({
           }}
           className={cn(
             cellDensityClass,
-            isPinned && "bg-background",
+            isPinned && "bg-card",
             isBoundaryLeft &&
               "relative after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
             isBoundaryRight &&
               "relative before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
+            cellAlign === "center" && "text-center",
+            cellAlign === "right" && "text-right",
             cellMetaClass,
           )}
         >
@@ -330,7 +348,7 @@ export function DataTableTable<TData>({
           style={style}
           data-state={row.getIsSelected() && "selected"}
           className={cn(
-            "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
+            "hover:bg-table-row-hover data-[state=selected]:bg-muted/70 border-b transition-colors",
             rowClassName,
             !dragSortMeta.handle && "cursor-grab",
             sortable.isDragging && "opacity-50",
@@ -348,7 +366,7 @@ export function DataTableTable<TData>({
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
-        className={rowClassName}
+        className={cn(rowClassName, "hover:bg-table-row-hover data-[state=selected]:bg-muted/70")}
       >
         {renderCells(row as Row<TData>)}
       </TableRow>
@@ -587,58 +605,73 @@ export function DataTableTable<TData>({
           <TableHeader className={headerClassName}>
             {dt.table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className={rowClassName}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{
-                      width: `${header.getSize()}px`,
-                      minWidth: `${header.getSize()}px`,
-                      ...(header.column.getIsPinned()
-                        ? header.column.getIsPinned() === "left"
-                          ? {
-                              position: "sticky",
-                              left: `${header.column.getStart("left")}px`,
-                            }
-                          : {
-                              position: "sticky",
-                              right: `${header.column.getAfter("right")}px`,
-                            }
-                        : {}),
-                      zIndex: header.column.getIsPinned() ? 20 : undefined,
-                    }}
-                    className={cn(
-                      "relative",
-                      header.column.getIsPinned() && "bg-background",
-                      scrollEdges.left &&
-                        header.column.id === lastLeftPinnedId &&
-                        "after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
-                      scrollEdges.right &&
-                        header.column.id === firstRightPinnedId &&
-                        "before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
-                      getMetaClass(header.column.columnDef.meta, "headerClassName"),
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </div>
-                      {header.column.getCanResize() && (
-                        <button
-                          type="button"
-                          onMouseDown={header.getResizeHandler()}
-                          onTouchStart={header.getResizeHandler()}
-                          aria-label={i18n.columnResizeHandleLabel}
-                          className={cn(
-                            "absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none border-0 bg-transparent p-0",
-                            header.column.getIsResizing() && "bg-primary",
-                          )}
-                        />
+                {headerGroup.headers.map((header) => {
+                  const headerMetaClass = getMetaClass(
+                    header.column.columnDef.meta,
+                    "headerClassName",
+                  )
+                  const headerAlign = getMetaAlign(header.column.columnDef.meta, "header")
+                  return (
+                    <TableHead
+                      key={header.id}
+                      style={{
+                        width: `${header.getSize()}px`,
+                        minWidth: `${header.getSize()}px`,
+                        ...(header.column.getIsPinned()
+                          ? header.column.getIsPinned() === "left"
+                            ? {
+                                position: "sticky",
+                                left: `${header.column.getStart("left")}px`,
+                              }
+                            : {
+                                position: "sticky",
+                                right: `${header.column.getAfter("right")}px`,
+                              }
+                          : {}),
+                        zIndex: header.column.getIsPinned() ? 20 : undefined,
+                      }}
+                      className={cn(
+                        "relative",
+                        header.column.getIsPinned() && "bg-table-header",
+                        scrollEdges.left &&
+                          header.column.id === lastLeftPinnedId &&
+                          "after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
+                        scrollEdges.right &&
+                          header.column.id === firstRightPinnedId &&
+                          "before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
+                        headerAlign === "center" && "text-center",
+                        headerAlign === "right" && "text-right",
+                        headerMetaClass,
                       )}
-                    </div>
-                  </TableHead>
-                ))}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={cn(
+                            "min-w-0 flex-1",
+                            headerAlign === "center" && "flex justify-center",
+                            headerAlign === "right" && "flex justify-end",
+                          )}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </div>
+                        {header.column.getCanResize() && (
+                          <button
+                            type="button"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                            aria-label={i18n.columnResizeHandleLabel}
+                            className={cn(
+                              "absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none border-0 bg-transparent p-0",
+                              header.column.getIsResizing() && "bg-primary",
+                            )}
+                          />
+                        )}
+                      </div>
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>

@@ -347,7 +347,7 @@ export function UserManagementPage() {
           <DataTableRoot
             dt={dt}
             layout={{ stickyHeader: true, stickyPagination: true }}
-            className="rounded-md border border-border/50"
+            className="overflow-hidden rounded-md border border-border/50"
           >
             <DataTableToolbar
               actions={
@@ -375,12 +375,10 @@ export function UserManagementPage() {
 
             <DataTableActiveFilters
               filters={activeFilterDefinitions}
-              className="border-b border-border/50 bg-background px-3 py-3"
+              className="border-b border-border/50 bg-muted/20 px-3 py-3"
             />
 
-            <div className="overflow-x-auto">
-              <DataTableTable<DemoUser> renderEmpty={() => "暂无匹配用户"} />
-            </div>
+            <DataTableTable<DemoUser> renderEmpty={() => "暂无匹配用户"} />
 
             <DataTableSelectionBar<DemoUser>
               actions={({ selectedRowsCurrentPage }) => (

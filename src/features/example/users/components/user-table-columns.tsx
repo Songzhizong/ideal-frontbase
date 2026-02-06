@@ -168,6 +168,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     size: 260,
     minSize: 220,
     meta: {
+      align: "left",
       headerLabel: "用户",
     },
   }),
@@ -207,6 +208,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     size: 110,
     minSize: 100,
     meta: {
+      align: "center",
       headerLabel: "风险分",
     },
   }),
@@ -248,5 +250,9 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
       headerLabel: "状态",
     },
   }),
-  helper.actions((row) => <RowActions user={row.original} />),
+  helper.actions((row) => <RowActions user={row.original} />, {
+    header: "操作",
+    size: 140,
+    align: "center",
+  }),
 ]

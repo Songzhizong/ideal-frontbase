@@ -200,9 +200,7 @@ export function Stage1BasicTableDemo() {
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <DataTableRoot dt={dt} layout={{ stickyHeader: true, stickyPagination: true }}>
-            <div className="overflow-x-auto">
-              <DataTableTable />
-            </div>
+            <DataTableTable />
             <DataTablePagination />
           </DataTableRoot>
         </CardContent>

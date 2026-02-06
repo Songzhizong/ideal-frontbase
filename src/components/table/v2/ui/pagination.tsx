@@ -122,7 +122,7 @@ export function DataTablePagination({
   return (
     <div
       className={cn(
-        "flex w-full flex-col gap-3 border-t border-border/50 bg-background px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
+        "flex w-full flex-col gap-3 border-t border-border/50 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
         isStickyPagination && "sticky bottom-(--dt-sticky-bottom,0px) z-10",
         className,
       )}

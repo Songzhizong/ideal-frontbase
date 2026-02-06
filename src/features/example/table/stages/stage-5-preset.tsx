@@ -230,7 +230,7 @@ export function Stage5PresetTableDemo() {
             <DataTablePreset<DemoInvoiceRow, Stage5Filters>
               dt={dt}
               layout={{ stickyHeader: true, stickyPagination: true }}
-              className="rounded-md border border-border/50"
+              className="overflow-hidden rounded-md border border-border/50"
               toolbarActions={
                 <div className="flex flex-wrap items-center gap-2">
                   <DataTableDensityToggle />

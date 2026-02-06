@@ -12,7 +12,7 @@ export function DataTableToolbar({ className, children, actions }: DataTableTool
   return (
     <div
       className={cn(
-        "flex w-full flex-col gap-2 border-b border-border/50 bg-background px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
+        "flex w-full flex-col gap-2 border-b border-border/50 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >

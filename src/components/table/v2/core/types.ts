@@ -329,6 +329,9 @@ export interface DataTableFeatures<TData, TFilterSchema> {
 export interface DataTableColumnMeta extends ColumnMeta<unknown, unknown> {
   headerClassName?: string
   cellClassName?: string
+  align?: "left" | "center" | "right"
+  headerAlign?: "left" | "center" | "right"
+  cellAlign?: "left" | "center" | "right"
   sortable?: boolean
   filterable?: boolean
   filterKey?: string

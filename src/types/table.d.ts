@@ -6,6 +6,9 @@ declare module "@tanstack/react-table" {
     className?: string
     headerClassName?: string
     cellClassName?: string
+    align?: "left" | "center" | "right"
+    headerAlign?: "left" | "center" | "right"
+    cellAlign?: "left" | "center" | "right"
     sortable?: boolean
     filterable?: boolean
     filterKey?: string
