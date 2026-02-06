@@ -7,3 +7,5 @@ dist
 coverage
 .env.local
 .env.*.local
+__pycache__/
+*.py[cod]

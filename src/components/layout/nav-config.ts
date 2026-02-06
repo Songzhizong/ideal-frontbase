@@ -28,6 +28,11 @@ export const PRIMARY_NAV: readonly NavItem[] = [
 				to: "/example/table-v2-demo",
 				icon: Table,
 			},
+			{
+				title: "用户管理",
+				to: "/example/users",
+				icon: Users,
+			},
 		],
 	},
 ]

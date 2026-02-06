@@ -21,6 +21,10 @@ import { Route as AuthenticatedExampleTableV2DemoRouteImport } from './routes/_a
 import { Route as AuthenticatedCoreUsersRouteImport } from './routes/_authenticated/_core/users'
 import { Route as AuthenticatedCoreProfileRouteImport } from './routes/_authenticated/_core/profile'
 import { Route as AuthenticatedCoreFileManagementRouteImport } from './routes/_authenticated/_core/file-management'
+import { Route as AuthenticatedExampleUsersIndexRouteImport } from './routes/_authenticated/example/users/index'
+import { Route as AuthenticatedExampleUsersNewRouteImport } from './routes/_authenticated/example/users/new'
+import { Route as AuthenticatedExampleUsersUserIdResetPasswordRouteImport } from './routes/_authenticated/example/users/$userId/reset-password'
+import { Route as AuthenticatedExampleUsersUserIdEditRouteImport } from './routes/_authenticated/example/users/$userId/edit'
 
 const BlankRouteRoute = BlankRouteRouteImport.update({
   id: '/_blank',
@@ -83,6 +87,30 @@ const AuthenticatedCoreFileManagementRoute =
     path: '/file-management',
     getParentRoute: () => AuthenticatedCoreRouteRoute,
   } as any)
+const AuthenticatedExampleUsersIndexRoute =
+  AuthenticatedExampleUsersIndexRouteImport.update({
+    id: '/example/users/',
+    path: '/example/users/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedExampleUsersNewRoute =
+  AuthenticatedExampleUsersNewRouteImport.update({
+    id: '/example/users/new',
+    path: '/example/users/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedExampleUsersUserIdResetPasswordRoute =
+  AuthenticatedExampleUsersUserIdResetPasswordRouteImport.update({
+    id: '/example/users/$userId/reset-password',
+    path: '/example/users/$userId/reset-password',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedExampleUsersUserIdEditRoute =
+  AuthenticatedExampleUsersUserIdEditRouteImport.update({
+    id: '/example/users/$userId/edit',
+    path: '/example/users/$userId/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedDashboardIndexRoute
@@ -94,6 +122,10 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedCoreUsersRoute
   '/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/login': typeof BlankAuthLoginRoute
+  '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
+  '/example/users/': typeof AuthenticatedExampleUsersIndexRoute
+  '/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
+  '/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedDashboardIndexRoute
@@ -105,6 +137,10 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedCoreUsersRoute
   '/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/login': typeof BlankAuthLoginRoute
+  '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
+  '/example/users': typeof AuthenticatedExampleUsersIndexRoute
+  '/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
+  '/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,6 +156,10 @@ export interface FileRoutesById {
   '/_authenticated/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/_blank/_auth/login': typeof BlankAuthLoginRoute
   '/_authenticated/_dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/example/users/new': typeof AuthenticatedExampleUsersNewRoute
+  '/_authenticated/example/users/': typeof AuthenticatedExampleUsersIndexRoute
+  '/_authenticated/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
+  '/_authenticated/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -133,6 +173,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/example/table-v2-demo'
     | '/login'
+    | '/example/users/new'
+    | '/example/users/'
+    | '/example/users/$userId/edit'
+    | '/example/users/$userId/reset-password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +188,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/example/table-v2-demo'
     | '/login'
+    | '/example/users/new'
+    | '/example/users'
+    | '/example/users/$userId/edit'
+    | '/example/users/$userId/reset-password'
   id:
     | '__root__'
     | '/_authenticated'
@@ -158,6 +206,10 @@ export interface FileRouteTypes {
     | '/_authenticated/example/table-v2-demo'
     | '/_blank/_auth/login'
     | '/_authenticated/_dashboard/'
+    | '/_authenticated/example/users/new'
+    | '/_authenticated/example/users/'
+    | '/_authenticated/example/users/$userId/edit'
+    | '/_authenticated/example/users/$userId/reset-password'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -254,6 +306,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCoreFileManagementRouteImport
       parentRoute: typeof AuthenticatedCoreRouteRoute
     }
+    '/_authenticated/example/users/': {
+      id: '/_authenticated/example/users/'
+      path: '/example/users'
+      fullPath: '/example/users/'
+      preLoaderRoute: typeof AuthenticatedExampleUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/example/users/new': {
+      id: '/_authenticated/example/users/new'
+      path: '/example/users/new'
+      fullPath: '/example/users/new'
+      preLoaderRoute: typeof AuthenticatedExampleUsersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/example/users/$userId/reset-password': {
+      id: '/_authenticated/example/users/$userId/reset-password'
+      path: '/example/users/$userId/reset-password'
+      fullPath: '/example/users/$userId/reset-password'
+      preLoaderRoute: typeof AuthenticatedExampleUsersUserIdResetPasswordRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/example/users/$userId/edit': {
+      id: '/_authenticated/example/users/$userId/edit'
+      path: '/example/users/$userId/edit'
+      fullPath: '/example/users/$userId/edit'
+      preLoaderRoute: typeof AuthenticatedExampleUsersUserIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -279,12 +359,22 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoreRouteRoute: typeof AuthenticatedCoreRouteRouteWithChildren
   AuthenticatedExampleTableV2DemoRoute: typeof AuthenticatedExampleTableV2DemoRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedExampleUsersNewRoute: typeof AuthenticatedExampleUsersNewRoute
+  AuthenticatedExampleUsersIndexRoute: typeof AuthenticatedExampleUsersIndexRoute
+  AuthenticatedExampleUsersUserIdEditRoute: typeof AuthenticatedExampleUsersUserIdEditRoute
+  AuthenticatedExampleUsersUserIdResetPasswordRoute: typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoreRouteRoute: AuthenticatedCoreRouteRouteWithChildren,
   AuthenticatedExampleTableV2DemoRoute: AuthenticatedExampleTableV2DemoRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedExampleUsersNewRoute: AuthenticatedExampleUsersNewRoute,
+  AuthenticatedExampleUsersIndexRoute: AuthenticatedExampleUsersIndexRoute,
+  AuthenticatedExampleUsersUserIdEditRoute:
+    AuthenticatedExampleUsersUserIdEditRoute,
+  AuthenticatedExampleUsersUserIdResetPasswordRoute:
+    AuthenticatedExampleUsersUserIdResetPasswordRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

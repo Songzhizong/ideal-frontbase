@@ -59,7 +59,11 @@ export function AppSidebar({
 										>
 											<SidebarMenuItem>
 												<CollapsibleTrigger asChild>
-													<SidebarMenuButton tooltip={item.title} isActive={isActive}>
+													<SidebarMenuButton
+														tooltip={item.title}
+														isActive={false}
+														className="font-medium pl-3.5"
+													>
 														{item.icon && <item.icon className="size-4 shrink-0" />}
 														<span>{item.title}</span>
 														<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -90,8 +94,8 @@ export function AppSidebar({
 											isActive={pathname === item.to}
 											tooltip={item.title}
 											className={cn(
-												"px-3 py-5 data-[active=true]:text-sidebar-primary data-[active=true]:font-medium mx-auto",
-												iconOnly && "justify-center gap-0",
+												"pl-3.5 data-[active=true]:text-sidebar-primary data-[active=true]:font-medium mx-auto",
+												iconOnly && "justify-center gap-0 pl-2",
 											)}
 										>
 											<Link to={item.to}>
