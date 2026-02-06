@@ -892,6 +892,8 @@ export interface DataTableErrors {
 - API 预留：`features.virtualization?: { mode: "windowed" | "infinite", estimatedRowHeight, overscan }`
 - 约束：与 sticky header 和 selection 需保持兼容
 - Selection 必须基于 rowId，不能依赖 DOM 索引
+- 实现方向：优先考虑 `@tanstack/react-virtual`，windowed 模式先落地，infinite 模式与 dataSource 的分页/追加策略协同
+- 注意点：列宽/固定列/展开行（subComponent）会影响行高估算，需要提供 `estimatedRowHeight` 并允许后续测量修正
 
 ---
 

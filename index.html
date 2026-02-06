@@ -16,6 +16,37 @@
         window.history.replaceState(null, "", target)
       })()
     </script>
+    <script>
+      ;(() => {
+        const storageKey = "theme-config"
+        const resolvedKey = "theme-resolved"
+        const root = document.documentElement
+        const raw = window.localStorage.getItem(storageKey)
+        const resolvedRaw = window.localStorage.getItem(resolvedKey)
+        if (resolvedRaw) {
+          try {
+            const resolved = JSON.parse(resolvedRaw)
+            const background = resolved?.background
+            if (typeof background === "string" && background.length > 0) {
+              root.style.setProperty("--background", background)
+              root.style.backgroundColor = `hsl(${background})`
+            }
+          } catch {}
+        }
+        if (!raw) return
+        try {
+          const parsed = JSON.parse(raw)
+          const state = parsed?.state ?? parsed
+          const mode = state?.mode
+          const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+          const shouldDark = mode === "dark" || (mode === "system" && isSystemDark)
+          if (!shouldDark) return
+          root.classList.remove("light")
+          root.classList.add("dark")
+          root.dataset.theme = "dark"
+        } catch {}
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet">

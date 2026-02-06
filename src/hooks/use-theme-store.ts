@@ -30,6 +30,48 @@ interface ThemeStore extends ThemeConfig {
 	getEffectiveMode: () => ThemeMode
 }
 
+const themeStorageKey = "theme-config"
+const resolvedThemeKey = "theme-resolved"
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function getPersistedThemeConfig(): ThemeConfig | null {
+	if (typeof window === "undefined") return null
+	const raw = window.localStorage.getItem(themeStorageKey)
+	if (!raw) return null
+	try {
+		const parsed: unknown = JSON.parse(raw)
+		if (!isRecord(parsed)) return null
+		const state = isRecord(parsed.state) ? parsed.state : parsed
+		const next: ThemeConfig = {
+			...defaultThemeSettings,
+			...(isRecord(state) ? (state as Partial<ThemeConfig>) : {}),
+			layout: {
+				...defaultThemeSettings.layout,
+				...(isRecord(state.layout) ? (state.layout as Partial<ThemeConfig["layout"]>) : {}),
+			},
+			ui: {
+				...defaultThemeSettings.ui,
+				...(isRecord(state.ui) ? (state.ui as Partial<ThemeConfig["ui"]>) : {}),
+			},
+		}
+		if (next.mode !== "light" && next.mode !== "dark" && next.mode !== "system") {
+			next.mode = defaultThemeSettings.mode
+		}
+		if (typeof next.activePreset !== "string" || next.activePreset.length === 0) {
+			next.activePreset = defaultThemeSettings.activePreset
+		}
+		if (typeof next.fontFamily !== "string" || next.fontFamily.length === 0) {
+			next.fontFamily = defaultThemeSettings.fontFamily
+		}
+		return next
+	} catch {
+		return null
+	}
+}
+
 export const useThemeStore = create<ThemeStore>()(
 	persist(
 		(set, get) => ({
@@ -108,7 +150,7 @@ export const useThemeStore = create<ThemeStore>()(
 			},
 		}),
 		{
-			name: "theme-config",
+			name: themeStorageKey,
 			partialize: (state) => ({
 				mode: state.mode,
 				activePreset: state.activePreset,
@@ -141,13 +183,25 @@ function applyTheme(config: ThemeConfig) {
 
 	const currentFontClass = `font-${config.fontFamily.replace(/\s+/g, "-").toLowerCase()}`
 	root.style.fontFamily = `var(--${currentFontClass})`
+
+	if (typeof window !== "undefined") {
+		const background = root.style.getPropertyValue("--background")
+		if (background) {
+			const payload = JSON.stringify({ mode: effectiveMode, background })
+			window.localStorage.setItem(resolvedThemeKey, payload)
+		}
+	}
 }
 
 /**
  * Initialize theme on app load
  */
 export function initializeTheme() {
-	const config = useThemeStore.getState()
+	const persistedConfig = getPersistedThemeConfig()
+	const config = persistedConfig ?? useThemeStore.getState()
+	if (persistedConfig) {
+		useThemeStore.setState(persistedConfig)
+	}
 	applyTheme(config)
 
 	// Listen for system theme changes

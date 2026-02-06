@@ -510,13 +510,13 @@ export function useDataTable<TData, TFilterSchema>(
 1. 创建示例页面 `src/pages/examples/table-v2-demo.tsx`
 2. 使用 `remote` 数据源 + `stateUrl` 适配器
 3. 验证以下场景：
-  - [ ] 首次加载显示 loading
-  - [ ] 数据加载后正常渲染
-  - [ ] 空数据显示 empty state
-  - [ ] 分页切换正常
-  - [ ] 排序正常
-  - [ ] URL 参数同步正常
-  - [ ] 刷新保留状态
+  - [x] 首次加载显示 loading
+  - [x] 数据加载后正常渲染
+  - [x] 空数据显示 empty state
+  - [x] 分页切换正常
+  - [x] 排序正常
+  - [x] URL 参数同步正常
+  - [x] 刷新保留状态
 
 ---
 

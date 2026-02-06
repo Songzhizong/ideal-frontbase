@@ -1,0 +1,60 @@
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useDataTableInstance } from "./context"
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+type DensityValue = "compact" | "comfortable"
+
+function getDensity(meta: unknown): DensityValue | null {
+	if (!isRecord(meta)) return null
+	return meta.dtDensity === "compact" || meta.dtDensity === "comfortable" ? meta.dtDensity : null
+}
+
+function getSetDensity(meta: unknown): ((value: DensityValue) => void) | null {
+	if (!isRecord(meta)) return null
+	const value = meta.dtSetDensity
+	return typeof value === "function" ? (value as (value: DensityValue) => void) : null
+}
+
+export interface DataTableDensityToggleProps {
+	className?: string
+}
+
+export function DataTableDensityToggle({ className }: DataTableDensityToggleProps) {
+	const dt = useDataTableInstance()
+
+	const density = getDensity(dt.table.options.meta)
+	const setDensity = getSetDensity(dt.table.options.meta)
+	if (!density || !setDensity) return null
+
+	return (
+		<div
+			className={cn(
+				"inline-flex items-center gap-1 rounded-md border border-border/50 p-1",
+				className,
+			)}
+		>
+			<Button
+				type="button"
+				variant={density === "compact" ? "secondary" : "ghost"}
+				size="sm"
+				className="h-7 px-2"
+				onClick={() => setDensity("compact")}
+			>
+				紧凑
+			</Button>
+			<Button
+				type="button"
+				variant={density === "comfortable" ? "secondary" : "ghost"}
+				size="sm"
+				className="h-7 px-2"
+				onClick={() => setDensity("comfortable")}
+			>
+				舒适
+			</Button>
+		</div>
+	)
+}
