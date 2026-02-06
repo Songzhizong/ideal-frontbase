@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import type { FilterDefinition } from "../core"
 import { DataTableActiveFilters } from "./active-filters"
 import { useDataTableConfig } from "./config"
-import { DataTableFilterItem } from "./filter-item"
+import { DataTableFilterItem, type DataTableFilterLabelMode } from "./filter-item"
 
 function buildCollapsedFilters<TFilterSchema>(
   filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>,
@@ -29,17 +29,23 @@ function buildCollapsedFilters<TFilterSchema>(
 
 export interface DataTableFilterBarProps<TFilterSchema> {
   filters: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
+  activeFilters?: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
   showActiveFilters?: boolean
   collapsible?: boolean
   maxVisible?: number
+  labelMode?: DataTableFilterLabelMode
+  showItemClearButtons?: boolean
   className?: string
 }
 
 export function DataTableFilterBar<TFilterSchema>({
   filters,
+  activeFilters,
   showActiveFilters = true,
   collapsible = true,
   maxVisible = 3,
+  labelMode = "top",
+  showItemClearButtons,
   className,
 }: DataTableFilterBarProps<TFilterSchema>) {
   const { i18n } = useDataTableConfig()
@@ -52,12 +58,19 @@ export function DataTableFilterBar<TFilterSchema>({
 
   const shouldCollapse = collapsible && collapsedFilters.length < filters.length
   const visibleFilters = expanded || !shouldCollapse ? filters : collapsedFilters
+  const resolvedShowItemClearButtons = showItemClearButtons ?? !showActiveFilters
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <div className="flex flex-wrap items-end gap-3">
         {visibleFilters.map((filter) => (
-          <DataTableFilterItem key={String(filter.key)} definition={filter} className="min-w-45" />
+          <DataTableFilterItem
+            key={String(filter.key)}
+            definition={filter}
+            className="min-w-45"
+            labelMode={labelMode}
+            showClearButton={resolvedShowItemClearButtons}
+          />
         ))}
         {shouldCollapse && (
           <Button
@@ -75,7 +88,7 @@ export function DataTableFilterBar<TFilterSchema>({
           </Button>
         )}
       </div>
-      {showActiveFilters && <DataTableActiveFilters filters={filters} />}
+      {showActiveFilters && <DataTableActiveFilters filters={activeFilters ?? filters} />}
     </div>
   )
 }

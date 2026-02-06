@@ -25,6 +25,7 @@ import { useDataTableInstance } from "./context"
 
 type DateRangeValue = { from: Date | undefined; to: Date | undefined }
 type NumberRangeValue = { min: number | undefined; max: number | undefined }
+export type DataTableFilterLabelMode = "top" | "inside"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -116,18 +117,30 @@ function isEmptyFilterValue(value: unknown, type: FilterType): boolean {
   return false
 }
 
+function getClearedFilterValue(type: FilterType): unknown {
+  if (type === "text") return ""
+  return null
+}
+
 export interface DataTableFilterItemProps<
   TFilterSchema,
   K extends keyof TFilterSchema = keyof TFilterSchema,
 > {
   definition: FilterDefinition<TFilterSchema, K>
   className?: string
+  labelMode?: DataTableFilterLabelMode
+  showClearButton?: boolean
 }
 
 export function DataTableFilterItem<
   TFilterSchema,
   K extends keyof TFilterSchema = keyof TFilterSchema,
->({ definition, className }: DataTableFilterItemProps<TFilterSchema, K>) {
+>({
+  definition,
+  className,
+  labelMode = "top",
+  showClearButton = true,
+}: DataTableFilterItemProps<TFilterSchema, K>) {
   const dt = useDataTableInstance<unknown, TFilterSchema>()
   const { i18n } = useDataTableConfig()
   const value = dt.filters.state[definition.key]
@@ -137,21 +150,43 @@ export function DataTableFilterItem<
   }
 
   const handleRemove = () => {
-    dt.filters.set(definition.key, null as TFilterSchema[K])
+    dt.filters.set(definition.key, getClearedFilterValue(definition.type) as TFilterSchema[K])
   }
 
   const baseClassName = "flex min-w-[160px] flex-col gap-1"
   const canClear = !isEmptyFilterValue(value, definition.type)
+  const showClear = showClearButton && canClear
+  const useInlineLabel =
+    labelMode === "inside" &&
+    (definition.type === "text" ||
+      definition.type === "select" ||
+      definition.type === "multi-select")
 
   const content = (() => {
     switch (definition.type) {
       case "text": {
         const textValue = typeof value === "string" ? value : value == null ? "" : String(value)
+        if (useInlineLabel) {
+          return (
+            <div className="flex w-full items-center text-sm">
+              <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
+              <span className="px-2 text-muted-foreground">:</span>
+              <Input
+                value={textValue}
+                onChange={(event) => handleChange(event.target.value as TFilterSchema[K])}
+                placeholder={definition.placeholder}
+                aria-label={definition.label}
+                className="h-auto border-0 bg-transparent px-0 py-0 shadow-none focus-visible:ring-0"
+              />
+            </div>
+          )
+        }
         return (
           <Input
             value={textValue}
             onChange={(event) => handleChange(event.target.value as TFilterSchema[K])}
             placeholder={definition.placeholder}
+            aria-label={definition.label}
             className="h-9"
           />
         )
@@ -176,7 +211,19 @@ export function DataTableFilterItem<
 
         return (
           <Select value={selectedKey} onValueChange={handleSelect}>
-            <SelectTrigger className="h-9 w-full">
+            <SelectTrigger
+              className={cn(
+                "w-full",
+                useInlineLabel
+                  ? "h-auto border-0 bg-transparent px-0 py-0 shadow-none focus:ring-0"
+                  : "h-9",
+              )}
+              aria-label={definition.label}
+            >
+              {useInlineLabel ? (
+                <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
+              ) : null}
+              {useInlineLabel ? <span className="px-2 text-muted-foreground">:</span> : null}
               <SelectValue placeholder={definition.placeholder ?? i18n.filters.selectPlaceholder} />
             </SelectTrigger>
             <SelectContent>
@@ -212,9 +259,19 @@ export function DataTableFilterItem<
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="outline"
-                className="h-9 w-full justify-between gap-2 px-3 text-sm font-normal"
+                variant={useInlineLabel ? "ghost" : "outline"}
+                className={cn(
+                  "w-full justify-between gap-2 text-sm font-normal",
+                  useInlineLabel
+                    ? "h-auto px-0 py-0 hover:bg-transparent focus-visible:ring-0"
+                    : "h-9 px-3",
+                )}
+                aria-label={definition.label}
               >
+                {useInlineLabel ? (
+                  <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
+                ) : null}
+                {useInlineLabel ? <span className="px-2 text-muted-foreground">:</span> : null}
                 <span className="truncate">{triggerLabel}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
@@ -287,6 +344,7 @@ export function DataTableFilterItem<
                 emitRange({ ...range, min: nextMin })
               }}
               placeholder={i18n.filters.numberRangeMinPlaceholder}
+              aria-label={`${definition.label}-${i18n.filters.numberRangeMinPlaceholder}`}
               className="h-9"
             />
             <span className="text-xs text-muted-foreground">-</span>
@@ -298,6 +356,7 @@ export function DataTableFilterItem<
                 emitRange({ ...range, max: nextMax })
               }}
               placeholder={i18n.filters.numberRangeMaxPlaceholder}
+              aria-label={`${definition.label}-${i18n.filters.numberRangeMaxPlaceholder}`}
               className="h-9"
             />
           </div>
@@ -334,11 +393,33 @@ export function DataTableFilterItem<
 
   if (!content) return null
 
+  if (useInlineLabel) {
+    return (
+      <div className={cn("flex min-w-40 items-center gap-1", className)}>
+        <div className="flex h-9 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-3">
+          {content as ReactNode}
+        </div>
+        {showClear ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="h-7 w-7"
+            onClick={handleRemove}
+            aria-label={i18n.filters.removeFilterAriaLabel(definition.label)}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
     <div className={cn(baseClassName, className)}>
       <div className="flex items-center justify-between gap-2">
         <Label className="text-xs text-muted-foreground">{definition.label}</Label>
-        {canClear ? (
+        {showClear ? (
           <Button
             type="button"
             variant="ghost"

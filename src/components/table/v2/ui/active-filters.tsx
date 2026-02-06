@@ -84,6 +84,11 @@ function isEmptyFilterValue(value: unknown, type: FilterType): boolean {
   return false
 }
 
+function getClearedFilterValue(type: FilterType): unknown {
+  if (type === "text") return ""
+  return null
+}
+
 function getOptionLabel<TFilterSchema>(
   filter: FilterDefinition<TFilterSchema, keyof TFilterSchema>,
   value: unknown,
@@ -165,7 +170,10 @@ export function DataTableActiveFilters<TFilterSchema>({
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       {activeItems.map(({ filter, value }) => {
         const handleRemove = () => {
-          dt.filters.set(filter.key, null as TFilterSchema[keyof TFilterSchema])
+          dt.filters.set(
+            filter.key,
+            getClearedFilterValue(filter.type) as TFilterSchema[keyof TFilterSchema],
+          )
         }
         if (renderTag) {
           return (

@@ -153,6 +153,19 @@ export function UserManagementPage() {
     ]
   }, [])
 
+  const activeFilterDefinitions = useMemo<
+    Array<FilterDefinition<DemoUserFilters, keyof DemoUserFilters>>
+  >(() => {
+    return [
+      {
+        key: "q",
+        label: "搜索",
+        type: "text",
+      },
+      ...filterDefinitions,
+    ]
+  }, [filterDefinitions])
+
   const metrics = useMemo(() => {
     const totalUsers = DEMO_USERS.length
     const onlineUsers = DEMO_USERS.filter((user) => user.isOnline).length
@@ -318,7 +331,11 @@ export function UserManagementPage() {
             </DataTableToolbar>
 
             <div className="border-b border-border/50 bg-background px-3 py-3">
-              <DataTableFilterBar filters={filterDefinitions} />
+              <DataTableFilterBar
+                filters={filterDefinitions}
+                activeFilters={activeFilterDefinitions}
+                labelMode="inside"
+              />
             </div>
 
             <div className="overflow-x-auto">
