@@ -12,7 +12,6 @@ import {
   DataTableToolbar,
   DataTableViewOptions,
   remote,
-  stateInternal,
   useDataTable,
 } from "@/components/table/v2"
 import { Button } from "@/components/ui/button"
@@ -27,6 +26,7 @@ import {
   type DemoUser,
   type DemoUserFilters,
 } from "../types"
+import { useUserManagementTableState } from "./use-user-management-table-state"
 import { demoUserTableColumns } from "./user-table-columns"
 
 const ROLE_LABEL: Record<(typeof DEMO_USER_ROLES)[number], string> = {
@@ -60,24 +60,7 @@ function downloadCsv(args: { filename: string; rows: string[][] }) {
 export function UserManagementPage() {
   const navigate = useBaseNavigate()
 
-  const state = stateInternal<DemoUserFilters>({
-    initial: {
-      page: 1,
-      size: 10,
-      sort: [],
-      filters: {
-        q: "",
-        nameKeyword: "",
-        status: null,
-        role: null,
-        department: null,
-        isOnline: null,
-        riskScoreRange: null,
-        createdAtDate: null,
-        lastLoginRange: null,
-      },
-    },
-  })
+  const state = useUserManagementTableState()
 
   const dataSource = useMemo(() => {
     return remote<DemoUser, DemoUserFilters, Awaited<ReturnType<typeof fetchDemoUsers>>>({

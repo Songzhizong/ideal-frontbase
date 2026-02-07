@@ -4,63 +4,28 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 import { stripBasePath, withBasePath } from "@/lib/base-path"
 import type {
   InferParserValues,
-  TableSort,
   TableStateAdapter,
   TableStateChangeReason,
   TableStateSnapshot,
   UrlStateOptions,
 } from "../types"
+import type { MutableSearchRecord, SearchRecord } from "./url-utils"
+import {
+  buildSearchParams,
+  getFirstString,
+  getPaginationDefaults,
+  isSerializedValueEmpty,
+  parsePositiveInt,
+  parseSearchRecord,
+  parseSort,
+  resolveHistoryMode,
+  serializeSort,
+} from "./url-utils"
 
-type SearchRecord = Record<string, string | string[] | undefined>
-type MutableSearchRecord = Record<string, string | string[] | null | undefined>
+const URL_STATE_DEFAULT_PAGE = 1
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function parseSearchRecord(searchStr: string): SearchRecord {
-  const params = new URLSearchParams(searchStr.startsWith("?") ? searchStr.slice(1) : searchStr)
-  const record: SearchRecord = {}
-  for (const [key, value] of params.entries()) {
-    const existing = record[key]
-    if (existing === undefined) {
-      record[key] = value
-      continue
-    }
-    if (Array.isArray(existing)) {
-      existing.push(value)
-      continue
-    }
-    record[key] = [existing, value]
-  }
-  return record
-}
-
-function buildSearchParams(record: MutableSearchRecord): string {
-  const params = new URLSearchParams()
-  for (const [key, value] of Object.entries(record)) {
-    if (value == null) continue
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        params.append(key, item)
-      }
-      continue
-    }
-    params.set(key, value)
-  }
-  const next = params.toString()
-  return next ? `?${next}` : ""
-}
-
-function parsePositiveInt(value: string | undefined, fallback: number): number {
-  const parsed = Number.parseInt(value ?? "", 10)
-  if (!Number.isFinite(parsed) || parsed <= 0) return fallback
-  return parsed
-}
-
-function getFirstString(value: string | string[] | undefined): string | undefined {
-  if (Array.isArray(value)) return value[0]
-  return value
 }
 
 function getSearchValue<TFilterSchema>(filters: TFilterSchema, key: string): unknown {
@@ -68,30 +33,11 @@ function getSearchValue<TFilterSchema>(filters: TFilterSchema, key: string): unk
   return filters[key]
 }
 
-function parseSort(value: string | null | undefined): TableSort[] {
-  if (!value) return []
-  const segments = value.split("|")
-  const items: TableSort[] = []
-  for (const segment of segments) {
-    const [field, order] = segment.split(".")
-    if (!field) continue
-    if (order !== "asc" && order !== "desc") continue
-    items.push({ field, order })
-  }
-  return items
-}
-
-function serializeSort(sort: TableSort[]): string | null {
-  if (sort.length === 0) return null
-  return sort.map((item) => `${item.field}.${item.order}`).join("|")
-}
-
 function applyFilterBehavior<TFilterSchema>(
   prev: TableStateSnapshot<TFilterSchema>,
   next: TableStateSnapshot<TFilterSchema>,
   reason: TableStateChangeReason,
   options?: {
-    history?: "push" | "replace"
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
     searchKey?: string
@@ -137,12 +83,18 @@ function parseFiltersWithParsers<TParsers extends ParserMap>(
       continue
     }
     if ("type" in parser && parser.type === "multi") {
-      const values = Array.isArray(rawValue) ? rawValue : [rawValue]
+      const values = (Array.isArray(rawValue) ? rawValue : [rawValue]).filter(
+        (value) => value.trim() !== "",
+      )
+      if (values.length === 0) {
+        next[key] = parser.defaultValue ?? null
+        continue
+      }
       next[key] = parser.parse(values) ?? parser.defaultValue ?? null
       continue
     }
     const value = Array.isArray(rawValue) ? rawValue[0] : rawValue
-    if (value == null) {
+    if (value == null || value.trim() === "") {
       next[key] = parser.defaultValue ?? null
       continue
     }
@@ -206,6 +158,7 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
   const searchStr = location.searchStr
   const behaviorRef = useRef(options.behavior)
   const defaultsRef = useRef(options.defaults)
+  const paginationRef = useRef(options.pagination)
   const parsersRef = useRef(options.parsers)
   const codecRef = useRef(options.codec)
   const keyRef = useRef(options.key)
@@ -213,6 +166,7 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
 
   behaviorRef.current = options.behavior
   defaultsRef.current = options.defaults
+  paginationRef.current = options.pagination
   parsersRef.current = options.parsers
   codecRef.current = options.codec
   keyRef.current = options.key
@@ -242,8 +196,9 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
     const pageKey = `${prefix}page`
     const sizeKey = `${prefix}size`
     const sortKey = `${prefix}sort`
-    const page = parsePositiveInt(getFirstString(searchRecord[pageKey]), 1)
-    const size = parsePositiveInt(getFirstString(searchRecord[sizeKey]), 10)
+    const paginationDefaults = getPaginationDefaults(paginationRef.current)
+    const page = parsePositiveInt(getFirstString(searchRecord[pageKey]), paginationDefaults.page)
+    const size = parsePositiveInt(getFirstString(searchRecord[sizeKey]), paginationDefaults.size)
     const sort = parseSort(getFirstString(searchRecord[sortKey]))
     const rawFilters: SearchRecord = {}
     for (const [key, value] of Object.entries(searchRecord)) {
@@ -310,18 +265,26 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
       } else {
         filterRecord = {}
       }
+      const paginationDefaults = getPaginationDefaults(paginationRef.current)
+      const pageKey = `${prefix}page`
+      const sizeKey = `${prefix}size`
+      const sortKey = `${prefix}sort`
       const nextSort = serializeSort(adjusted.sort)
-      searchRecord[`${prefix}page`] = String(Math.max(1, adjusted.page))
-      searchRecord[`${prefix}size`] = String(Math.max(1, adjusted.size))
-      searchRecord[`${prefix}sort`] = nextSort ?? null
+      const normalizedPage = Math.max(URL_STATE_DEFAULT_PAGE, adjusted.page)
+      const normalizedSize = Math.max(URL_STATE_DEFAULT_PAGE, adjusted.size)
+      searchRecord[pageKey] =
+        normalizedPage === paginationDefaults.page ? null : String(normalizedPage)
+      searchRecord[sizeKey] =
+        normalizedSize === paginationDefaults.size ? null : String(normalizedSize)
+      searchRecord[sortKey] = nextSort ?? null
       for (const [key, value] of Object.entries(filterRecord)) {
-        searchRecord[`${prefix}${key}`] = value
+        searchRecord[`${prefix}${key}`] = isSerializedValueEmpty(value) ? null : value
       }
       const nextSearchStr = buildSearchParams(searchRecord)
       if (nextSearchStr === locationRef.current.searchStr) return
       const nextPathname = withBasePath(stripBasePath(locationRef.current.pathname))
       const nextHref = `${nextPathname}${nextSearchStr}${locationRef.current.hash}`
-      const historyMode = behaviorRef.current?.history ?? "push"
+      const historyMode = resolveHistoryMode(reason, behaviorRef.current)
       if (historyMode === "replace") {
         router.history.replace(nextHref)
       } else {

@@ -152,8 +152,12 @@ export function stateUrl<TParsers extends ParserMap | undefined>(options: {
   parsers?: TParsers
   codec?: TableCodec<InferParserValues<TParsers>>
   defaults?: Partial<InferParserValues<TParsers>>
+  pagination?: {
+    defaultPage?: number
+    defaultSize?: number
+  }
   behavior?: {
-    history?: "push" | "replace"
+    historyByReason?: Partial<Record<TableStateChangeReason, "push" | "replace">>
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
     searchKey?: string
@@ -165,7 +169,19 @@ export function stateUrl<TParsers extends ParserMap | undefined>(options: {
 说明：
 - URL 中分页与排序字段由适配器托管。
 - 排序序列化格式：`field.asc|field.desc`。
+- `behavior.historyByReason` 默认值：`init/filters/reset -> replace`，`page/size/sort -> push`。
+- `pagination.defaultPage/defaultSize` 可配置 URL 回退默认值；当 page/size 等于默认值时会从 URL 省略。
+- URL 紧凑策略会清理空值（`""`、空数组、`null/undefined`），但保留 `false` 与 `0`。
 - `behavior.searchKey` 会透传到 `dt.meta.state.searchKey`。
+
+### 2.4 内置 URL Parser
+
+`@/components/table/v2` 额外导出以下可复用 parser：
+
+- `parseAsNumberRange`：`"10~20"`、`"10~"`、`"~20"`。
+- `parseAsLocalDate`：本地日期 `YYYY-MM-DD`。
+- `parseAsLocalDateRange`：本地日期区间 `"2026-01-01~2026-01-31"`（支持半边区间）。
+- `parseAsTriStateBoolean`：支持 `true/false/1/0`。
 
 ---
 
@@ -492,4 +508,3 @@ export function createColumnHelper<TData>(): {
   ) => ColumnDef<TData>
 }
 ```
-

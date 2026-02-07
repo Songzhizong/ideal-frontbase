@@ -108,8 +108,17 @@ const state = stateUrl({
     q: parseAsString.withDefault(""),
     status: parseAsString.withDefault("all"),
   },
+  pagination: {
+    defaultPage: 1,
+    defaultSize: 20,
+  },
   behavior: {
-    history: "replace",
+    historyByReason: {
+      filters: "replace",
+      page: "push",
+      size: "push",
+      sort: "push",
+    },
     searchKey: "q", // 会透传到 dt.meta.state.searchKey
     resetPageOnFilterChange: true,
     resetPageOnSearchChange: true,
@@ -119,6 +128,7 @@ const state = stateUrl({
 
 补充：
 - URL 排序序列化格式：`field.asc|field.desc`
+- URL 会做紧凑写入：默认 page/size 与空筛选值会自动省略
 - 也可用 `codec` 完全接管 parse/serialize
 
 ---

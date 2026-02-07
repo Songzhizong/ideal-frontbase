@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react"
+import { parseAsBoolean, parseAsInteger, parseAsString } from "nuqs"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { TableStateSnapshot } from "../types"
 
@@ -103,7 +104,7 @@ describe("stateUrl", () => {
     expect(result.current.getSnapshot().filters).toEqual({ status: "all" })
   })
 
-  it("setSnapshot 会序列化并 push URL（filters 重置 page=1，数组使用重复 key）", async () => {
+  it("setSnapshot 在 filters 变更时会紧凑序列化并默认 replace", async () => {
     urlMocks.setLocation({
       pathname: "/list",
       hash: "#h",
@@ -111,15 +112,23 @@ describe("stateUrl", () => {
     })
 
     const { stateUrl } = await import("./url")
-    const { result } = renderHook(() => stateUrl({ key: "t" }))
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        parsers: {
+          q: parseAsString.withDefault(""),
+          status: parseAsString,
+        },
+      }),
+    )
 
-    const next: TableStateSnapshot<Record<string, unknown>> = {
+    const next: TableStateSnapshot<{ q: string; status: string | null }> = {
       page: 9,
       size: 50,
       sort: [{ field: "name", order: "asc" }],
       filters: {
         q: "hello",
-        status: ["a", "b"],
+        status: "active",
       },
     }
 
@@ -127,22 +136,23 @@ describe("stateUrl", () => {
       result.current.setSnapshot(next, "filters")
     })
 
-    expect(urlMocks.push).toHaveBeenCalledTimes(1)
-    const href = urlMocks.push.mock.calls[0]?.[0] as string
+    expect(urlMocks.replace).toHaveBeenCalledTimes(1)
+    expect(urlMocks.push).toHaveBeenCalledTimes(0)
+    const href = urlMocks.replace.mock.calls[0]?.[0] as string
     const url = parseHref(href)
     const params = url.searchParams
 
     expect(url.pathname).toBe("/list")
     expect(url.hash).toBe("#h")
     expect(params.get("x")).toBe("1")
-    expect(params.get("t_page")).toBe("1")
+    expect(params.get("t_page")).toBeNull()
     expect(params.get("t_size")).toBe("50")
     expect(params.get("t_sort")).toBe("name.asc")
     expect(params.get("t_q")).toBe("hello")
-    expect(params.getAll("t_status")).toEqual(["a", "b"])
+    expect(params.get("t_status")).toBe("active")
   })
 
-  it("behavior.history=replace 时使用 replace", async () => {
+  it("compact 模式会删除空值，但保留 false 与 0", async () => {
     urlMocks.setLocation({
       pathname: "/list",
       hash: "",
@@ -153,7 +163,92 @@ describe("stateUrl", () => {
     const { result } = renderHook(() =>
       stateUrl({
         key: "t",
-        behavior: { history: "replace" },
+        parsers: {
+          q: parseAsString.withDefault(""),
+          flag: parseAsBoolean,
+          count: parseAsInteger,
+        },
+      }),
+    )
+
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 1,
+          size: 10,
+          sort: [],
+          filters: {
+            q: "",
+            flag: false,
+            count: 0,
+          },
+        },
+        "filters",
+      )
+    })
+
+    expect(urlMocks.replace).toHaveBeenCalledTimes(1)
+    const href = urlMocks.replace.mock.calls[0]?.[0] as string
+    const url = parseHref(href)
+    expect(url.searchParams.get("t_q")).toBeNull()
+    expect(url.searchParams.get("t_flag")).toBe("false")
+    expect(url.searchParams.get("t_count")).toBe("0")
+  })
+
+  it("page/sort 默认 push，filters 默认 replace", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "",
+    })
+
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() => stateUrl({ key: "t" }))
+
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 2,
+          size: 10,
+          sort: [],
+          filters: {},
+        },
+        "page",
+      )
+    })
+
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 2,
+          size: 10,
+          sort: [],
+          filters: { q: "alice" },
+        },
+        "filters",
+      )
+    })
+
+    expect(urlMocks.push).toHaveBeenCalledTimes(1)
+    expect(urlMocks.replace).toHaveBeenCalledTimes(1)
+  })
+
+  it("historyByReason 可覆盖默认行为", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "",
+    })
+
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        behavior: {
+          historyByReason: {
+            page: "replace",
+          },
+        },
       }),
     )
 
@@ -204,10 +299,10 @@ describe("stateUrl", () => {
       )
     })
 
-    expect(urlMocks.push).toHaveBeenCalledTimes(1)
-    const href = urlMocks.push.mock.calls[0]?.[0] as string
+    expect(urlMocks.replace).toHaveBeenCalledTimes(1)
+    const href = urlMocks.replace.mock.calls[0]?.[0] as string
     const url = parseHref(href)
-    expect(url.searchParams.get("t_page")).toBe("1")
+    expect(url.searchParams.get("t_page")).toBeNull()
     expect(url.searchParams.get("t_keyword")).toBe("bob")
   })
 

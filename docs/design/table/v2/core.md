@@ -345,13 +345,17 @@ export type UrlStateMiddleware<TFilterSchema> = (args: {
   filters: TFilterSchema
 }
 
-export interface UrlStateOptions<TParsers> {
+export interface UrlStateOptions<TParsers extends ParserMap | undefined> {
   key: string
   parsers?: TParsers
   codec?: TableCodec<InferParserValues<TParsers>>
   defaults?: Partial<InferParserValues<TParsers>>
+  pagination?: {
+    defaultPage?: number
+    defaultSize?: number
+  }
   behavior?: {
-    history?: "push" | "replace"
+    historyByReason?: Partial<Record<TableStateChangeReason, "push" | "replace">>
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
     searchKey?: string
@@ -371,6 +375,9 @@ export function stateUrl<TParsers>(
 - URL 入参天然是字符串，`parsers/codec` 是唯一的类型转换入口；业务不得在 UI 层自行做 string → number/date 的隐式转换。
 - 默认实现路径以 TanStack Router 的 search 语义为准：adapter 通过 Router 的 search 读写完成状态同步；`key` 用作命名空间前缀，避免与页面其他 search 参数冲突。
 - `state.url` 会把解析后的 `searchKey` 透传到 `TableStateAdapter.searchKey`，随后由 `useDataTable` 暴露到 `dt.meta.state.searchKey`，供 `DataTableSearch` 默认对齐。
+- `behavior.historyByReason` 支持按原因覆盖 history 行为；默认值为：`init/filters/reset -> replace`，`page/size/sort -> push`。
+- `pagination.defaultPage/defaultSize` 用于 URL 读取回退值，并参与紧凑序列化（与默认值相同的 page/size 不写入 URL）。
+- URL 采用紧凑写入策略：空字符串、空数组、`null/undefined` 会被删除；`false` 与 `0` 会被保留。
 - **V2.0 约束**：`TFilterSchema` 必须为扁平对象（仅一层 key/value），不支持嵌套结构，避免 codec 与 URL 映射复杂度爆炸。
 - **数组格式规范**：URL 多值参数统一使用重复 key（例如 `?status=a&status=b`），禁止逗号拼接（`?status=a,b`）以避免歧义。
 

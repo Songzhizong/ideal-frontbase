@@ -453,8 +453,12 @@ export interface UrlStateOptions<TParsers extends ParserMap | undefined> {
   parsers?: TParsers
   codec?: TableCodec<InferParserValues<TParsers>>
   defaults?: Partial<InferParserValues<TParsers>>
+  pagination?: {
+    defaultPage?: number
+    defaultSize?: number
+  }
   behavior?: {
-    history?: "push" | "replace"
+    historyByReason?: Partial<Record<TableStateChangeReason, "push" | "replace">>
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
     searchKey?: string
