@@ -74,10 +74,14 @@ function buildResult<TData>(
   const currentPage = Math.max(1, page)
   const start = (currentPage - 1) * pageSize
   const pagedRows = rows.slice(start, start + pageSize)
+  const total =
+    typeof totalOverride === "number" && Number.isFinite(totalOverride) && totalOverride >= 0
+      ? totalOverride
+      : rows.length
   return {
     rows: pagedRows,
-    pageCount: rows.length > 0 ? Math.ceil(rows.length / pageSize) : 0,
-    total: totalOverride ?? rows.length,
+    pageCount: total > 0 ? Math.ceil(total / pageSize) : 0,
+    total,
   }
 }
 

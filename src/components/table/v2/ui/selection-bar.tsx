@@ -2,32 +2,46 @@ import type { ReactNode } from "react"
 import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { DataTableSelection } from "../core"
+import {
+  buildSelectionExportPayload,
+  type DataTableSelection,
+  type DataTableSelectionExportPayload,
+} from "../core"
 import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
 
-export interface DataTableSelectionBarProps<TData> {
+export interface DataTableSelectionBarProps<TData, TFilterSchema = unknown> {
   className?: string
   actions?: (args: {
     selectedRowIds: string[]
     selectedRowsCurrentPage: TData[]
     mode: "page" | "cross-page"
     selection: DataTableSelection<TData>
+    selectionScope: DataTableSelection<TData>["selectionScope"]
+    exportPayload: DataTableSelectionExportPayload<TFilterSchema>
   }) => ReactNode
   i18n?: DataTableI18nOverrides
 }
 
-export function DataTableSelectionBar<TData>({
+export function DataTableSelectionBar<TData, TFilterSchema = unknown>({
   className,
   actions,
   i18n: i18nOverrides,
-}: DataTableSelectionBarProps<TData>) {
-  const dt = useDataTableInstance<TData, unknown>()
+}: DataTableSelectionBarProps<TData, TFilterSchema>) {
+  const dt = useDataTableInstance<TData, TFilterSchema>()
   const { i18n: globalI18n } = useDataTableConfig()
 
   const i18n = useMemo(() => {
     return mergeDataTableI18n(globalI18n, i18nOverrides)
   }, [globalI18n, i18nOverrides])
+  const exportPayload = useMemo<DataTableSelectionExportPayload<TFilterSchema>>(
+    () =>
+      buildSelectionExportPayload({
+        selectionScope: dt.selection.selectionScope,
+        filters: dt.filters.state,
+      }),
+    [dt.selection.selectionScope, dt.filters.state],
+  )
 
   if (!dt.selection.enabled) return null
 
@@ -99,6 +113,8 @@ export function DataTableSelectionBar<TData>({
           selectedRowsCurrentPage: dt.selection.selectedRowsCurrentPage,
           mode: dt.selection.mode,
           selection: dt.selection,
+          selectionScope: dt.selection.selectionScope,
+          exportPayload,
         })}
       </div>
     </div>

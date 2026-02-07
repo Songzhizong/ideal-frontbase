@@ -103,6 +103,7 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
 
   const [isDragging, setIsDragging] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [lastError, setLastError] = useState<unknown | null>(null)
 
   const moveRowWithDrop = useStableCallback(
     async (params: { activeId: string; overId: string; position: DragSortDropPosition }) => {
@@ -143,7 +144,7 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
           return
       }
 
-      let targetIndex = 0
+      let targetIndex: number
       if (position === "inside") {
         targetIndex = index.childrenByParentId.get(overNode.id)?.length ?? 0
       } else if (position === "below") {
@@ -184,14 +185,34 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
 
       if (activeNode.parentId === null && targetParentId === null) {
         const reorderedRows = arrayMove(args.rows, activeNode.indexInParent, adjustedTargetIndex)
-        await args.feature?.onReorder({
-          ...payloadBase,
-          reorderedRows,
-        })
+        try {
+          await args.feature?.onReorder({
+            ...payloadBase,
+            reorderedRows,
+          })
+        } catch (error) {
+          setLastError(error)
+          args.feature?.onError?.({
+            error,
+            activeId: params.activeId,
+            overId: params.overId,
+            dropPosition: position,
+          })
+        }
         return
       }
 
-      await args.feature?.onReorder(payloadBase)
+      try {
+        await args.feature?.onReorder(payloadBase)
+      } catch (error) {
+        setLastError(error)
+        args.feature?.onError?.({
+          error,
+          activeId: params.activeId,
+          overId: params.overId,
+          dropPosition: position,
+        })
+      }
     },
   )
 
@@ -202,6 +223,7 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
 
   const onDragStart = useStableCallback((rowId: string) => {
     if (!enabled) return
+    setLastError(null)
     setIsDragging(true)
     setActiveId(rowId)
   })
@@ -210,6 +232,11 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
     if (!enabled) return
     setIsDragging(false)
     setActiveId(null)
+  })
+
+  const clearDragSortError = useStableCallback(() => {
+    if (!enabled) return
+    setLastError(null)
   })
 
   const onDragEnd = useStableCallback(
@@ -250,6 +277,8 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
           dtDragSortOnDragStart: onDragStart,
           dtDragSortOnDragEnd: onDragEnd,
           dtDragSortOnDragCancel: onDragCancel,
+          dtDragSortError: lastError,
+          dtDragSortClearError: clearDragSortError,
         },
       }
     },
@@ -262,6 +291,7 @@ export function useDragSortFeature<TData, TFilterSchema>(args: {
     onReset: () => {
       if (!enabled) return
       onDragCancel()
+      clearDragSortError()
     },
   })
 

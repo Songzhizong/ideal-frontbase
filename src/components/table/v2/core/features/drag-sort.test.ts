@@ -154,4 +154,46 @@ describe("dragSort feature", () => {
 
     expect(onReorder).toHaveBeenCalledTimes(0)
   })
+
+  it("onReorder 抛错时会回调 onError，且不会向外抛出", async () => {
+    type RowData = { id: string }
+
+    const error = new Error("reorder failed")
+    const onReorder = vi.fn(async () => {
+      throw error
+    })
+    const onError = vi.fn()
+    const rows: RowData[] = [{ id: "a" }, { id: "b" }]
+
+    const { result } = renderHook(() =>
+      useDragSortFeature<RowData, Record<string, never>>({
+        feature: { onReorder, onError },
+        getRowId: (row) => row.id,
+        getSubRows: undefined,
+        rows,
+      }),
+    )
+
+    const patch = result.current.runtime.patchTableOptions?.({})
+    const onDragEnd = getMetaValue<
+      (args: {
+        activeId: string
+        overId: string | null
+        position?: "above" | "below" | "inside"
+      }) => Promise<void>
+    >(patch, "dtDragSortOnDragEnd")
+
+    await act(async () => {
+      await onDragEnd?.({ activeId: "a", overId: "b", position: "below" })
+    })
+
+    expect(onReorder).toHaveBeenCalledTimes(1)
+    expect(onError).toHaveBeenCalledTimes(1)
+    expect(onError).toHaveBeenCalledWith({
+      error,
+      activeId: "a",
+      overId: "b",
+      dropPosition: "below",
+    })
+  })
 })

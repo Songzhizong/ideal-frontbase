@@ -10,8 +10,6 @@ import { useDataTableInstance } from "./context"
 type DateRangeValue = { from: Date | undefined; to: Date | undefined }
 type NumberRangeValue = { min: number | undefined; max: number | undefined }
 
-const dateFormatter = new Intl.DateTimeFormat("zh-CN")
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
@@ -101,6 +99,11 @@ function getOptionLabel<TFilterSchema>(
 function formatFilterValue<TFilterSchema>(
   filter: FilterDefinition<TFilterSchema, keyof TFilterSchema>,
   value: unknown,
+  args?: {
+    booleanTrueText: string
+    booleanFalseText: string
+    formatDate: (date: Date) => string
+  },
 ): string {
   switch (filter.type) {
     case "select":
@@ -111,12 +114,12 @@ function formatFilterValue<TFilterSchema>(
       return labels.join("、")
     }
     case "date":
-      return isDateValue(value) ? dateFormatter.format(value) : String(value)
+      return isDateValue(value) ? (args?.formatDate(value) ?? String(value)) : String(value)
     case "date-range": {
       const range = parseDateRange(value)
       if (!range?.from && !range?.to) return ""
-      const from = range?.from ? dateFormatter.format(range.from) : ""
-      const to = range?.to ? dateFormatter.format(range.to) : ""
+      const from = range?.from ? (args?.formatDate(range.from) ?? String(range.from)) : ""
+      const to = range?.to ? (args?.formatDate(range.to) ?? String(range.to)) : ""
       if (from && to) return `${from} - ${to}`
       return from || to
     }
@@ -130,7 +133,9 @@ function formatFilterValue<TFilterSchema>(
       return ""
     }
     case "boolean":
-      return value === true ? "是" : "否"
+      return value === true
+        ? (args?.booleanTrueText ?? "true")
+        : (args?.booleanFalseText ?? "false")
     default:
       return String(value)
   }
@@ -182,7 +187,11 @@ export function DataTableActiveFilters<TFilterSchema>({
             </span>
           )
         }
-        const displayValue = formatFilterValue(filter, value)
+        const displayValue = formatFilterValue(filter, value, {
+          booleanTrueText: i18n.filters.booleanTrueText,
+          booleanFalseText: i18n.filters.booleanFalseText,
+          formatDate: i18n.filters.formatDate,
+        })
         return (
           <Badge key={String(filter.key)} variant="secondary" className="gap-1">
             <span>{filter.label}</span>

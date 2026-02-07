@@ -10,6 +10,8 @@ import type {
   PinningFeatureOptions,
   TableStateSnapshot,
 } from "../types"
+import { useAnalyticsFeature } from "./analytics"
+import { useColumnOrderFeature } from "./column-order"
 import { useColumnSizingFeature } from "./column-sizing"
 import { useColumnVisibilityFeature } from "./column-visibility"
 import { useDensityFeature } from "./density"
@@ -18,6 +20,7 @@ import { useExpansionFeature } from "./expansion"
 import { usePinningFeature } from "./pinning"
 import { useSelectionFeature } from "./selection"
 import { useTreeFeature } from "./tree"
+import { useVirtualizationFeature } from "./virtualization"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -95,6 +98,11 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
   dragSort: DataTableDragSort
 } {
   const leafColumns = useMemo(() => getLeafColumnDefs(args.columns), [args.columns])
+  const leafColumnIds = useMemo(
+    () =>
+      leafColumns.map((column) => getColumnId(column)).filter((id): id is string => Boolean(id)),
+    [leafColumns],
+  )
 
   const hideableColumnIds = useMemo(() => {
     return leafColumns
@@ -103,8 +111,7 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
         const metaHideable = getBooleanMeta(meta, "hideable")
         const enableHiding = isRecord(column) ? column.enableHiding : undefined
         if (metaHideable === false) return false
-        if (enableHiding === false) return false
-        return true
+        return enableHiding !== false
       })
       .map((col) => getColumnId(col))
       .filter((id): id is string => Boolean(id))
@@ -115,13 +122,8 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
       .map((column) => {
         const id = getColumnId(column)
         if (!id) return null
-        const meta = getColumnMeta(column as ColumnDef<unknown>)
-        const metaResizable = getBooleanMeta(meta, "resizable")
-        const enableResizing = isRecord(column) ? column.enableResizing : undefined
-        const resizable = metaResizable !== false && enableResizing !== false
         return {
           id,
-          resizable,
           size: getNumberValue(isRecord(column) ? column.size : undefined),
           minSize: getNumberValue(isRecord(column) ? column.minSize : undefined),
           maxSize: getNumberValue(isRecord(column) ? column.maxSize : undefined),
@@ -179,6 +181,12 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
       metaPinnedLeft: metaPinned.left,
       metaPinnedRight: metaPinned.right,
     }),
+    columnIds: leafColumnIds,
+  })
+
+  const { runtime: columnOrderRuntime } = useColumnOrderFeature<TData, TFilterSchema>({
+    feature: args.features?.columnOrder,
+    columnIds: leafColumnIds,
   })
 
   const { runtime: expansionRuntime } = useExpansionFeature<TData, TFilterSchema>({
@@ -187,6 +195,14 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
 
   const { runtime: densityRuntime } = useDensityFeature<TData, TFilterSchema>({
     feature: args.features?.density,
+  })
+
+  const { runtime: virtualizationRuntime } = useVirtualizationFeature<TData, TFilterSchema>({
+    feature: args.features?.virtualization,
+  })
+
+  const { runtime: analyticsRuntime } = useAnalyticsFeature<TData, TFilterSchema>({
+    feature: args.features?.analytics,
   })
 
   const { dragSort, runtime: dragSortRuntime } = useDragSortFeature<TData, TFilterSchema>({
@@ -203,9 +219,12 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
         columnVisibilityRuntime,
         columnSizingRuntime,
         pinningRuntime,
+        columnOrderRuntime,
         expansionRuntime,
         treeRuntime,
         densityRuntime,
+        virtualizationRuntime,
+        analyticsRuntime,
         dragSortRuntime,
       ] as Array<DataTableFeatureRuntime<TData, TFilterSchema>>,
     [
@@ -213,9 +232,12 @@ export function useFeatureRuntimes<TData, TFilterSchema>(args: {
       columnVisibilityRuntime,
       columnSizingRuntime,
       pinningRuntime,
+      columnOrderRuntime,
       expansionRuntime,
       treeRuntime,
       densityRuntime,
+      virtualizationRuntime,
+      analyticsRuntime,
       dragSortRuntime,
     ],
   )

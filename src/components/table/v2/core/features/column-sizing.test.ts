@@ -82,4 +82,33 @@ describe("columnSizing feature", () => {
       expect(map.has(storageKey)).toBe(false)
     })
   })
+
+  it("storageKey 为空时会降级为非持久模式", async () => {
+    const { map, storage } = createMemoryStorage<{
+      schemaVersion: number
+      updatedAt: number
+      value: Record<string, number>
+    }>()
+
+    const { result } = renderHook(() =>
+      useColumnSizingFeature({
+        feature: { storageKey: "", storage, defaultSizing: { a: 180 } },
+        columns: [
+          { id: "a", size: 100, minSize: 50, maxSize: 200 },
+          { id: "b", size: 120, minSize: 80, maxSize: 160 },
+        ],
+      }),
+    )
+
+    const patch = result.current.runtime.patchTableOptions?.({})
+    expect(patch?.state?.columnSizing).toEqual({ a: 180, b: 120 })
+
+    act(() => {
+      patch?.onColumnSizingChange?.({ a: 150, b: 140 })
+    })
+
+    await waitFor(() => {
+      expect(map.size).toBe(0)
+    })
+  })
 })

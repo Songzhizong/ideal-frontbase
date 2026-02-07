@@ -78,4 +78,38 @@ describe("tree feature", () => {
     }
     expect(getSubRows?.(root)).toEqual([{ id: "a1" }])
   })
+
+  it("loadChildren 抛错时不会产生未处理异常，并会在 meta 暴露错误", async () => {
+    type RowData = { id: string }
+
+    const rows: RowData[] = [{ id: "a" }]
+    const loadChildren = vi.fn(async () => {
+      throw new Error("load failed")
+    })
+
+    const { result } = renderHook(() =>
+      useTreeFeature<RowData, Record<string, never>>({
+        feature: {
+          loadChildren,
+        },
+        getRowId: (row) => row.id,
+        rows,
+      }),
+    )
+
+    const patched = result.current.runtime.patchActions?.(createNoopActions())
+    act(() => {
+      patched?.expandRow?.("a")
+    })
+
+    await waitFor(() => {
+      expect(result.current.tree.loadingRowIds).not.toContain("a")
+    })
+
+    expect(loadChildren).toHaveBeenCalledTimes(1)
+    const options = result.current.runtime.patchTableOptions?.({})
+    const treeError = (options?.meta as { dtTreeLoadError?: unknown } | undefined)?.dtTreeLoadError
+    expect(treeError).toBeInstanceOf(Error)
+    expect((treeError as Error).message).toBe("load failed")
+  })
 })

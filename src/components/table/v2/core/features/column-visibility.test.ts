@@ -76,4 +76,34 @@ describe("columnVisibility feature", () => {
       expect(map.has(storageKey)).toBe(false)
     })
   })
+
+  it("storageKey 为空时会降级为非持久模式", async () => {
+    const { map, storage } = createMemoryStorage<{
+      schemaVersion: number
+      updatedAt: number
+      value: Record<string, boolean>
+    }>()
+
+    const { result } = renderHook(() =>
+      useColumnVisibilityFeature({
+        feature: {
+          storageKey: "",
+          storage,
+          defaultVisible: { a: false },
+        },
+        columnIds: ["a", "b"],
+      }),
+    )
+
+    const patch = result.current.runtime.patchTableOptions?.({})
+    expect(patch?.state?.columnVisibility).toEqual({ a: false, b: true })
+
+    act(() => {
+      patch?.onColumnVisibilityChange?.({ a: true, b: false })
+    })
+
+    await waitFor(() => {
+      expect(map.size).toBe(0)
+    })
+  })
 })

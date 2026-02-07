@@ -30,11 +30,22 @@ export interface DataTablePagination {
   total?: number
 }
 
+export type DataTableSelectionScope =
+  | {
+      type: "ids"
+      rowIds: string[]
+    }
+  | {
+      type: "all"
+      excludedRowIds: string[]
+    }
+
 export interface DataTableSelection<TData> {
   enabled: boolean
   mode: "page" | "cross-page"
   selectedRowIds: string[]
   selectedRowsCurrentPage: TData[]
+  selectionScope: DataTableSelectionScope
   crossPage?: {
     selection: CrossPageSelection
     totalSelected: number | "all"
@@ -88,6 +99,11 @@ export interface DataTableActions {
 
   resetColumnVisibility: () => void
   resetColumnSizing: () => void
+  setColumnPin: (columnId: string, pin: "left" | "right" | false) => void
+  resetColumnPinning: () => void
+  setColumnOrder: (columnOrder: string[]) => void
+  moveColumn: (columnId: string, direction: "left" | "right") => void
+  resetColumnOrder: () => void
   resetDensity: () => void
 
   expandRow: (rowId: string) => void
@@ -125,10 +141,16 @@ export interface DataTableInstance<TData, TFilterSchema> {
       columnVisibilityEnabled: boolean
       columnSizingEnabled: boolean
       pinningEnabled: boolean
+      columnOrderEnabled: boolean
+      virtualizationEnabled: boolean
+      analyticsEnabled: boolean
       expansionEnabled: boolean
       densityEnabled: boolean
       treeEnabled: boolean
       dragSortEnabled: boolean
+    }
+    state?: {
+      searchKey?: string
     }
     data?: {
       extraMeta?: Record<string, unknown>
@@ -162,6 +184,7 @@ export interface TableStateAdapter<TFilterSchema> {
   getSnapshot: () => TableStateSnapshot<TFilterSchema>
   setSnapshot: (next: TableStateSnapshot<TFilterSchema>, reason: TableStateChangeReason) => void
   subscribe: (listener: () => void) => () => void
+  searchKey?: string
 }
 
 export interface DataTableQuery<TFilterSchema> {
@@ -255,6 +278,27 @@ export interface PinningFeatureOptions {
   enabled?: boolean
   left?: string[]
   right?: string[]
+  storageKey?: string
+  schemaVersion?: number
+  migrate?: PreferenceMigration<{
+    left: string[]
+    right: string[]
+  }>
+  storage?: TablePreferenceStorage<
+    PreferenceEnvelope<{
+      left: string[]
+      right: string[]
+    }>
+  >
+}
+
+export interface ColumnOrderFeatureOptions {
+  enabled?: boolean
+  storageKey: string
+  defaultOrder?: string[]
+  schemaVersion?: number
+  migrate?: PreferenceMigration<string[]>
+  storage?: TablePreferenceStorage<PreferenceEnvelope<string[]>>
 }
 
 export interface ExpansionFeatureOptions<TData> {
@@ -281,7 +325,6 @@ export interface TreeFeatureOptions<TData> {
   selectionBehavior?: "independent" | "cascade"
   allowNesting?: boolean
   indentSize?: number
-  scrollOnExpand?: boolean
 }
 
 export interface DragSortFeatureOptions<TData> {
@@ -300,6 +343,12 @@ export interface DragSortFeatureOptions<TData> {
     targetParentId?: string | null
     targetIndex?: number
   }) => void | Promise<void>
+  onError?: (args: {
+    error: unknown
+    activeId: string
+    overId: string
+    dropPosition: "above" | "below" | "inside"
+  }) => void
   handle?: boolean
   canDrag?: (row: TData) => boolean
   canDrop?: (activeRow: TData, overRow: TData) => boolean
@@ -309,9 +358,22 @@ export interface DragSortFeatureOptions<TData> {
 
 export interface VirtualizationFeatureOptions {
   enabled?: boolean
-  mode: "windowed" | "infinite"
-  estimatedRowHeight: number
+  mode?: "windowed" | "infinite"
+  rowHeight?: number
   overscan?: number
+  loadMore?: () => void | Promise<void>
+  loadMoreOffset?: number
+}
+
+export interface AnalyticsFeatureOptions<TData> {
+  enabled?: boolean
+  groupBy?: (row: TData) => string
+  groupLabel?: (args: { group: string; count: number }) => string
+  summary?: {
+    label?: string
+    labelColumnId?: string
+    values: Record<string, (rows: TData[]) => ReactNode>
+  }
 }
 
 export interface DataTableFeatures<TData, TFilterSchema> {
@@ -319,11 +381,13 @@ export interface DataTableFeatures<TData, TFilterSchema> {
   columnVisibility?: ColumnVisibilityFeatureOptions
   columnSizing?: ColumnSizingFeatureOptions
   pinning?: PinningFeatureOptions
+  columnOrder?: ColumnOrderFeatureOptions
+  virtualization?: VirtualizationFeatureOptions
+  analytics?: AnalyticsFeatureOptions<TData>
   expansion?: ExpansionFeatureOptions<TData>
   density?: DensityFeatureOptions
   tree?: TreeFeatureOptions<TData>
   dragSort?: DragSortFeatureOptions<TData>
-  virtualization?: VirtualizationFeatureOptions
 }
 
 export interface DataTableColumnMeta extends ColumnMeta<unknown, unknown> {
@@ -332,11 +396,7 @@ export interface DataTableColumnMeta extends ColumnMeta<unknown, unknown> {
   align?: "left" | "center" | "right"
   headerAlign?: "left" | "center" | "right"
   cellAlign?: "left" | "center" | "right"
-  sortable?: boolean
-  filterable?: boolean
-  filterKey?: string
   hideable?: boolean
-  resizable?: boolean
   pinned?: "left" | "right" | false
   headerLabel?: string
 }
@@ -397,6 +457,7 @@ export interface UrlStateOptions<TParsers extends ParserMap | undefined> {
     history?: "push" | "replace"
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
+    searchKey?: string
     middleware?: UrlStateMiddleware<InferParserValues<TParsers>>
   }
 }

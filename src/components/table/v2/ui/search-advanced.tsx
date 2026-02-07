@@ -55,6 +55,11 @@ export function DataTableAdvancedSearch<TFilterSchema>({
     requestInputFocus: () => {
       inputRef.current?.focus()
     },
+    placeholderTexts: {
+      defaultText: i18n.advancedSearch.defaultPlaceholder,
+      textField: i18n.advancedSearch.textFieldPlaceholder,
+      optionField: i18n.advancedSearch.optionFieldPlaceholder,
+    },
   })
 
   const activeFieldValue = state.activeField ? dt.filters.state[state.activeField.key] : undefined
@@ -85,6 +90,7 @@ export function DataTableAdvancedSearch<TFilterSchema>({
               activeField={state.activeField}
               searchableFields={state.searchableFields}
               onSelectField={state.onSelectField}
+              i18n={{ advancedSearch: i18n.advancedSearch }}
             />
             <span className="mx-2 h-4 w-px shrink-0 bg-border/70" />
             {isDateField ? (
@@ -154,6 +160,7 @@ export function DataTableAdvancedSearch<TFilterSchema>({
           onNumberRangeChange={state.onNumberRangeChange}
           onCancelRange={state.onCancelRange}
           onConfirmRange={state.onConfirmRange}
+          i18n={{ advancedSearch: i18n.advancedSearch, filters: i18n.filters }}
         />
       </PopoverContent>
     </Popover>

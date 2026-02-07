@@ -36,4 +36,40 @@ describe("useDataTable", () => {
 
     expect(result.current.table.getState().columnPinning.right).toContain("__actions__")
   })
+
+  it("当 dataResult 存在但当前页 rows 为空时，错误应归类为 nonBlocking", () => {
+    type Row = { id: string }
+    type Filters = { q: string | null }
+
+    const { result } = renderHook(() => {
+      const state = stateInternal<Filters>({
+        initial: { page: 1, size: 10, sort: [], filters: { q: null } },
+      })
+      const dataSource = {
+        use: () => ({
+          data: { rows: [], pageCount: 1, total: 10 },
+          isInitialLoading: false,
+          isFetching: false,
+          error: new Error("partial error"),
+        }),
+      }
+      const helper = createColumnHelper<Row>()
+      const columns = [
+        helper.accessor("id", {
+          header: "ID",
+          cell: (ctx) => ctx.getValue(),
+        }),
+      ]
+
+      return useDataTable<Row, Filters>({
+        columns,
+        dataSource,
+        state,
+        getRowId: (row) => row.id,
+      })
+    })
+
+    expect(result.current.errors?.nonBlocking).toBeDefined()
+    expect(result.current.errors?.blocking).toBeUndefined()
+  })
 })

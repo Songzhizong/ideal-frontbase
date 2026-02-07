@@ -95,6 +95,7 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
 
   const [childrenById, setChildrenById] = useState<Record<string, TData[]>>({})
   const [loadingRowIds, setLoadingRowIds] = useState<Set<string>>(() => new Set())
+  const [loadChildrenError, setLoadChildrenError] = useState<unknown | null>(null)
   const [expanded, setExpanded] = useState<ExpandedState>(() => ({}))
   const expandedRef = useRef(expanded)
   expandedRef.current = expanded
@@ -161,6 +162,7 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
 
     setLoadingRowIds((prev) => new Set(prev).add(rowId))
     try {
+      setLoadChildrenError(null)
       const children = await args.feature.loadChildren(row)
       setChildrenById((prev) => ({ ...prev, [rowId]: children }))
       if (children.length === 0) {
@@ -172,6 +174,8 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
           return next
         })
       }
+    } catch (error) {
+      setLoadChildrenError(error)
     } finally {
       setLoadingRowIds((prev) => {
         const next = new Set(prev)
@@ -275,6 +279,7 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
         meta: {
           dtTreeIndentSize: indentSize,
           dtTreeAllowNesting: allowNesting,
+          dtTreeLoadError: loadChildrenError,
         },
         state: {
           expanded,
@@ -298,6 +303,7 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
       collapseAll()
       setChildrenById({})
       setLoadingRowIds(new Set())
+      setLoadChildrenError(null)
     },
   })
 

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import type { DataTableI18n } from "../config"
 import { useDataTableConfig } from "../config"
 import type { AdvancedOptionEntry, AdvancedSearchField } from "./types"
 import { areValuesEqual } from "./utils"
@@ -26,6 +27,7 @@ export interface DataTableAdvancedValueEditorProps<TFilterSchema> {
   onNumberRangeChange: (nextRange: { min: string; max: string }) => void
   onCancelRange: () => void
   onConfirmRange: () => void
+  i18n?: Pick<DataTableI18n, "advancedSearch" | "filters">
 }
 
 export function DataTableAdvancedValueEditor<TFilterSchema>({
@@ -43,8 +45,10 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
   onNumberRangeChange,
   onCancelRange,
   onConfirmRange,
+  i18n: i18nOverrides,
 }: DataTableAdvancedValueEditorProps<TFilterSchema>) {
-  const { i18n } = useDataTableConfig()
+  const { i18n: globalI18n } = useDataTableConfig()
+  const i18n = i18nOverrides ?? globalI18n
   const numberRangeMinInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -63,10 +67,14 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
   if (activeField.type === "boolean") {
     return (
       <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">选择{activeField.label}</p>
+        <p className="text-xs text-muted-foreground">
+          {i18n.advancedSearch.chooseField(activeField.label)}
+        </p>
         <div className="max-h-64 space-y-1 overflow-y-auto">
           {filteredOptionEntries.length === 0 ? (
-            <p className="py-5 text-center text-sm text-muted-foreground">暂无匹配选项</p>
+            <p className="py-5 text-center text-sm text-muted-foreground">
+              {i18n.advancedSearch.noMatchingOptionsText}
+            </p>
           ) : (
             filteredOptionEntries.map((entry, index) => {
               const checked = areValuesEqual(fieldValue, entry.option.value)
@@ -97,7 +105,9 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
   if (activeField.type === "number-range") {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">输入{activeField.label}</p>
+        <p className="text-xs text-muted-foreground">
+          {i18n.advancedSearch.inputField(activeField.label)}
+        </p>
         <div className="flex items-center gap-2">
           <Input
             ref={numberRangeMinInputRef}
@@ -128,10 +138,10 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
         </div>
         <div className="flex justify-end gap-2 border-t border-border/50 pt-2">
           <Button type="button" variant="ghost" size="sm" onClick={onCancelRange}>
-            取消
+            {i18n.advancedSearch.cancelText}
           </Button>
           <Button type="button" size="sm" onClick={onConfirmRange}>
-            确认
+            {i18n.advancedSearch.confirmText}
           </Button>
         </div>
       </div>
@@ -141,10 +151,14 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
   if (activeField.type === "select") {
     return (
       <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">选择{activeField.label}</p>
+        <p className="text-xs text-muted-foreground">
+          {i18n.advancedSearch.chooseField(activeField.label)}
+        </p>
         <div className="max-h-64 space-y-1 overflow-y-auto">
           {filteredOptionEntries.length === 0 ? (
-            <p className="py-5 text-center text-sm text-muted-foreground">暂无匹配选项</p>
+            <p className="py-5 text-center text-sm text-muted-foreground">
+              {i18n.advancedSearch.noMatchingOptionsText}
+            </p>
           ) : (
             filteredOptionEntries.map((entry, index) => {
               const checked = areValuesEqual(fieldValue, entry.option.value)
@@ -174,10 +188,14 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-muted-foreground">选择{activeField.label}</p>
+      <p className="text-xs text-muted-foreground">
+        {i18n.advancedSearch.chooseField(activeField.label)}
+      </p>
       <div className="max-h-64 space-y-1 overflow-y-auto">
         {filteredOptionEntries.length === 0 ? (
-          <p className="py-5 text-center text-sm text-muted-foreground">暂无匹配选项</p>
+          <p className="py-5 text-center text-sm text-muted-foreground">
+            {i18n.advancedSearch.noMatchingOptionsText}
+          </p>
         ) : (
           filteredOptionEntries.map((entry, index) => {
             const checked = pendingMultiValues.some((value) =>
@@ -204,10 +222,10 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
       </div>
       <div className="flex justify-end gap-2 border-t border-border/50 pt-2">
         <Button type="button" variant="ghost" size="sm" onClick={onCancelMulti}>
-          取消
+          {i18n.advancedSearch.cancelText}
         </Button>
         <Button type="button" size="sm" onClick={onConfirmMulti}>
-          确认
+          {i18n.advancedSearch.confirmText}
         </Button>
       </div>
     </div>

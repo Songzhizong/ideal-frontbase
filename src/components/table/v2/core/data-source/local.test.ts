@@ -59,5 +59,6 @@ describe("local dataSource", () => {
     })
 
     expect(state.data?.total).toBe(100)
+    expect(state.data?.pageCount).toBe(10)
   })
 })

@@ -74,6 +74,8 @@ export function DataTableViewOptions({
   const density = getDensity(dt.table.options.meta)
   const setDensity = getSetDensity(dt.table.options.meta)
   const hasDensity = Boolean(density && setDensity)
+  const hasPinning = dt.meta.feature.pinningEnabled
+  const hasColumnOrder = dt.meta.feature.columnOrderEnabled
 
   const handleToggleAll = (checked: boolean) => {
     if (!hasColumns) return
@@ -171,7 +173,20 @@ export function DataTableViewOptions({
 
         {showResetAll ? (
           <>
-            {hasColumns || hasDensity ? <DropdownMenuSeparator /> : null}
+            {hasColumns || hasDensity || hasPinning || hasColumnOrder ? (
+              <DropdownMenuSeparator />
+            ) : null}
+            {hasPinning ? (
+              <DropdownMenuItem onSelect={() => dt.actions.resetColumnPinning()}>
+                {i18n.columnArrangement.resetPinningText}
+              </DropdownMenuItem>
+            ) : null}
+            {hasColumnOrder ? (
+              <DropdownMenuItem onSelect={() => dt.actions.resetColumnOrder()}>
+                {i18n.columnArrangement.resetOrderText}
+              </DropdownMenuItem>
+            ) : null}
+            {hasPinning || hasColumnOrder ? <DropdownMenuSeparator /> : null}
             <DropdownMenuItem onSelect={() => dt.actions.resetAll()}>
               <RotateCcw className="h-4 w-4" />
               {i18n.viewOptions.resetAllText}

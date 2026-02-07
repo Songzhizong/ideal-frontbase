@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from "react"
-import {
-  applyPreferenceMigrations,
-  usePreference,
-  useStableCallback,
-  useStableObject,
-} from "@/components/table/v2"
 import type {
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
   DensityFeatureOptions,
 } from "../types"
+import { applyPreferenceMigrations } from "../utils/preference-storage"
+import { useStableCallback, useStableObject } from "../utils/reference-stability"
+import { usePreference } from "../utils/use-preference"
 
 type DensityValue = "compact" | "comfortable"
 
@@ -30,6 +27,7 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
 } {
   const enabled = isFeatureEnabled(args.feature)
   const storageKey = args.feature?.storageKey ?? ""
+  const persistenceEnabled = enabled && storageKey.trim() !== ""
   const schemaVersion = args.feature?.schemaVersion ?? 1
   const defaultDensity: DensityValue = args.feature?.default ?? "compact"
 
@@ -40,7 +38,7 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
     persist,
     remove: removeStorage,
   } = usePreference({
-    enabled,
+    enabled: persistenceEnabled,
     storageKey,
     schemaVersion,
     storage: args.feature?.storage,
@@ -49,6 +47,7 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
 
   const mergedDensity = useMemo<DensityValue>(() => {
     if (!enabled) return defaultDensity
+    if (!persistenceEnabled) return defaultDensity
     const migratedEnvelope = envelope
       ? applyPreferenceMigrations({
           envelope,
@@ -58,7 +57,7 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
         })
       : null
     return migratedEnvelope?.value ?? envelope?.value ?? defaultDensity
-  }, [enabled, envelope, schemaVersion, args.feature?.migrate, defaultDensity])
+  }, [enabled, persistenceEnabled, envelope, schemaVersion, args.feature?.migrate, defaultDensity])
 
   const [density, setDensity] = useState<DensityValue>(() => mergedDensity)
 
@@ -70,12 +69,14 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
   const setDensityPreference = useStableCallback((nextDensity: DensityValue) => {
     if (!enabled) return
     setDensity(nextDensity)
+    if (!persistenceEnabled) return
     void persist(nextDensity)
   })
 
   const resetDensity = useStableCallback(() => {
     if (!enabled) return
     setDensityPreference(defaultDensity)
+    if (!persistenceEnabled) return
     void removeStorage().then(() => {
       if (!storage?.remove) {
         void persist(defaultDensity)

@@ -1,19 +1,14 @@
 import type { ColumnSizingState, OnChangeFn } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
-import {
-  applyPreferenceMigrations,
-  mergeRecordPreference,
-  shallowEqual,
-  usePreference,
-  useStableCallback,
-  useStableObject,
-} from "@/components/table/v2"
 import type {
   ColumnSizingFeatureOptions,
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
 } from "../types"
+import { applyPreferenceMigrations, mergeRecordPreference } from "../utils/preference-storage"
+import { shallowEqual, useStableCallback, useStableObject } from "../utils/reference-stability"
+import { usePreference } from "../utils/use-preference"
 
 function isFeatureEnabled(feature?: { enabled?: boolean }): boolean {
   if (!feature) return false
@@ -48,6 +43,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
 } {
   const enabled = isFeatureEnabled(args.feature)
   const storageKey = args.feature?.storageKey ?? ""
+  const persistenceEnabled = enabled && storageKey.trim() !== ""
   const schemaVersion = args.feature?.schemaVersion ?? 1
   const columnIds = useMemo(() => args.columns.map((column) => column.id), [args.columns])
 
@@ -88,7 +84,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
     persist: persistEnvelope,
     remove: removeStorage,
   } = usePreference({
-    enabled,
+    enabled: persistenceEnabled,
     storageKey,
     schemaVersion,
     storage: args.feature?.storage,
@@ -97,6 +93,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
 
   const mergedSizing = useMemo<ColumnSizingState>(() => {
     if (!enabled) return {}
+    if (!persistenceEnabled) return defaults
     const migratedEnvelope = envelope
       ? applyPreferenceMigrations({
           envelope,
@@ -124,7 +121,16 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
         return numeric
       },
     })
-  }, [enabled, envelope, schemaVersion, columnIds, args.feature?.migrate, defaults, constraints])
+  }, [
+    enabled,
+    persistenceEnabled,
+    envelope,
+    schemaVersion,
+    columnIds,
+    args.feature?.migrate,
+    defaults,
+    constraints,
+  ])
 
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>(() => mergedSizing)
 
@@ -138,7 +144,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
   }, [enabled, mergedSizing])
 
   const persist = useStableCallback(async (nextSizing: ColumnSizingState) => {
-    if (!enabled) return
+    if (!persistenceEnabled) return
     const merged = mergeRecordPreference({
       stored: nextSizing,
       defaults,
@@ -173,6 +179,7 @@ export function useColumnSizingFeature<TData, TFilterSchema>(args: {
   const resetColumnSizing = useStableCallback(() => {
     if (!enabled) return
     setColumnSizing(defaults)
+    if (!persistenceEnabled) return
     void removeStorage().then(() => {
       if (!storage?.remove) {
         void persist(defaults)

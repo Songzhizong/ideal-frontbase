@@ -63,9 +63,9 @@ function getFirstString(value: string | string[] | undefined): string | undefine
   return value
 }
 
-function getSearchValue<TFilterSchema>(filters: TFilterSchema): unknown {
+function getSearchValue<TFilterSchema>(filters: TFilterSchema, key: string): unknown {
   if (!isRecord(filters)) return undefined
-  return filters.q
+  return filters[key]
 }
 
 function parseSort(value: string | null | undefined): TableSort[] {
@@ -94,6 +94,7 @@ function applyFilterBehavior<TFilterSchema>(
     history?: "push" | "replace"
     resetPageOnFilterChange?: boolean
     resetPageOnSearchChange?: boolean
+    searchKey?: string
     middleware?: (args: {
       prev: TableStateSnapshot<TFilterSchema>
       next: TableStateSnapshot<TFilterSchema>
@@ -105,8 +106,9 @@ function applyFilterBehavior<TFilterSchema>(
   if (resetOnFilter) return { ...next, page: 1 }
   const resetOnSearch = options?.resetPageOnSearchChange ?? false
   if (!resetOnSearch) return next
-  const prevSearch = getSearchValue(prev.filters)
-  const nextSearch = getSearchValue(next.filters)
+  const searchKey = options?.searchKey ?? "q"
+  const prevSearch = getSearchValue(prev.filters, searchKey)
+  const nextSearch = getSearchValue(next.filters, searchKey)
   if (Object.is(prevSearch, nextSearch)) return next
   return { ...next, page: 1 }
 }
@@ -216,6 +218,7 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
   keyRef.current = options.key
   const locationRef = useRef(location)
   locationRef.current = location
+  const resolvedSearchKey = options.behavior?.searchKey ?? "q"
 
   const lastSnapshotRef = useRef<TableStateSnapshot<InferParserValues<TParsers>> | undefined>(
     undefined,
@@ -340,7 +343,8 @@ export function stateUrl<TParsers extends ParserMap | undefined>(
       getSnapshot,
       setSnapshot,
       subscribe,
+      searchKey: resolvedSearchKey,
     }),
-    [getSnapshot, setSnapshot, subscribe],
+    [getSnapshot, setSnapshot, subscribe, resolvedSearchKey],
   )
 }

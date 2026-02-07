@@ -35,6 +35,11 @@ describe("selection feature", () => {
       expect(result.current.selection.crossPage?.selection.mode).toBe("exclude")
       expect(result.current.selection.crossPage?.isAllSelected).toBe(true)
       expect(result.current.selection.crossPage?.totalSelected).toBe(5)
+      expect(result.current.selection.selectedRowIds).toEqual([])
+      expect(result.current.selection.selectionScope).toEqual({
+        type: "all",
+        excludedRowIds: [],
+      })
     })
   })
 
@@ -67,6 +72,10 @@ describe("selection feature", () => {
     await waitFor(() => {
       expect(result.current.selection.crossPage?.selection.mode).toBe("include")
       expect(result.current.selection.crossPage?.isAllSelected).toBe(false)
+      expect(result.current.selection.selectionScope).toEqual({
+        type: "ids",
+        rowIds: [],
+      })
     })
   })
 
@@ -106,6 +115,10 @@ describe("selection feature", () => {
       expect(fetchAllIds).toHaveBeenCalledTimes(1)
       expect(result.current.selection.crossPage?.selection.mode).toBe("include")
       expect(result.current.selection.selectedRowIds.sort()).toEqual(["a", "b"])
+      expect(result.current.selection.selectionScope).toEqual({
+        type: "ids",
+        rowIds: ["a", "b"],
+      })
     })
   })
 
@@ -146,6 +159,10 @@ describe("selection feature", () => {
 
     await waitFor(() => {
       expect(result.current.selection.selectedRowIds).toContain("a")
+      expect(result.current.selection.selectionScope).toEqual({
+        type: "ids",
+        rowIds: ["a"],
+      })
     })
 
     rerender({

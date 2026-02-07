@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useMemo, useRef, useState } from "react"
+import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react"
 import type { UseAdvancedSearchStateParams, UseAdvancedSearchStateResult } from "./state-types"
 import type { AdvancedOptionEntry, AdvancedSearchField } from "./types"
 import { isAdvancedSearchField } from "./types"
@@ -13,6 +13,20 @@ import {
   serializeOptionValue,
 } from "./utils"
 
+function toSearchInputText(value: unknown): string {
+  if (value == null) return ""
+  if (typeof value === "string") return value
+  if (typeof value === "number" || typeof value === "boolean") return String(value)
+  if (value instanceof Date) return value.toISOString()
+  return ""
+}
+
+function getClearedSearchValue(value: unknown): unknown {
+  if (typeof value === "string") return ""
+  if (Array.isArray(value)) return []
+  return null
+}
+
 export function useAdvancedSearchState<TFilterSchema>({
   filterKey,
   placeholder,
@@ -21,8 +35,11 @@ export function useAdvancedSearchState<TFilterSchema>({
   filtersState,
   setFilter,
   requestInputFocus,
+  placeholderTexts,
 }: UseAdvancedSearchStateParams<TFilterSchema>): UseAdvancedSearchStateResult<TFilterSchema> {
-  const [draftValue, setDraftValue] = useState("")
+  const searchFilterValue = filtersState[filterKey]
+  const searchFilterTextValue = toSearchInputText(searchFilterValue)
+  const [draftValue, setDraftValue] = useState(searchFilterTextValue)
   const [fieldPickerOpen, setFieldPickerOpen] = useState(false)
   const [valuePickerOpen, setValuePickerOpen] = useState(false)
   const [activeFieldKey, setActiveFieldKey] = useState<string | null>(null)
@@ -35,6 +52,13 @@ export function useAdvancedSearchState<TFilterSchema>({
   const [pendingDateRange, setPendingDateRange] = useState<DateRangeValue | undefined>(undefined)
   const [activeOptionIndex, setActiveOptionIndex] = useState(0)
   const isOpeningValuePickerRef = useRef(false)
+  const lastSearchFilterTextRef = useRef(searchFilterTextValue)
+
+  useEffect(() => {
+    if (lastSearchFilterTextRef.current === searchFilterTextValue) return
+    lastSearchFilterTextRef.current = searchFilterTextValue
+    setDraftValue(searchFilterTextValue)
+  }, [searchFilterTextValue])
 
   const searchableFields = useMemo(
     () => advancedFields.filter((field) => isAdvancedSearchField(field)),
@@ -82,7 +106,7 @@ export function useAdvancedSearchState<TFilterSchema>({
   }, [optionEntries, optionKeyword])
 
   const resetAdvancedDraft = () => {
-    setDraftValue("")
+    setDraftValue(searchFilterTextValue)
     setOptionKeyword("")
     setPendingMultiValues([])
     setPendingNumberRange({ min: "", max: "" })
@@ -281,6 +305,10 @@ export function useAdvancedSearchState<TFilterSchema>({
     }
     setDraftValue("")
     setOptionKeyword("")
+    setFilter(
+      filterKey,
+      getClearedSearchValue(searchFilterValue) as TFilterSchema[typeof filterKey],
+    )
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -367,9 +395,9 @@ export function useAdvancedSearchState<TFilterSchema>({
     activeField && activeField.type !== "text" ? optionKeyword : draftValue
   const resolvedPlaceholder = activeField
     ? activeField.type === "text"
-      ? `输入${activeField.label}`
-      : `选择${activeField.label}`
-    : (placeholder ?? "输入关键字后按回车添加")
+      ? placeholderTexts.textField(activeField.label)
+      : placeholderTexts.optionField(activeField.label)
+    : (placeholder ?? placeholderTexts.defaultText)
   const canClear =
     activeField !== null || advancedDisplayValue.trim() !== "" || pendingMultiValues.length > 0
   const normalizedOptionIndex =

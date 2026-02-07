@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import type { DataTableI18n } from "../config"
+import { useDataTableConfig } from "../config"
 import type { AdvancedSearchField } from "./types"
 import { getFieldTypeLabel } from "./utils"
 
@@ -19,6 +21,7 @@ export interface DataTableAdvancedFieldPickerProps<TFilterSchema> {
   activeField: AdvancedSearchField<TFilterSchema> | null
   searchableFields: Array<AdvancedSearchField<TFilterSchema>>
   onSelectField: (field: AdvancedSearchField<TFilterSchema>) => void
+  i18n?: Pick<DataTableI18n, "advancedSearch">
 }
 
 export function DataTableAdvancedFieldPicker<TFilterSchema>({
@@ -27,7 +30,10 @@ export function DataTableAdvancedFieldPicker<TFilterSchema>({
   activeField,
   searchableFields,
   onSelectField,
+  i18n: i18nOverrides,
 }: DataTableAdvancedFieldPickerProps<TFilterSchema>) {
+  const { i18n: globalI18n } = useDataTableConfig()
+  const i18n = i18nOverrides ?? globalI18n
   const fieldButtonClassName = cn(
     "h-7 shrink-0 gap-1 px-2 text-xs font-medium transition-colors",
     activeField
@@ -43,24 +49,26 @@ export function DataTableAdvancedFieldPicker<TFilterSchema>({
     <Popover open={fieldPickerOpen} onOpenChange={onFieldPickerOpenChange}>
       <PopoverTrigger asChild>
         <Button type="button" variant="ghost" size="sm" className={fieldButtonClassName}>
-          <span className="max-w-24 truncate">{activeField?.label ?? "筛选字段"}</span>
+          <span className="max-w-24 truncate">
+            {activeField?.label ?? i18n.advancedSearch.fieldTriggerText}
+          </span>
           <ChevronDown className={fieldChevronClassName} />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-72 p-0">
         <Command>
           <CommandInput
-            placeholder="搜索筛选字段"
+            placeholder={i18n.advancedSearch.fieldSearchPlaceholder}
             className="border-0 shadow-none focus-visible:ring-0 focus-visible:outline-none"
           />
           <CommandList>
-            <CommandEmpty>暂无匹配字段</CommandEmpty>
-            <CommandGroup heading="可用字段">
+            <CommandEmpty>{i18n.advancedSearch.fieldEmptyText}</CommandEmpty>
+            <CommandGroup heading={i18n.advancedSearch.fieldGroupLabel}>
               {searchableFields.map((field) => (
                 <CommandItem key={String(field.key)} onSelect={() => onSelectField(field)}>
                   <span className="truncate">{field.label}</span>
                   <span className="ml-auto text-xs text-muted-foreground">
-                    {getFieldTypeLabel(field.type)}
+                    {getFieldTypeLabel(field.type, i18n.advancedSearch)}
                   </span>
                 </CommandItem>
               ))}

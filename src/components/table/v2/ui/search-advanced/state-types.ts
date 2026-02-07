@@ -19,6 +19,11 @@ export interface UseAdvancedSearchStateParams<TFilterSchema> {
   filtersState: TFilterSchema
   setFilter: SetFilterValue<TFilterSchema>
   requestInputFocus: () => void
+  placeholderTexts: {
+    defaultText: string
+    textField: (label: string) => string
+    optionField: (label: string) => string
+  }
 }
 
 export interface UseAdvancedSearchStateResult<TFilterSchema> {

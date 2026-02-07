@@ -1,19 +1,14 @@
 import type { OnChangeFn, VisibilityState } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
-import {
-  applyPreferenceMigrations,
-  mergeRecordPreference,
-  shallowEqual,
-  usePreference,
-  useStableCallback,
-  useStableObject,
-} from "@/components/table/v2"
 import type {
   ColumnVisibilityFeatureOptions,
   DataTableActions,
   DataTableActivity,
   DataTableFeatureRuntime,
 } from "../types"
+import { applyPreferenceMigrations, mergeRecordPreference } from "../utils/preference-storage"
+import { shallowEqual, useStableCallback, useStableObject } from "../utils/reference-stability"
+import { usePreference } from "../utils/use-preference"
 
 function isFeatureEnabled(feature?: { enabled?: boolean }): boolean {
   if (!feature) return false
@@ -42,6 +37,7 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
 } {
   const enabled = isFeatureEnabled(args.feature)
   const storageKey = args.feature?.storageKey ?? ""
+  const persistenceEnabled = enabled && storageKey.trim() !== ""
   const schemaVersion = args.feature?.schemaVersion ?? 1
 
   const defaults = useMemo<Record<string, boolean>>(() => {
@@ -60,7 +56,7 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
     persist: persistEnvelope,
     remove: removeStorage,
   } = usePreference({
-    enabled,
+    enabled: persistenceEnabled,
     storageKey,
     schemaVersion,
     storage: args.feature?.storage,
@@ -69,6 +65,7 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
 
   const mergedVisibility = useMemo<VisibilityState>(() => {
     if (!enabled) return {}
+    if (!persistenceEnabled) return defaults
     const stored = envelope?.value ?? null
     const migratedEnvelope = envelope
       ? applyPreferenceMigrations({
@@ -83,7 +80,15 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
       defaults,
       ctx: { columnIds: args.columnIds },
     })
-  }, [enabled, envelope, schemaVersion, args.columnIds, args.feature?.migrate, defaults])
+  }, [
+    enabled,
+    persistenceEnabled,
+    envelope,
+    schemaVersion,
+    args.columnIds,
+    args.feature?.migrate,
+    defaults,
+  ])
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => mergedVisibility)
 
@@ -97,7 +102,7 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
   }, [enabled, mergedVisibility])
 
   const persist = useStableCallback(async (nextVisibility: VisibilityState) => {
-    if (!enabled) return
+    if (!persistenceEnabled) return
     const merged = mergeRecordPreference({
       stored: nextVisibility,
       defaults,
@@ -118,6 +123,7 @@ export function useColumnVisibilityFeature<TData, TFilterSchema>(args: {
   const resetColumnVisibility = useStableCallback(() => {
     if (!enabled) return
     setColumnVisibility(defaults)
+    if (!persistenceEnabled) return
     void removeStorage().then(() => {
       if (!storage?.remove) {
         void persistEnvelope(defaults)

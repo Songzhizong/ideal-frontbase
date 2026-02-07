@@ -1,18 +1,6 @@
-import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-  type DragOverEvent,
-  DragOverlay,
-  type DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core"
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { flexRender, type Row } from "@tanstack/react-table"
-import { AlertCircle } from "lucide-react"
-import type { CSSProperties, ReactElement, ReactNode } from "react"
+import { AlertCircle, X } from "lucide-react"
+import type { ReactElement, ReactNode } from "react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -20,6 +8,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -27,131 +16,19 @@ import {
 import { cn } from "@/lib/utils"
 import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance, useDataTableLayout } from "./context"
-import { DataTableDragSortRowProvider } from "./drag-handle"
-import { DataTableDropIndicator } from "./drop-indicator"
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function getMetaClass(meta: unknown, key: "headerClassName" | "cellClassName"): string | undefined {
-  if (!isRecord(meta)) return undefined
-  const value = meta[key]
-  return typeof value === "string" && value.trim() !== "" ? value : undefined
-}
-
-function normalizeAlign(value: unknown): "left" | "center" | "right" | undefined {
-  if (value === "left" || value === "center" || value === "right") {
-    return value
-  }
-  return undefined
-}
-
-function getMetaAlign(meta: unknown, target: "header" | "cell"): "left" | "center" | "right" {
-  if (!isRecord(meta)) return "left"
-  const specificKey = target === "header" ? "headerAlign" : "cellAlign"
-  const specificAlign = normalizeAlign(meta[specificKey])
-  if (specificAlign) return specificAlign
-  return normalizeAlign(meta.align) ?? "left"
-}
-
-function getDensity(meta: unknown): "compact" | "comfortable" {
-  if (!isRecord(meta)) return "compact"
-  return meta.dtDensity === "comfortable" ? "comfortable" : "compact"
-}
-
-function getTreeIndentSize(meta: unknown): number {
-  if (!isRecord(meta)) return 24
-  const value = meta.dtTreeIndentSize
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 24
-}
-
-function getTreeAllowNesting(meta: unknown): boolean {
-  if (!isRecord(meta)) return false
-  return meta.dtTreeAllowNesting === true
-}
-
-function getParentRowId<TData>(row: Row<TData>): string | null {
-  const parent = row.getParentRow()
-  return parent ? parent.id : null
-}
-
-function isDescendantRow<TData>(row: Row<TData>, ancestorId: string): boolean {
-  let current = row.getParentRow()
-  while (current) {
-    if (current.id === ancestorId) return true
-    current = current.getParentRow()
-  }
-  return false
-}
-
-type DragSortOverlayMode = "row" | "ghost" | "minimal"
-type DragSortDropPosition = "above" | "below" | "inside"
-
-function getDragSortMeta(meta: unknown): {
-  handle: boolean
-  overlay: DragSortOverlayMode
-  allowNesting: boolean
-  canDrag: ((row: unknown) => boolean) | null
-  canDrop: ((activeRow: unknown, overRow: unknown) => boolean) | null
-  onDragStart: ((rowId: string) => void) | null
-  onDragEnd:
-    | ((args: {
-        activeId: string
-        overId: string | null
-        position?: DragSortDropPosition
-      }) => void | Promise<void>)
-    | null
-  onDragCancel: (() => void) | null
-} {
-  if (!isRecord(meta)) {
-    return {
-      handle: true,
-      overlay: "row",
-      allowNesting: false,
-      canDrag: null,
-      canDrop: null,
-      onDragStart: null,
-      onDragEnd: null,
-      onDragCancel: null,
-    }
-  }
-  const handleValue = meta.dtDragSortHandle
-  const overlayValue = meta.dtDragSortOverlay
-  const allowNestingValue = meta.dtDragSortAllowNesting
-  const canDragValue = meta.dtDragSortCanDrag
-  const canDropValue = meta.dtDragSortCanDrop
-  const onDragStartValue = meta.dtDragSortOnDragStart
-  const onDragEndValue = meta.dtDragSortOnDragEnd
-  const onDragCancelValue = meta.dtDragSortOnDragCancel
-
-  return {
-    handle: typeof handleValue === "boolean" ? handleValue : true,
-    overlay:
-      overlayValue === "ghost" || overlayValue === "minimal" || overlayValue === "row"
-        ? overlayValue
-        : "row",
-    allowNesting: typeof allowNestingValue === "boolean" ? allowNestingValue : false,
-    canDrag:
-      typeof canDragValue === "function" ? (canDragValue as (row: unknown) => boolean) : null,
-    canDrop:
-      typeof canDropValue === "function"
-        ? (canDropValue as (activeRow: unknown, overRow: unknown) => boolean)
-        : null,
-    onDragStart:
-      typeof onDragStartValue === "function" ? (onDragStartValue as (rowId: string) => void) : null,
-    onDragEnd:
-      typeof onDragEndValue === "function"
-        ? (onDragEndValue as (args: {
-            activeId: string
-            overId: string | null
-            position?: DragSortDropPosition
-          }) => void | Promise<void>)
-        : null,
-    onDragCancel:
-      typeof onDragCancelValue === "function" ? (onDragCancelValue as () => void) : null,
-  }
-}
+import { DataTableDragSortBody } from "./table/drag-sort-body"
+import {
+  getAnalyticsMeta,
+  getDensity,
+  getDragSortMeta,
+  getErrorMessage,
+  getMetaAlign,
+  getMetaClass,
+  getTreeAllowNesting,
+  getTreeIndentSize,
+  getVirtualizationMeta,
+} from "./table/helpers"
+import { useTableBodyRows } from "./table/use-table-body"
 
 export interface DataTableTableProps<TData> {
   className?: string
@@ -219,6 +96,7 @@ export function DataTableTable<TData>({
   const lastLeftPinnedId = leftPinned[leftPinned.length - 1]?.id
   const firstRightPinnedId = rightPinned[0]?.id
 
+  const rowModel = dt.table.getRowModel()
   const columnCount = dt.table.getVisibleLeafColumns().length
   const colSpan = Math.max(1, columnCount)
   const isInitialLoading = dt.activity.isInitialLoading || !dt.activity.preferencesReady
@@ -230,20 +108,19 @@ export function DataTableTable<TData>({
   )
 
   const rowClassName = "border-border/50"
-
   const dragSortEnabled = dt.dragSort.enabled
-  const dragSortMeta = useMemo(
-    () => getDragSortMeta(dt.table.options.meta),
-    [dt.table.options.meta],
-  )
+  const dragSortMeta = useMemo(() => getDragSortMeta(tableMeta), [tableMeta])
   const allowNestingEnabled = dragSortMeta.allowNesting && dt.tree.enabled && treeAllowNesting
-  const rowModel = dt.table.getRowModel()
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
-  const [dragOver, setDragOver] = useState<{
-    overId: string | null
-    position: DragSortDropPosition
-  } | null>(null)
-  const sortableRowIds = rowModel.rows.map((row) => row.id)
+  const virtualizationMeta = useMemo(() => getVirtualizationMeta(tableMeta), [tableMeta])
+  const analyticsMeta = useMemo(() => getAnalyticsMeta<TData>(tableMeta), [tableMeta])
+
+  const canVirtualize =
+    virtualizationMeta.enabled &&
+    scrollContainer === "root" &&
+    !dragSortEnabled &&
+    !renderSubComponent &&
+    !dt.tree.enabled &&
+    !analyticsMeta.groupBy
 
   const renderCells = (row: Row<TData>) => {
     return row.getVisibleCells().map((cell) => {
@@ -284,7 +161,7 @@ export function DataTableTable<TData>({
     })
   }
 
-  const renderExpandedRow = (row: Row<TData>) => {
+  const renderExpandedRow = (row: Row<TData>): ReactElement | null => {
     if (!renderSubComponent || !row.getIsExpanded()) return null
     return (
       <TableRow key={`${row.id}__expanded`} className={rowClassName}>
@@ -295,292 +172,48 @@ export function DataTableTable<TData>({
     )
   }
 
-  const renderDropIndicatorRow = (
-    key: string,
-    position: DragSortDropPosition,
-    indentPx?: number,
-  ) => {
-    return (
-      <TableRow key={key} className={cn(rowClassName, "border-0 hover:bg-transparent")}>
-        <TableCell colSpan={colSpan} className="p-0">
-          <div className="relative h-0">
-            <DataTableDropIndicator
-              position={position}
-              {...(typeof indentPx === "number" ? { indentPx } : {})}
-            />
-          </div>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
-  function SortableRow({ row }: { row: Row<TData> }) {
-    const canDrag = dragSortMeta.canDrag ? dragSortMeta.canDrag(row.original) : true
-    const sortable = useSortable({
-      id: row.id,
-      disabled: !canDrag,
-    })
-    const dragProps = dragSortMeta.handle
-      ? {}
-      : {
-          ...sortable.attributes,
-          ...(sortable.listeners ?? {}),
-        }
-    const transform = sortable.transform
-    const style: CSSProperties = {
-      transform: transform
-        ? `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0)`
-        : undefined,
-      transition: sortable.transition ?? undefined,
-    }
-    return (
-      <DataTableDragSortRowProvider
-        value={{
-          handle: dragSortMeta.handle,
-          isDragging: sortable.isDragging,
-          setActivatorNodeRef: sortable.setActivatorNodeRef,
-          attributes: sortable.attributes as unknown as Record<string, unknown>,
-          listeners: (sortable.listeners ?? {}) as unknown as Record<string, unknown>,
-        }}
-      >
-        <tr
-          ref={sortable.setNodeRef}
-          style={style}
-          data-state={row.getIsSelected() && "selected"}
-          className={cn(
-            "hover:bg-table-row-hover data-[state=selected]:bg-muted/70 border-b transition-colors",
-            rowClassName,
-            !dragSortMeta.handle && "cursor-grab",
-            sortable.isDragging && "opacity-50",
-          )}
-          {...dragProps}
-        >
-          {renderCells(row)}
-        </tr>
-      </DataTableDragSortRowProvider>
-    )
-  }
-
-  const regularRows = rowModel.rows.flatMap((row) => {
+  const renderDataRow = (row: Row<TData>) => {
     const baseRow = (
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
         className={cn(rowClassName, "hover:bg-table-row-hover data-[state=selected]:bg-muted/70")}
       >
-        {renderCells(row as Row<TData>)}
+        {renderCells(row)}
       </TableRow>
     )
-    const expandedRow = renderExpandedRow(row as Row<TData>)
+    const expandedRow = renderExpandedRow(row)
     return expandedRow ? [baseRow, expandedRow] : [baseRow]
+  }
+
+  const regularRows = rowModel.rows.flatMap((row) => renderDataRow(row as Row<TData>))
+  const { groupedRows, virtualizedRows, summaryCells } = useTableBodyRows<TData>({
+    rows: rowModel.rows as Array<Row<TData>>,
+    colSpan,
+    rowClassName,
+    cellDensityClass,
+    canVirtualize,
+    wrapperRef,
+    virtualizationMeta,
+    analyticsMeta,
+    renderDataRow,
+    visibleLeafColumns: dt.table.getVisibleLeafColumns(),
   })
 
   const dragSortRows = (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={(event: DragStartEvent) => {
-        const activeId = String(event.active.id)
-        dragSortMeta.onDragStart?.(activeId)
-        setDragOver(null)
-      }}
-      onDragOver={(event: DragOverEvent) => {
-        if (!event.over) {
-          setDragOver(null)
-          return
-        }
-        const activeId = String(event.active.id)
-        const overId = String(event.over.id)
-        if (activeId === overId) {
-          setDragOver(null)
-          return
-        }
-
-        const activeIndex = sortableRowIds.indexOf(activeId)
-        const overIndex = sortableRowIds.indexOf(overId)
-        if (activeIndex < 0 || overIndex < 0) return
-
-        const activeRow = rowModel.rowsById[activeId]
-        const overRow = rowModel.rowsById[overId]
-        if (!activeRow || !overRow) {
-          setDragOver(null)
-          return
-        }
-
-        if (dt.tree.enabled && isDescendantRow(overRow as Row<TData>, activeId)) {
-          setDragOver(null)
-          return
-        }
-
-        if (dt.tree.enabled && !allowNestingEnabled) {
-          const activeParentId = getParentRowId(activeRow as Row<TData>)
-          const overParentId = getParentRowId(overRow as Row<TData>)
-          if (activeParentId !== overParentId) {
-            setDragOver(null)
-            return
-          }
-        }
-
-        if (
-          dragSortMeta.canDrop &&
-          !dragSortMeta.canDrop(
-            (activeRow as Row<TData>).original,
-            (overRow as Row<TData>).original,
-          )
-        ) {
-          setDragOver(null)
-          return
-        }
-
-        const translated = event.active.rect.current.translated
-        const rect = event.over.rect
-        if (translated && rect.height > 0) {
-          const centerY = translated.top + translated.height / 2
-          const ratio = (centerY - rect.top) / rect.height
-          if (allowNestingEnabled) {
-            if (ratio < 0.25) {
-              setDragOver({ overId, position: "above" })
-              return
-            }
-            if (ratio > 0.75) {
-              setDragOver({ overId, position: "below" })
-              return
-            }
-            setDragOver({ overId, position: "inside" })
-            return
-          }
-          setDragOver({ overId, position: ratio < 0.5 ? "above" : "below" })
-          return
-        }
-
-        setDragOver({ overId, position: activeIndex < overIndex ? "below" : "above" })
-      }}
-      onDragEnd={(event: DragEndEvent) => {
-        if (!event.over) {
-          dragSortMeta.onDragCancel?.()
-          setDragOver(null)
-          return
-        }
-        const activeId = String(event.active.id)
-        const overId = String(event.over.id)
-        let position: DragSortDropPosition =
-          overId && dragOver?.overId === overId ? dragOver.position : "above"
-        setDragOver(null)
-
-        const activeRow = rowModel.rowsById[activeId]
-        const overRow = rowModel.rowsById[overId]
-        if (!activeRow || !overRow) {
-          dragSortMeta.onDragCancel?.()
-          return
-        }
-
-        const translated = event.active.rect.current.translated
-        const rect = event.over.rect
-        if (!overId || !translated || rect.height <= 0) {
-          position = "above"
-        } else {
-          const centerY = translated.top + translated.height / 2
-          const ratio = (centerY - rect.top) / rect.height
-          if (allowNestingEnabled) {
-            position = ratio < 0.25 ? "above" : ratio > 0.75 ? "below" : "inside"
-          } else {
-            position = ratio < 0.5 ? "above" : "below"
-          }
-        }
-
-        if (dt.tree.enabled && isDescendantRow(overRow as Row<TData>, activeId)) {
-          dragSortMeta.onDragCancel?.()
-          return
-        }
-
-        if (dt.tree.enabled && !allowNestingEnabled) {
-          const activeParentId = getParentRowId(activeRow as Row<TData>)
-          const overParentId = getParentRowId(overRow as Row<TData>)
-          if (activeParentId !== overParentId) {
-            dragSortMeta.onDragCancel?.()
-            return
-          }
-        }
-
-        if (
-          dragSortMeta.canDrop &&
-          !dragSortMeta.canDrop(
-            (activeRow as Row<TData>).original,
-            (overRow as Row<TData>).original,
-          )
-        ) {
-          dragSortMeta.onDragCancel?.()
-          return
-        }
-
-        void dragSortMeta.onDragEnd?.({ activeId, overId, position })
-      }}
-      onDragCancel={() => {
-        dragSortMeta.onDragCancel?.()
-        setDragOver(null)
-      }}
-    >
-      <SortableContext items={sortableRowIds} strategy={verticalListSortingStrategy}>
-        {rowModel.rows.flatMap((row) => {
-          const rows: ReactElement[] = []
-
-          if (dragOver?.overId === row.id && dragOver.position === "above") {
-            rows.push(renderDropIndicatorRow(`${row.id}__drop_above`, "above"))
-          }
-
-          rows.push(<SortableRow key={row.id} row={row as Row<TData>} />)
-
-          const expandedRow = renderExpandedRow(row as Row<TData>)
-          if (expandedRow) rows.push(expandedRow)
-
-          if (dragOver?.overId === row.id && dragOver.position !== "above") {
-            rows.push(
-              renderDropIndicatorRow(
-                `${row.id}__drop_${dragOver.position}`,
-                dragOver.position,
-                dragOver.position === "inside" ? (row.depth + 1) * treeIndentSize : undefined,
-              ),
-            )
-          }
-
-          return rows
-        })}
-      </SortableContext>
-
-      {dragSortMeta.overlay !== "minimal" && (
-        <DragOverlay>
-          {dt.dragSort.activeId && rowModel.rowsById[dt.dragSort.activeId] ? (
-            <div
-              className={cn(
-                "rounded-md border border-border/50 bg-background shadow-sm",
-                dragSortMeta.overlay === "ghost" && "opacity-70",
-              )}
-            >
-              <Table className="table-fixed">
-                <TableBody>
-                  <TableRow className={cn(rowClassName, "border-0")}>
-                    {(rowModel.rowsById[dt.dragSort.activeId] as Row<TData>)
-                      .getVisibleCells()
-                      .map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          style={{
-                            width: `${cell.column.getSize()}px`,
-                            minWidth: `${cell.column.getSize()}px`,
-                          }}
-                          className={cellDensityClass}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-          ) : null}
-        </DragOverlay>
-      )}
-    </DndContext>
+    <DataTableDragSortBody<TData>
+      dt={dt}
+      rows={rowModel.rows as Array<Row<TData>>}
+      rowsById={rowModel.rowsById as Record<string, Row<TData>>}
+      rowClassName={rowClassName}
+      cellDensityClass={cellDensityClass}
+      colSpan={colSpan}
+      treeIndentSize={treeIndentSize}
+      allowNestingEnabled={allowNestingEnabled}
+      dragSortMeta={dragSortMeta}
+      renderCells={(row) => renderCells(row)}
+      renderExpandedRow={renderExpandedRow}
+    />
   )
 
   return (
@@ -597,6 +230,25 @@ export function DataTableTable<TData>({
           <span>{i18n.refreshingText}</span>
         </div>
       )}
+      {dragSortEnabled && dragSortMeta.error ? (
+        <div className="absolute right-3 top-3 z-20 flex max-w-[360px] items-start gap-2 rounded-md border border-destructive/40 bg-background px-2 py-1.5 text-xs text-destructive shadow-sm">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span className="line-clamp-2">
+            {getErrorMessage(dragSortMeta.error, i18n.dragSort.errorText)}
+          </span>
+          {dragSortMeta.clearError ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              className="h-5 w-5 shrink-0"
+              onClick={dragSortMeta.clearError}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <div
         ref={wrapperRef}
         className={cn("min-h-0 w-full", scrollContainer === "root" ? "flex-1 overflow-y-auto" : "")}
@@ -719,8 +371,21 @@ export function DataTableTable<TData>({
                     ))
                   : dragSortEnabled
                     ? dragSortRows
-                    : regularRows}
+                    : canVirtualize
+                      ? virtualizedRows
+                      : (groupedRows ?? regularRows)}
           </TableBody>
+          {summaryCells ? (
+            <TableFooter>
+              <TableRow className={rowClassName}>
+                {summaryCells.map((value, index) => (
+                  <TableCell key={`__summary__${String(index)}`} className={cellDensityClass}>
+                    {value}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableFooter>
+          ) : null}
         </Table>
       </div>
     </div>

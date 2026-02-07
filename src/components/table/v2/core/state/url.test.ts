@@ -173,6 +173,44 @@ describe("stateUrl", () => {
     expect(urlMocks.push).toHaveBeenCalledTimes(0)
   })
 
+  it("resetPageOnSearchChange + 自定义 searchKey 时，搜索变化会重置 page=1", async () => {
+    urlMocks.setLocation({
+      pathname: "/list",
+      hash: "",
+      searchStr: "?t_page=9&t_size=20&t_keyword=alice",
+    })
+
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        behavior: {
+          resetPageOnFilterChange: false,
+          resetPageOnSearchChange: true,
+          searchKey: "keyword",
+        },
+      }),
+    )
+
+    act(() => {
+      result.current.setSnapshot(
+        {
+          page: 9,
+          size: 20,
+          sort: [],
+          filters: { keyword: "bob" },
+        },
+        "filters",
+      )
+    })
+
+    expect(urlMocks.push).toHaveBeenCalledTimes(1)
+    const href = urlMocks.push.mock.calls[0]?.[0] as string
+    const url = parseHref(href)
+    expect(url.searchParams.get("t_page")).toBe("1")
+    expect(url.searchParams.get("t_keyword")).toBe("bob")
+  })
+
   it("在 basepath 场景下 push 的 URL 会保留 basepath", async () => {
     basePathMocks.setBasePath("/idealtemplate")
     urlMocks.setLocation({
@@ -200,5 +238,19 @@ describe("stateUrl", () => {
     const href = urlMocks.push.mock.calls[0]?.[0] as string
     const url = parseHref(href)
     expect(url.pathname).toBe("/idealtemplate/list")
+  })
+
+  it("会向 adapter 暴露 searchKey，供 UI 搜索组件自动对齐", async () => {
+    const { stateUrl } = await import("./url")
+    const { result } = renderHook(() =>
+      stateUrl({
+        key: "t",
+        behavior: {
+          searchKey: "keyword",
+        },
+      }),
+    )
+
+    expect(result.current.searchKey).toBe("keyword")
   })
 })

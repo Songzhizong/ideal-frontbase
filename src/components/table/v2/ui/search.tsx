@@ -40,7 +40,8 @@ export function DataTableSearch<TFilterSchema>({
 }: DataTableSearchProps<TFilterSchema>) {
   const dt = useDataTableInstance<unknown, TFilterSchema>()
   const { i18n: globalI18n } = useDataTableConfig()
-  const key = (filterKey ?? "q") as keyof TFilterSchema
+  const inferredSearchKey = dt.meta.state?.searchKey as keyof TFilterSchema | undefined
+  const key = (filterKey ?? inferredSearchKey ?? "q") as keyof TFilterSchema
   const rawValue = dt.filters.state[key]
   const normalizedValue = useMemo(() => toTextValue(rawValue), [rawValue])
   const [simpleValue, setSimpleValue] = useState(normalizedValue)

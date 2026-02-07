@@ -7,129 +7,31 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { useCallback, useMemo, useRef, useSyncExternalStore } from "react"
-import { useStableCallback, useStableObject } from "@/components/table/v2"
 import { useFeatureRuntimes } from "./features"
 import type {
   DataTableActions,
-  DataTableActivity,
   DataTableDragSort,
-  DataTableErrors,
   DataTableInstance,
   DataTablePagination,
   DataTableSelection,
   DataTableStatus,
   DataTableTree,
-  TableFilters,
   TableStateSnapshot,
   UseDataTableOptions,
 } from "./types"
-
-function isFeatureEnabled<T extends { enabled?: boolean }>(feature?: T): boolean {
-  if (!feature) return false
-  return feature.enabled !== false
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function mergeTableOptions<TData>(
-  base: TableOptions<TData>,
-  patch?: Partial<TableOptions<TData>>,
-): TableOptions<TData> {
-  if (!patch) return base
-  const next: TableOptions<TData> = {
-    ...base,
-    ...patch,
-  }
-  if (patch.state) {
-    next.state = { ...(base.state ?? {}), ...patch.state }
-  }
-  if (patch.meta && isRecord(base.meta) && isRecord(patch.meta)) {
-    next.meta = { ...base.meta, ...patch.meta }
-  }
-  return next
-}
-
-function applyActionPatches(
-  actions: DataTableActions,
-  featureRuntimes: Array<{
-    patchActions?: (actions: DataTableActions) => Partial<DataTableActions>
-  }>,
-): DataTableActions {
-  let next = actions
-  for (const runtime of featureRuntimes) {
-    const patch = runtime.patchActions?.(next)
-    if (patch) {
-      next = { ...next, ...patch }
-    }
-  }
-  return next
-}
-
-function applyActivityPatches(
-  activity: DataTableActivity,
-  featureRuntimes: Array<{
-    patchActivity?: (activity: DataTableActivity) => Partial<DataTableActivity>
-  }>,
-): DataTableActivity {
-  let next = activity
-  for (const runtime of featureRuntimes) {
-    const patch = runtime.patchActivity?.(next)
-    if (patch) {
-      next = { ...next, ...patch }
-    }
-  }
-  return next
-}
-
-function applyMetaPatches<TData, TFilterSchema>(
-  meta: DataTableInstance<TData, TFilterSchema>["meta"],
-  featureRuntimes: Array<{
-    patchMeta?: (meta: DataTableInstance<TData, TFilterSchema>["meta"]) => unknown
-  }>,
-): DataTableInstance<TData, TFilterSchema>["meta"] {
-  let next = meta
-  for (const runtime of featureRuntimes) {
-    const patch = runtime.patchMeta?.(next)
-    if (isRecord(patch)) {
-      next = { ...next, ...patch }
-    }
-  }
-  return next
-}
-
-function toSortingState(sort: TableStateSnapshot<unknown>["sort"]): SortingState {
-  return sort.map((item) => ({
-    id: item.field,
-    desc: item.order === "desc",
-  }))
-}
-
-function toSortSnapshot(sorting: SortingState): TableStateSnapshot<unknown>["sort"] {
-  return sorting.map((item) => ({
-    field: item.id,
-    order: item.desc ? "desc" : "asc",
-  }))
-}
-
-function buildErrors(error: unknown, hasData: boolean): DataTableErrors | undefined {
-  if (!error) return undefined
-  if (hasData) {
-    return {
-      nonBlocking: {
-        severity: "non-blocking",
-        original: error,
-      },
-    }
-  }
-  return {
-    blocking: {
-      severity: "blocking",
-      original: error,
-    },
-  }
-}
+import { useTableFilters } from "./use-data-table/filters"
+import {
+  applyActionPatches,
+  applyActivityPatches,
+  applyMetaPatches,
+  buildErrors,
+  isFeatureEnabled,
+  mergeTableOptions,
+  resolveStatus,
+  toSortingState,
+  toSortSnapshot,
+} from "./use-data-table/helpers"
+import { useStableCallback, useStableObject } from "./utils/reference-stability"
 
 export function useDataTable<TData, TFilterSchema>(
   options: UseDataTableOptions<TData, TFilterSchema>,
@@ -138,15 +40,12 @@ export function useDataTable<TData, TFilterSchema>(
   const snapshot = useSyncExternalStore(adapter.subscribe, adapter.getSnapshot, adapter.getSnapshot)
   const initialSnapshotRef = useRef<TableStateSnapshot<TFilterSchema>>(snapshot)
 
-  const query = useMemo(
-    () => ({
-      page: snapshot.page,
-      size: snapshot.size,
-      sort: snapshot.sort,
-      filters: snapshot.filters,
-    }),
-    [snapshot],
-  )
+  const query = {
+    page: snapshot.page,
+    size: snapshot.size,
+    sort: snapshot.sort,
+    filters: snapshot.filters,
+  }
 
   const dataState = options.dataSource.use(query)
   const rows = dataState.data?.rows ?? []
@@ -287,30 +186,8 @@ export function useDataTable<TData, TFilterSchema>(
     adapter.setSnapshot({ ...next, sort: [] }, "sort")
   })
 
-  const clearSelection = useStableCallback(() => {})
-  const selectAllCurrentPage = useStableCallback(() => {})
-  const selectAllMatching = useStableCallback(() => {})
-  const resetColumnVisibility = useStableCallback(() => {})
-  const resetColumnSizing = useStableCallback(() => {})
-  const resetDensity = useStableCallback(() => {})
-  const expandRow = useStableCallback((rowId: string) => {
-    void rowId
-  })
-  const collapseRow = useStableCallback((rowId: string) => {
-    void rowId
-  })
-  const toggleRowExpanded = useStableCallback((rowId: string) => {
-    void rowId
-  })
-  const expandAll = useStableCallback(() => {})
-  const collapseAll = useStableCallback(() => {})
-  const expandToDepth = useStableCallback((depth: number) => {
-    void depth
-  })
-  const moveRow = useStableCallback((activeId: string, overId: string) => {
-    void activeId
-    void overId
-  })
+  const noopAction = useStableCallback((..._args: unknown[]) => {})
+  const noopAsyncAction = useStableCallback(async (..._args: unknown[]) => {})
 
   const refetch = useStableCallback(() => dataState.refetch?.())
   const retry = useStableCallback((options?: { resetInvalidFilters?: boolean }) => {
@@ -327,19 +204,24 @@ export function useDataTable<TData, TFilterSchema>(
       setPageSize,
       setSort,
       clearSort,
-      clearSelection,
-      selectAllCurrentPage,
-      selectAllMatching,
-      resetColumnVisibility,
-      resetColumnSizing,
-      resetDensity,
-      expandRow,
-      collapseRow,
-      toggleRowExpanded,
-      expandAll,
-      collapseAll,
-      expandToDepth,
-      moveRow,
+      clearSelection: noopAction as DataTableActions["clearSelection"],
+      selectAllCurrentPage: noopAction as DataTableActions["selectAllCurrentPage"],
+      selectAllMatching: noopAsyncAction as DataTableActions["selectAllMatching"],
+      resetColumnVisibility: noopAction as DataTableActions["resetColumnVisibility"],
+      resetColumnSizing: noopAction as DataTableActions["resetColumnSizing"],
+      setColumnPin: noopAction as DataTableActions["setColumnPin"],
+      resetColumnPinning: noopAction as DataTableActions["resetColumnPinning"],
+      setColumnOrder: noopAction as DataTableActions["setColumnOrder"],
+      moveColumn: noopAction as DataTableActions["moveColumn"],
+      resetColumnOrder: noopAction as DataTableActions["resetColumnOrder"],
+      resetDensity: noopAction as DataTableActions["resetDensity"],
+      expandRow: noopAction as DataTableActions["expandRow"],
+      collapseRow: noopAction as DataTableActions["collapseRow"],
+      toggleRowExpanded: noopAction as DataTableActions["toggleRowExpanded"],
+      expandAll: noopAction as DataTableActions["expandAll"],
+      collapseAll: noopAction as DataTableActions["collapseAll"],
+      expandToDepth: noopAction as DataTableActions["expandToDepth"],
+      moveRow: noopAsyncAction as DataTableActions["moveRow"],
     }),
     [
       refetch,
@@ -349,19 +231,8 @@ export function useDataTable<TData, TFilterSchema>(
       setPageSize,
       setSort,
       clearSort,
-      clearSelection,
-      selectAllCurrentPage,
-      selectAllMatching,
-      resetColumnVisibility,
-      resetColumnSizing,
-      resetDensity,
-      expandRow,
-      collapseRow,
-      toggleRowExpanded,
-      expandAll,
-      collapseAll,
-      expandToDepth,
-      moveRow,
+      noopAction,
+      noopAsyncAction,
     ],
   )
 
@@ -369,64 +240,18 @@ export function useDataTable<TData, TFilterSchema>(
     useMemo(() => applyActionPatches(baseActions, featureRuntimes), [baseActions, featureRuntimes]),
   )
 
-  const setFilter = useStableCallback(
-    <K extends keyof TFilterSchema>(key: K, value: TFilterSchema[K]) => {
-      const next = adapter.getSnapshot()
-      adapter.setSnapshot(
-        {
-          ...next,
-          filters: {
-            ...next.filters,
-            [key]: value,
-          },
-        },
-        "filters",
-      )
-    },
-  )
-
-  const setBatch = useStableCallback((updates: Partial<TFilterSchema>) => {
-    const next = adapter.getSnapshot()
-    adapter.setSnapshot(
-      {
-        ...next,
-        filters: {
-          ...next.filters,
-          ...updates,
-        },
-      },
-      "filters",
-    )
+  const filters = useTableFilters({
+    adapter,
+    snapshotFilters: snapshot.filters,
+    initialFilters: initialSnapshotRef.current.filters,
   })
 
-  const resetFilters = useStableCallback(() => {
-    const next = adapter.getSnapshot()
-    adapter.setSnapshot(
-      {
-        ...next,
-        filters: initialSnapshotRef.current.filters,
-      },
-      "filters",
-    )
+  const status: DataTableStatus = resolveStatus({
+    error: dataState.error,
+    hasDataResult: Boolean(dataState.data),
+    isInitialLoading: dataState.isInitialLoading,
+    rowCount: rows.length,
   })
-
-  const filters: TableFilters<TFilterSchema> = useStableObject({
-    state: snapshot.filters,
-    set: setFilter,
-    setBatch,
-    reset: resetFilters,
-  })
-
-  const hasData = rows.length > 0
-  const status: DataTableStatus = useMemo(() => {
-    if (dataState.error && !dataState.data) {
-      return { type: "error", error: dataState.error }
-    }
-    if (!dataState.isInitialLoading && dataState.data && rows.length === 0) {
-      return { type: "empty" }
-    }
-    return { type: "ready" }
-  }, [dataState.error, dataState.data, dataState.isInitialLoading, rows.length])
 
   const activity = useStableObject(
     useMemo(
@@ -463,7 +288,7 @@ export function useDataTable<TData, TFilterSchema>(
   const stableTree: DataTableTree = useStableObject(tree)
   const stableDragSort: DataTableDragSort = useStableObject(dragSort)
 
-  const errors = useMemo(() => buildErrors(dataState.error, hasData), [dataState.error, hasData])
+  const errors = buildErrors(dataState.error, Boolean(dataState.data))
 
   const meta = useStableObject(
     useMemo(
@@ -475,11 +300,21 @@ export function useDataTable<TData, TFilterSchema>(
               columnVisibilityEnabled: isFeatureEnabled(options.features?.columnVisibility),
               columnSizingEnabled: isFeatureEnabled(options.features?.columnSizing),
               pinningEnabled: isFeatureEnabled(options.features?.pinning),
+              columnOrderEnabled: isFeatureEnabled(options.features?.columnOrder),
+              virtualizationEnabled: isFeatureEnabled(options.features?.virtualization),
+              analyticsEnabled: isFeatureEnabled(options.features?.analytics),
               expansionEnabled: isFeatureEnabled(options.features?.expansion),
               densityEnabled: isFeatureEnabled(options.features?.density),
               treeEnabled: isFeatureEnabled(options.features?.tree),
               dragSortEnabled: isFeatureEnabled(options.features?.dragSort),
             },
+            ...(typeof adapter.searchKey === "string" && adapter.searchKey.trim() !== ""
+              ? {
+                  state: {
+                    searchKey: adapter.searchKey,
+                  },
+                }
+              : {}),
             ...(dataState.data?.extraMeta ? { data: { extraMeta: dataState.data.extraMeta } } : {}),
           },
           featureRuntimes,
@@ -489,10 +324,14 @@ export function useDataTable<TData, TFilterSchema>(
         options.features?.columnVisibility,
         options.features?.columnSizing,
         options.features?.pinning,
+        options.features?.columnOrder,
+        options.features?.virtualization,
+        options.features?.analytics,
         options.features?.expansion,
         options.features?.density,
         options.features?.tree,
         options.features?.dragSort,
+        adapter.searchKey,
         dataState.data?.extraMeta,
         featureRuntimes,
       ],

@@ -19,108 +19,22 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
-import type { FilterDefinition, FilterType } from "../core"
+import type { FilterDefinition } from "../core"
 import { useDataTableConfig } from "./config"
 import { useDataTableInstance } from "./context"
+import {
+  areValuesEqual,
+  getClearedFilterValue,
+  isDateValue,
+  isEmptyFilterValue,
+  type NumberRangeValue,
+  parseDateRange,
+  parseNumberInput,
+  parseNumberRange,
+  serializeOptionValue,
+} from "./filter-item-utils"
 
-type DateRangeValue = { from: Date | undefined; to: Date | undefined }
-type NumberRangeValue = { min: number | undefined; max: number | undefined }
 export type DataTableFilterLabelMode = "top" | "inside"
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function isDateValue(value: unknown): value is Date {
-  return value instanceof Date && !Number.isNaN(value.getTime())
-}
-
-function areValuesEqual(a: unknown, b: unknown): boolean {
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime()
-  }
-  return Object.is(a, b)
-}
-
-function serializeOptionValue(value: unknown): string {
-  if (typeof value === "string") return value
-  if (typeof value === "number" || typeof value === "boolean") return String(value)
-  if (value instanceof Date) return value.toISOString()
-  try {
-    return JSON.stringify(value) ?? String(value)
-  } catch {
-    return String(value)
-  }
-}
-
-function parseNumberInput(value: string): number | undefined {
-  if (value.trim() === "") return undefined
-  const parsed = Number(value)
-  if (Number.isNaN(parsed)) return undefined
-  return parsed
-}
-
-function parseNumberRange(value: unknown): NumberRangeValue {
-  if (isRecord(value)) {
-    const min = typeof value.min === "number" ? value.min : undefined
-    const max = typeof value.max === "number" ? value.max : undefined
-    return { min, max }
-  }
-  if (Array.isArray(value)) {
-    const [min, max] = value
-    return {
-      min: typeof min === "number" ? min : undefined,
-      max: typeof max === "number" ? max : undefined,
-    }
-  }
-  return { min: undefined, max: undefined }
-}
-
-function parseDateRange(value: unknown): DateRangeValue | undefined {
-  if (Array.isArray(value)) {
-    const [from, to] = value
-    if (isDateValue(from) || isDateValue(to)) {
-      return {
-        from: isDateValue(from) ? from : undefined,
-        to: isDateValue(to) ? to : undefined,
-      }
-    }
-  }
-  if (isRecord(value)) {
-    const from = value.from
-    const to = value.to
-    if (isDateValue(from) || isDateValue(to)) {
-      return {
-        from: isDateValue(from) ? from : undefined,
-        to: isDateValue(to) ? to : undefined,
-      }
-    }
-  }
-  return undefined
-}
-
-function isEmptyFilterValue(value: unknown, type: FilterType): boolean {
-  if (value == null) return true
-  if (type === "text" && typeof value === "string") return value.trim() === ""
-  if (type === "multi-select") return !Array.isArray(value) || value.length === 0
-  if (type === "number-range") {
-    const range = parseNumberRange(value)
-    return range.min == null && range.max == null
-  }
-  if (type === "date-range") {
-    const range = parseDateRange(value)
-    return !range?.from && !range?.to
-  }
-  if (type === "date") return !isDateValue(value)
-  if (Array.isArray(value)) return value.length === 0
-  if (typeof value === "string") return value.trim() === ""
-  return false
-}
-
-function getClearedFilterValue(type: FilterType): unknown {
-  if (type === "text") return ""
-  return null
-}
 
 export interface DataTableFilterItemProps<
   TFilterSchema,

@@ -1,10 +1,14 @@
-import type { AdvancedFieldType } from "./types"
+import type { FilterType } from "../core"
 
-export type NumberRangeValue = { min: number | undefined; max: number | undefined }
 export type DateRangeValue = { from: Date | undefined; to: Date | undefined }
+export type NumberRangeValue = { min: number | undefined; max: number | undefined }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+export function isDateValue(value: unknown): value is Date {
+  return value instanceof Date && !Number.isNaN(value.getTime())
 }
 
 export function areValuesEqual(a: unknown, b: unknown): boolean {
@@ -23,31 +27,6 @@ export function serializeOptionValue(value: unknown): string {
   } catch {
     return String(value)
   }
-}
-
-export function getFieldTypeLabel(
-  type: AdvancedFieldType,
-  labels: {
-    typeText: string
-    typeSelect: string
-    typeMultiSelect: string
-    typeBoolean: string
-    typeNumberRange: string
-    typeDate: string
-    typeDateRange: string
-  },
-): string {
-  if (type === "select") return labels.typeSelect
-  if (type === "multi-select") return labels.typeMultiSelect
-  if (type === "boolean") return labels.typeBoolean
-  if (type === "number-range") return labels.typeNumberRange
-  if (type === "date") return labels.typeDate
-  if (type === "date-range") return labels.typeDateRange
-  return labels.typeText
-}
-
-export function normalizeKeyword(value: string): string {
-  return value.trim().toLocaleLowerCase()
 }
 
 export function parseNumberInput(value: string): number | undefined {
@@ -73,10 +52,6 @@ export function parseNumberRange(value: unknown): NumberRangeValue {
   return { min: undefined, max: undefined }
 }
 
-export function isDateValue(value: unknown): value is Date {
-  return value instanceof Date && !Number.isNaN(value.getTime())
-}
-
 export function parseDateRange(value: unknown): DateRangeValue | undefined {
   if (Array.isArray(value)) {
     const [from, to] = value
@@ -98,4 +73,27 @@ export function parseDateRange(value: unknown): DateRangeValue | undefined {
     }
   }
   return undefined
+}
+
+export function isEmptyFilterValue(value: unknown, type: FilterType): boolean {
+  if (value == null) return true
+  if (type === "text" && typeof value === "string") return value.trim() === ""
+  if (type === "multi-select") return !Array.isArray(value) || value.length === 0
+  if (type === "number-range") {
+    const range = parseNumberRange(value)
+    return range.min == null && range.max == null
+  }
+  if (type === "date-range") {
+    const range = parseDateRange(value)
+    return !range?.from && !range?.to
+  }
+  if (type === "date") return !isDateValue(value)
+  if (Array.isArray(value)) return value.length === 0
+  if (typeof value === "string") return value.trim() === ""
+  return false
+}
+
+export function getClearedFilterValue(type: FilterType): unknown {
+  if (type === "text") return ""
+  return null
 }
