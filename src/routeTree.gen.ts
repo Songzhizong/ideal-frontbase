@@ -18,7 +18,6 @@ import { Route as AuthenticatedCoreRouteRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/_dashboard/index'
 import { Route as BlankAuthLoginRouteImport } from './routes/_blank/_auth/login'
 import { Route as AuthenticatedExampleTableV2DemoRouteImport } from './routes/_authenticated/example/table-v2-demo'
-import { Route as AuthenticatedCoreUsersRouteImport } from './routes/_authenticated/_core/users'
 import { Route as AuthenticatedCoreProfileRouteImport } from './routes/_authenticated/_core/profile'
 import { Route as AuthenticatedCoreFileManagementRouteImport } from './routes/_authenticated/_core/file-management'
 import { Route as AuthenticatedExampleUsersIndexRouteImport } from './routes/_authenticated/example/users/index'
@@ -70,11 +69,6 @@ const AuthenticatedExampleTableV2DemoRoute =
     path: '/example/table-v2-demo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCoreUsersRoute = AuthenticatedCoreUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthenticatedCoreRouteRoute,
-} as any)
 const AuthenticatedCoreProfileRoute =
   AuthenticatedCoreProfileRouteImport.update({
     id: '/profile',
@@ -119,7 +113,6 @@ export interface FileRoutesByFullPath {
   '/errors/500': typeof Errors500Route
   '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
-  '/users': typeof AuthenticatedCoreUsersRoute
   '/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/login': typeof BlankAuthLoginRoute
   '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
@@ -134,7 +127,6 @@ export interface FileRoutesByTo {
   '/errors/500': typeof Errors500Route
   '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
-  '/users': typeof AuthenticatedCoreUsersRoute
   '/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/login': typeof BlankAuthLoginRoute
   '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
@@ -152,7 +144,6 @@ export interface FileRoutesById {
   '/errors/500': typeof Errors500Route
   '/_authenticated/_core/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/_authenticated/_core/profile': typeof AuthenticatedCoreProfileRoute
-  '/_authenticated/_core/users': typeof AuthenticatedCoreUsersRoute
   '/_authenticated/example/table-v2-demo': typeof AuthenticatedExampleTableV2DemoRoute
   '/_blank/_auth/login': typeof BlankAuthLoginRoute
   '/_authenticated/_dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -170,7 +161,6 @@ export interface FileRouteTypes {
     | '/errors/500'
     | '/file-management'
     | '/profile'
-    | '/users'
     | '/example/table-v2-demo'
     | '/login'
     | '/example/users/new'
@@ -185,7 +175,6 @@ export interface FileRouteTypes {
     | '/errors/500'
     | '/file-management'
     | '/profile'
-    | '/users'
     | '/example/table-v2-demo'
     | '/login'
     | '/example/users/new'
@@ -202,7 +191,6 @@ export interface FileRouteTypes {
     | '/errors/500'
     | '/_authenticated/_core/file-management'
     | '/_authenticated/_core/profile'
-    | '/_authenticated/_core/users'
     | '/_authenticated/example/table-v2-demo'
     | '/_blank/_auth/login'
     | '/_authenticated/_dashboard/'
@@ -285,13 +273,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExampleTableV2DemoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/_core/users': {
-      id: '/_authenticated/_core/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthenticatedCoreUsersRouteImport
-      parentRoute: typeof AuthenticatedCoreRouteRoute
-    }
     '/_authenticated/_core/profile': {
       id: '/_authenticated/_core/profile'
       path: '/profile'
@@ -340,14 +321,12 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedCoreRouteRouteChildren {
   AuthenticatedCoreFileManagementRoute: typeof AuthenticatedCoreFileManagementRoute
   AuthenticatedCoreProfileRoute: typeof AuthenticatedCoreProfileRoute
-  AuthenticatedCoreUsersRoute: typeof AuthenticatedCoreUsersRoute
 }
 
 const AuthenticatedCoreRouteRouteChildren: AuthenticatedCoreRouteRouteChildren =
   {
     AuthenticatedCoreFileManagementRoute: AuthenticatedCoreFileManagementRoute,
     AuthenticatedCoreProfileRoute: AuthenticatedCoreProfileRoute,
-    AuthenticatedCoreUsersRoute: AuthenticatedCoreUsersRoute,
   }
 
 const AuthenticatedCoreRouteRouteWithChildren =

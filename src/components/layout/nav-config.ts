@@ -17,7 +17,6 @@ export const PRIMARY_NAV: readonly NavItem[] = [
     icon: FolderOpen,
     permission: PERMISSIONS.FILE_MANAGEMENT_VIEW,
   },
-  { title: "用户管理", to: "/users", icon: Users, permission: PERMISSIONS.USERS_READ },
   {
     title: "示例",
     to: "/example",
