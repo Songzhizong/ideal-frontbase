@@ -23,11 +23,6 @@ export const PRIMARY_NAV: readonly NavItem[] = [
     icon: Table,
     children: [
       {
-        title: "表格",
-        to: "/example/table-v2-demo",
-        icon: Table,
-      },
-      {
         title: "用户管理",
         to: "/example/users",
         icon: Users,

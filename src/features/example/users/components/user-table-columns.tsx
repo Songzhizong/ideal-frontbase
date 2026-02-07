@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Ellipsis, KeyRound, Pencil } from "lucide-react"
 import { BaseLink } from "@/components/common/base-link"
-import { createColumnHelper } from "@/components/table/v2"
+import { createColumnHelper, DataTableSortableHeader } from "@/components/table/v2"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { SortableHeader } from "@/features/example/table/components/sortable-header"
 import { cn } from "@/lib/utils"
 import type { DemoUser, DemoUserRole, DemoUserStatus } from "../types"
 
@@ -162,7 +161,7 @@ function RowActions({ user }: { user: DemoUser }) {
 export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
   helper.select(),
   helper.accessor("name", {
-    header: ({ column }) => <SortableHeader column={column} label="用户" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="用户" />,
     cell: ({ row }) => <UserInfoCell user={row.original} />,
     enableSorting: true,
     size: 260,
@@ -173,7 +172,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("role", {
-    header: ({ column }) => <SortableHeader column={column} label="角色" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="角色" />,
     cell: ({ row }) => <RoleBadge role={row.original.role} />,
     enableSorting: true,
     size: 140,
@@ -183,7 +182,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("department", {
-    header: ({ column }) => <SortableHeader column={column} label="部门" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="部门" />,
     cell: ({ row }) => row.original.department,
     enableSorting: true,
     size: 140,
@@ -202,7 +201,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("riskScore", {
-    header: ({ column }) => <SortableHeader column={column} label="风险分" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="风险分" />,
     cell: ({ row }) => <span className="font-mono text-sm">{row.original.riskScore}</span>,
     enableSorting: true,
     size: 110,
@@ -213,7 +212,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("createdAt", {
-    header: ({ column }) => <SortableHeader column={column} label="创建时间" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="创建时间" />,
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
         {formatDateTime(row.original.createdAt)}
@@ -227,7 +226,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("lastLoginAt", {
-    header: ({ column }) => <SortableHeader column={column} label="最后登录" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="最后登录" />,
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
         {formatDateTime(row.original.lastLoginAt)}
@@ -241,7 +240,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
     },
   }),
   helper.accessor("status", {
-    header: ({ column }) => <SortableHeader column={column} label="状态" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} label="状态" />,
     cell: ({ row }) => <StatusPill status={row.original.status} />,
     enableSorting: true,
     size: 120,
