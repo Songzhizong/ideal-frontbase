@@ -120,7 +120,7 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
               })
             }
             placeholder={i18n.filters.numberRangeMinPlaceholder}
-            className="h-8"
+            className="h-8 dark:[color-scheme:dark]"
           />
           <span className="text-xs text-muted-foreground">-</span>
           <Input
@@ -133,7 +133,7 @@ export function DataTableAdvancedValueEditor<TFilterSchema>({
               })
             }
             placeholder={i18n.filters.numberRangeMaxPlaceholder}
-            className="h-8"
+            className="h-8 dark:[color-scheme:dark]"
           />
         </div>
         <div className="flex justify-end gap-2 border-t border-border/50 pt-2">

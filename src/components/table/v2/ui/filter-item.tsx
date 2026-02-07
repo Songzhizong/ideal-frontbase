@@ -84,13 +84,13 @@ export function DataTableFilterItem<
           return (
             <div className="flex w-full items-center text-sm">
               <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
-              <span className="px-2 text-muted-foreground">:</span>
+              <span className="px-1 text-muted-foreground">:</span>
               <Input
                 value={textValue}
                 onChange={(event) => handleChange(event.target.value as TFilterSchema[K])}
                 placeholder={definition.placeholder}
                 aria-label={definition.label}
-                className="h-auto border-0 bg-transparent px-0 py-0 shadow-none focus-visible:ring-0"
+                className="h-auto border-0 bg-transparent px-0 py-0 shadow-none focus-visible:ring-0 dark:bg-transparent"
               />
             </div>
           )
@@ -129,7 +129,7 @@ export function DataTableFilterItem<
               className={cn(
                 "w-full",
                 useInlineLabel
-                  ? "h-auto border-0 bg-transparent px-0 py-0 shadow-none focus:ring-0"
+                  ? "h-auto justify-start gap-1.5 border-0 bg-transparent px-0 py-0 shadow-none focus:ring-0 [&>svg]:ml-auto dark:bg-transparent dark:hover:bg-transparent"
                   : "h-9",
               )}
               aria-label={definition.label}
@@ -137,7 +137,7 @@ export function DataTableFilterItem<
               {useInlineLabel ? (
                 <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
               ) : null}
-              {useInlineLabel ? <span className="px-2 text-muted-foreground">:</span> : null}
+              {useInlineLabel ? <span className="px-1 text-muted-foreground">:</span> : null}
               <SelectValue placeholder={definition.placeholder ?? i18n.filters.selectPlaceholder} />
             </SelectTrigger>
             <SelectContent>
@@ -185,7 +185,7 @@ export function DataTableFilterItem<
                 {useInlineLabel ? (
                   <span className="shrink-0 text-xs text-muted-foreground">{definition.label}</span>
                 ) : null}
-                {useInlineLabel ? <span className="px-2 text-muted-foreground">:</span> : null}
+                {useInlineLabel ? <span className="px-1 text-muted-foreground">:</span> : null}
                 <span className="truncate">{triggerLabel}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
@@ -214,6 +214,7 @@ export function DataTableFilterItem<
         return (
           <DatePicker
             value={dateValue}
+            triggerClassName="bg-card"
             onChange={(nextValue) => {
               if (!nextValue) {
                 handleRemove()
@@ -229,6 +230,7 @@ export function DataTableFilterItem<
         return (
           <DateRangePicker
             value={rangeValue}
+            triggerClassName="bg-card"
             onChange={(nextValue) => {
               if (!nextValue) {
                 handleRemove()
@@ -259,7 +261,7 @@ export function DataTableFilterItem<
               }}
               placeholder={i18n.filters.numberRangeMinPlaceholder}
               aria-label={`${definition.label}-${i18n.filters.numberRangeMinPlaceholder}`}
-              className="h-9"
+              className="h-9 dark:[color-scheme:dark]"
             />
             <span className="text-xs text-muted-foreground">-</span>
             <Input
@@ -271,7 +273,7 @@ export function DataTableFilterItem<
               }}
               placeholder={i18n.filters.numberRangeMaxPlaceholder}
               aria-label={`${definition.label}-${i18n.filters.numberRangeMaxPlaceholder}`}
-              className="h-9"
+              className="h-9 dark:[color-scheme:dark]"
             />
           </div>
         )
@@ -310,7 +312,7 @@ export function DataTableFilterItem<
   if (useInlineLabel) {
     return (
       <div className={cn("flex min-w-40 items-center gap-1", className)}>
-        <div className="flex h-9 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-3">
+        <div className="flex h-9 min-w-0 flex-1 items-center rounded-md border border-input bg-card px-3 dark:bg-input/30">
           {content as ReactNode}
         </div>
         {showClear ? (

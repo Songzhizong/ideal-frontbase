@@ -23,6 +23,7 @@ export interface DataTableSearchProps<TFilterSchema> {
   placeholder?: string
   className?: string
   inputClassName?: string
+  fullWidth?: boolean
   i18n?: DataTableI18nOverrides
   mode?: "simple" | "advanced"
   advancedFields?: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
@@ -34,6 +35,7 @@ export function DataTableSearch<TFilterSchema>({
   placeholder,
   className,
   inputClassName,
+  fullWidth = true,
   i18n: i18nOverrides,
   mode = "simple",
   advancedFields = [],
@@ -95,6 +97,7 @@ export function DataTableSearch<TFilterSchema>({
         placeholder={placeholder}
         className={className}
         inputClassName={inputClassName}
+        fullWidth={fullWidth}
         i18n={i18nOverrides}
         advancedFields={advancedFields}
       />
@@ -102,7 +105,12 @@ export function DataTableSearch<TFilterSchema>({
   }
 
   return (
-    <div className={cn("relative w-full max-w-sm", className)}>
+    <div
+      className={cn(
+        fullWidth ? "relative w-full max-w-sm" : "relative w-auto min-w-0 max-w-sm",
+        className,
+      )}
+    >
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         value={simpleValue}

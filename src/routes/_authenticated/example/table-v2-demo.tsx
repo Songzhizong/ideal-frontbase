@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { TableV2DemoPage } from "@/features/example/table"
+import { UserManagementPage } from "@/features/example/users"
 
 export const Route = createFileRoute("/_authenticated/example/table-v2-demo")({
-  component: TableV2DemoPage,
+  component: UserManagementPage,
   staticData: {
-    title: "Table V2 手动验证",
+    title: "Table V2 默认示例",
   },
 })

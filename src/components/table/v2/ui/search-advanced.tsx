@@ -18,6 +18,7 @@ export interface DataTableAdvancedSearchProps<TFilterSchema> {
   placeholder?: string | undefined
   className?: string | undefined
   inputClassName?: string | undefined
+  fullWidth?: boolean | undefined
   i18n?: DataTableI18nOverrides | undefined
   advancedFields: Array<FilterDefinition<TFilterSchema, keyof TFilterSchema>>
 }
@@ -27,6 +28,7 @@ export function DataTableAdvancedSearch<TFilterSchema>({
   placeholder,
   className,
   inputClassName,
+  fullWidth = true,
   i18n: i18nOverrides,
   advancedFields,
 }: DataTableAdvancedSearchProps<TFilterSchema>) {
@@ -81,7 +83,7 @@ export function DataTableAdvancedSearch<TFilterSchema>({
   return (
     <Popover open={state.isValuePickerOpen} onOpenChange={state.onValuePickerOpenChange}>
       <PopoverAnchor asChild>
-        <div className={cn("w-full max-w-3xl", className)}>
+        <div className={cn(fullWidth ? "w-full max-w-3xl" : "w-auto min-w-0 max-w-3xl", className)}>
           <div className="flex h-9 w-full items-center rounded-md border border-input bg-background px-2">
             <Search className="ml-1 mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
             <DataTableAdvancedFieldPicker

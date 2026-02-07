@@ -21,5 +21,20 @@ export function useUserManagementTableState() {
       createdAtDate: parseAsLocalDate,
       lastLoginRange: parseAsLocalDateRange,
     },
+    pagination: {
+      defaultPage: 1,
+      defaultSize: 20,
+    },
+    behavior: {
+      searchKey: "q",
+      resetPageOnFilterChange: true,
+      resetPageOnSearchChange: true,
+      historyByReason: {
+        filters: "replace",
+        page: "push",
+        size: "push",
+        sort: "push",
+      },
+    },
   })
 }

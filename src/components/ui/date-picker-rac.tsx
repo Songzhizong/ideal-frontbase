@@ -162,7 +162,10 @@ export function DatePicker({
 					{(segment) => (
 						<DateSegment
 							segment={segment}
-							className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground"
+							className={cn(
+								"px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground",
+								!date && segment.type === "literal" && "text-muted-foreground",
+							)}
 						/>
 					)}
 				</DateInput>
@@ -320,7 +323,10 @@ export function DateRangePicker({
 					{(segment) => (
 						<DateSegment
 							segment={segment}
-							className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground"
+							className={cn(
+								"px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground",
+								!range && segment.type === "literal" && "text-muted-foreground",
+							)}
 						/>
 					)}
 				</DateInput>
@@ -334,7 +340,10 @@ export function DateRangePicker({
 					{(segment) => (
 						<DateSegment
 							segment={segment}
-							className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground"
+							className={cn(
+								"px-0.5 tabular-nums outline-none rounded-sm focus:bg-accent focus:text-accent-foreground data-placeholder:text-muted-foreground",
+								!range && segment.type === "literal" && "text-muted-foreground",
+							)}
 						/>
 					)}
 				</DateInput>

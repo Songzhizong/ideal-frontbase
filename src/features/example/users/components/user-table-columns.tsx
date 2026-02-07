@@ -132,7 +132,7 @@ function StatusPill({ status }: { status: DemoUserStatus }) {
 function RowActions({ user }: { user: DemoUser }) {
   return (
     <div className="flex items-center justify-end gap-1">
-      <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+      <Button variant="ghost" size="sm" className="h-8 px-2" aria-label="编辑用户" asChild>
         <BaseLink to={`/example/users/${user.id}/edit`}>
           <Pencil className="h-4 w-4" />
         </BaseLink>

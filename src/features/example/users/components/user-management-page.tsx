@@ -1,66 +1,43 @@
 import { Activity, AlertTriangle, Download, Plus, RefreshCw, UserPlus, Users } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { PageContainer } from "@/components/common/page-container"
-import type { FilterDefinition } from "@/components/table/v2"
-import {
-  DataTableActiveFilters,
-  DataTablePagination,
-  DataTableRoot,
-  DataTableSearch,
-  DataTableSelectionBar,
-  DataTableTable,
-  DataTableToolbar,
-  DataTableViewOptions,
-  remote,
-  useDataTable,
-} from "@/components/table/v2"
+import type { DataTableSelectionExportPayload } from "@/components/table/v2"
+import { DataTablePreset, DataTableViewOptions, remote, useDataTable } from "@/components/table/v2"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/features/dashboard/components/stats-card"
 import { useBaseNavigate } from "@/hooks/use-base-navigate"
-import { DEMO_USERS, fetchDemoUsers } from "../demo/users"
-import {
-  DEMO_USER_DEPARTMENTS,
-  DEMO_USER_ROLES,
-  DEMO_USER_STATUSES,
-  type DemoUser,
-  type DemoUserFilters,
-} from "../types"
+import { cn } from "@/lib/utils"
+import { DEMO_USERS, fetchDemoUsers, filterDemoUsers } from "../demo/users"
+import type { DemoUser, DemoUserFilters } from "../types"
 import { useUserManagementTableState } from "./use-user-management-table-state"
+import { buildUserCsvRows, downloadCsvFile } from "./user-management-csv"
+import {
+  buildActiveUserFilterDefinitions,
+  buildExpandableUserFilterDefinitions,
+  buildToolbarUserFilterDefinitions,
+  buildUserFilterDefinitions,
+  ROLE_LABEL,
+  STATUS_LABEL,
+} from "./user-management-filters"
 import { demoUserTableColumns } from "./user-table-columns"
-
-const ROLE_LABEL: Record<(typeof DEMO_USER_ROLES)[number], string> = {
-  super_admin: "超级管理员",
-  employee: "普通员工",
-  partner: "外部伙伴",
-}
-
-const STATUS_LABEL: Record<(typeof DEMO_USER_STATUSES)[number], string> = {
-  active: "激活",
-  disabled: "禁用",
-  locked: "锁定",
-}
-
-function buildCsvCell(value: string): string {
-  const normalized = value.replaceAll('"', '""')
-  return `"${normalized}"`
-}
-
-function downloadCsv(args: { filename: string; rows: string[][] }) {
-  const csv = args.rows.map((row) => row.map(buildCsvCell).join(",")).join("\n")
-  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement("a")
-  link.href = url
-  link.download = args.filename
-  link.click()
-  URL.revokeObjectURL(url)
-}
 
 export function UserManagementPage() {
   const navigate = useBaseNavigate()
 
   const state = useUserManagementTableState()
+
+  const demoUsersById = useMemo(() => {
+    const map = new Map<string, DemoUser>()
+    for (const user of DEMO_USERS) {
+      map.set(user.id, user)
+    }
+    return map
+  }, [])
+
+  const fetchAllMatchingIds = useCallback(async (filters: DemoUserFilters) => {
+    return filterDemoUsers(DEMO_USERS, filters).map((user) => user.id)
+  }, [])
 
   const dataSource = useMemo(() => {
     return remote<DemoUser, DemoUserFilters, Awaited<ReturnType<typeof fetchDemoUsers>>>({
@@ -78,7 +55,12 @@ export function UserManagementPage() {
     features: {
       selection: {
         enabled: true,
-        mode: "page",
+        mode: "cross-page",
+        crossPage: {
+          selectAllStrategy: "server",
+          fetchAllIds: fetchAllMatchingIds,
+          maxSelection: 5000,
+        },
       },
       columnVisibility: {
         enabled: true,
@@ -97,91 +79,20 @@ export function UserManagementPage() {
         enabled: true,
         left: ["__select__", "name"],
         right: ["__actions__"],
+        storageKey: "example_users_v2_pinning",
       },
     },
   })
 
-  const filterDefinitions = useMemo<
-    Array<FilterDefinition<DemoUserFilters, keyof DemoUserFilters>>
-  >(() => {
-    return [
-      {
-        key: "nameKeyword",
-        label: "姓名",
-        type: "text",
-        placeholder: "输入姓名关键字后回车",
-        defaultVisible: true,
-      },
-      {
-        key: "status",
-        label: "状态",
-        type: "select",
-        placeholder: "全部",
-        options: DEMO_USER_STATUSES.map((status) => ({
-          label: STATUS_LABEL[status],
-          value: status,
-        })),
-        alwaysVisible: true,
-      },
-      {
-        key: "role",
-        label: "角色",
-        type: "select",
-        placeholder: "全部",
-        options: DEMO_USER_ROLES.map((role) => ({
-          label: ROLE_LABEL[role],
-          value: role,
-        })),
-        defaultVisible: true,
-      },
-      {
-        key: "department",
-        label: "部门",
-        type: "select",
-        placeholder: "全部",
-        options: DEMO_USER_DEPARTMENTS.map((department) => ({
-          label: department,
-          value: department,
-        })),
-        defaultVisible: true,
-      },
-      {
-        key: "isOnline",
-        label: "在线状态",
-        type: "boolean",
-        defaultVisible: true,
-      },
-      {
-        key: "riskScoreRange",
-        label: "风险分区间",
-        type: "number-range",
-        defaultVisible: true,
-      },
-      {
-        key: "createdAtDate",
-        label: "创建日期",
-        type: "date",
-      },
-      {
-        key: "lastLoginRange",
-        label: "最近登录区间",
-        type: "date-range",
-      },
-    ]
-  }, [])
+  const filterDefinitions = useMemo(() => buildUserFilterDefinitions(), [])
+  const quickFilterDefinitions = useMemo(() => buildToolbarUserFilterDefinitions(), [])
+  const expandableFilterDefinitions = useMemo(() => buildExpandableUserFilterDefinitions(), [])
 
-  const activeFilterDefinitions = useMemo<
-    Array<FilterDefinition<DemoUserFilters, keyof DemoUserFilters>>
-  >(() => {
-    return [
-      {
-        key: "q",
-        label: "搜索",
-        type: "text",
-      },
-      ...filterDefinitions,
-    ]
+  const activeFilterDefinitions = useMemo(() => {
+    return buildActiveUserFilterDefinitions(filterDefinitions)
   }, [filterDefinitions])
+
+  const isRefreshing = dt.activity.isInitialLoading || dt.activity.isFetching
 
   const metrics = useMemo(() => {
     const totalUsers = DEMO_USERS.length
@@ -234,50 +145,60 @@ export function UserManagementPage() {
   }, [navigate])
 
   const handleExportCurrentPage = useCallback(() => {
+    if (dt.status.type !== "ready") return
     const rows = dt.table.getRowModel().rows.map((row) => row.original)
     const filename = `users_page_${dt.pagination.page}_size_${dt.pagination.size}.csv`
-    downloadCsv({
+    downloadCsvFile({
       filename,
-      rows: [
-        ["ID", "姓名", "邮箱", "手机号", "风险分", "角色", "部门", "状态", "创建时间", "最后登录"],
-        ...rows.map((user) => [
-          user.id,
-          user.name,
-          user.email,
-          user.phone,
-          String(user.riskScore),
-          ROLE_LABEL[user.role],
-          user.department,
-          STATUS_LABEL[user.status],
-          user.createdAt,
-          user.lastLoginAt,
-        ]),
-      ],
+      rows: buildUserCsvRows({
+        users: rows,
+        roleLabel: (role) => ROLE_LABEL[role],
+        statusLabel: (status) => STATUS_LABEL[status],
+      }),
     })
-  }, [dt.pagination.page, dt.pagination.size, dt.table])
+  }, [dt.pagination.page, dt.pagination.size, dt.status, dt.table])
 
-  const handleExportSelectedCurrentPage = useCallback((selectedRowsCurrentPage: DemoUser[]) => {
-    if (selectedRowsCurrentPage.length === 0) return
-    const filename = `users_selected_${selectedRowsCurrentPage.length}.csv`
-    downloadCsv({
-      filename,
-      rows: [
-        ["ID", "姓名", "邮箱", "手机号", "风险分", "角色", "部门", "状态", "创建时间", "最后登录"],
-        ...selectedRowsCurrentPage.map((user) => [
-          user.id,
-          user.name,
-          user.email,
-          user.phone,
-          String(user.riskScore),
-          ROLE_LABEL[user.role],
-          user.department,
-          STATUS_LABEL[user.status],
-          user.createdAt,
-          user.lastLoginAt,
-        ]),
-      ],
-    })
-  }, [])
+  const resolveRowsByExportPayload = useCallback(
+    (payload: DataTableSelectionExportPayload<DemoUserFilters>): DemoUser[] => {
+      if (payload.type === "ids") {
+        const rows: DemoUser[] = []
+        for (const rowId of payload.rowIds) {
+          const user = demoUsersById.get(rowId)
+          if (user) {
+            rows.push(user)
+          }
+        }
+        return rows
+      }
+
+      const excludedRowIds = new Set(payload.excludedRowIds)
+      return filterDemoUsers(DEMO_USERS, payload.filters).filter(
+        (user) => !excludedRowIds.has(user.id),
+      )
+    },
+    [demoUsersById],
+  )
+
+  const handleExportSelection = useCallback(
+    (payload: DataTableSelectionExportPayload<DemoUserFilters>) => {
+      const rows = resolveRowsByExportPayload(payload)
+      if (rows.length === 0) return
+      const filename =
+        payload.type === "all"
+          ? `users_all_matching_${rows.length}.csv`
+          : `users_selected_${rows.length}.csv`
+
+      downloadCsvFile({
+        filename,
+        rows: buildUserCsvRows({
+          users: rows,
+          roleLabel: (role) => ROLE_LABEL[role],
+          statusLabel: (status) => STATUS_LABEL[status],
+        }),
+      })
+    },
+    [resolveRowsByExportPayload],
+  )
 
   return (
     <PageContainer className="flex flex-col gap-6">
@@ -285,7 +206,7 @@ export function UserManagementPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold text-foreground">用户管理</h1>
           <p className="text-sm text-muted-foreground">
-            用于验证 DataTable V2 的高级筛选能力（布尔、数值区间、日期、日期区间）。
+            DataTablePreset 参考实现：远程数据源、URL 状态、搜索筛选、跨页选择与批量导出。
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -293,6 +214,7 @@ export function UserManagementPage() {
             type="button"
             variant="outline"
             className="gap-2"
+            disabled={isRefreshing || dt.status.type !== "ready"}
             onClick={handleExportCurrentPage}
           >
             <Download className="h-4 w-4" />
@@ -320,20 +242,26 @@ export function UserManagementPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>用户列表（Table V2）</CardTitle>
+          <CardTitle>用户列表（Table V2 默认示例）</CardTitle>
           <CardDescription>
-            内置 220 条 mock
-            用户数据，支持高级条件组合筛选（在线状态、风险分、创建日期、登录区间）。
+            内置 220 条 mock 用户数据，覆盖搜索、筛选、列偏好、跨页批量选择与导出。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <DataTableRoot
+          <DataTablePreset<DemoUser, DemoUserFilters>
             dt={dt}
             layout={{ stickyHeader: true, stickyPagination: true }}
             className="rounded-md border border-border/50"
-          >
-            <DataTableToolbar
-              actions={
+            query={{
+              className: "bg-transparent",
+              search: {
+                placeholder: "搜索姓名、邮箱、手机号",
+              },
+              quickFilters: quickFilterDefinitions,
+              advancedFilters: expandableFilterDefinitions,
+              activeFilters: activeFilterDefinitions,
+              showActiveFilters: true,
+              actions: (
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
@@ -342,45 +270,30 @@ export function UserManagementPage() {
                     className="h-8 w-8"
                     onClick={() => dt.actions.refetch()}
                     aria-label="刷新"
+                    disabled={isRefreshing}
                   >
-                    <RefreshCw className="h-4 w-4" />
+                    <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
                   </Button>
                   <DataTableViewOptions />
                 </div>
-              }
-            >
-              <DataTableSearch<DemoUserFilters>
-                mode="advanced"
-                placeholder="输入关键字按回车，或选择字段后添加条件（布尔/区间/日期）"
-                advancedFields={filterDefinitions}
-                className="[&>div]:border-border/60 [&>div]:bg-card"
-              />
-            </DataTableToolbar>
-
-            <DataTableActiveFilters
-              filters={activeFilterDefinitions}
-              className="border-b border-border/50 bg-muted/20 px-3 py-3"
-            />
-
-            <DataTableTable<DemoUser> renderEmpty={() => "暂无匹配用户"} />
-
-            <DataTableSelectionBar<DemoUser>
-              actions={({ selectedRowsCurrentPage }) => (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-2"
-                  onClick={() => handleExportSelectedCurrentPage(selectedRowsCurrentPage)}
-                >
-                  <Download className="h-4 w-4" />
-                  导出已选（当前页）
-                </Button>
-              )}
-            />
-
-            <DataTablePagination />
-          </DataTableRoot>
+              ),
+            }}
+            table={{
+              renderEmpty: () => "暂无匹配用户",
+            }}
+            selectionBarActions={({ exportPayload }) => (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2"
+                onClick={() => handleExportSelection(exportPayload)}
+              >
+                <Download className="h-4 w-4" />
+                导出已选（支持跨页）
+              </Button>
+            )}
+          />
         </CardContent>
       </Card>
     </PageContainer>

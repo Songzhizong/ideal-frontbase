@@ -169,6 +169,14 @@ export function DataTableActiveFilters<TFilterSchema>({
     }))
     .filter(({ filter, value }) => !isEmptyFilterValue(value, filter.type))
 
+  const handleClearAll = () => {
+    const updates = {} as Partial<TFilterSchema>
+    for (const { filter } of activeItems) {
+      updates[filter.key] = getClearedFilterValue(filter.type) as TFilterSchema[keyof TFilterSchema]
+    }
+    dt.filters.setBatch(updates)
+  }
+
   if (activeItems.length === 0) return null
 
   return (
@@ -196,7 +204,7 @@ export function DataTableActiveFilters<TFilterSchema>({
           <Badge key={String(filter.key)} variant="secondary" className="gap-1">
             <span>{filter.label}</span>
             <span className="text-muted-foreground">:</span>
-            <span className="max-w-[160px] truncate">{displayValue}</span>
+            <span className="max-w-40 truncate">{displayValue}</span>
             <Button
               variant="ghost"
               size="icon-xs"
@@ -213,7 +221,7 @@ export function DataTableActiveFilters<TFilterSchema>({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => dt.filters.reset()}
+          onClick={handleClearAll}
           className="h-7 px-2 text-muted-foreground"
         >
           {clearLabel ?? i18n.filters.clearAllText}
