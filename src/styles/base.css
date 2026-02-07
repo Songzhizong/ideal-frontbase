@@ -124,4 +124,13 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
   }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }

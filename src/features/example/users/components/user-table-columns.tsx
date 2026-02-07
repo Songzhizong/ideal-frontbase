@@ -252,7 +252,7 @@ export const demoUserTableColumns: ColumnDef<DemoUser, never>[] = [
   }),
   helper.actions((row) => <RowActions user={row.original} />, {
     header: "操作",
-    size: 140,
+    size: 90,
     align: "center",
   }),
 ]

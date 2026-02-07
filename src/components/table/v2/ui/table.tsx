@@ -3,6 +3,7 @@ import { AlertCircle, X } from "lucide-react"
 import type { ReactElement, ReactNode } from "react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -62,34 +63,12 @@ export function DataTableTable<TData>({
   const cellDensityClass = density === "comfortable" ? "py-4" : "py-2"
   const treeIndentSize = getTreeIndentSize(tableMeta)
   const treeAllowNesting = getTreeAllowNesting(tableMeta)
+  const useSplitHeaderBody = scrollContainer === "root" && isStickyHeader
 
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const splitHeaderScrollRef = useRef<HTMLDivElement>(null)
+  const splitBodyViewportRef = useRef<HTMLDivElement>(null)
   const [scrollEdges, setScrollEdges] = useState({ left: false, right: false })
-
-  useEffect(() => {
-    const root = wrapperRef.current
-    if (!root) return
-    const scrollElement = root.querySelector<HTMLDivElement>('[data-slot="table-container"]')
-    if (!scrollElement) return
-
-    const update = () => {
-      const left = scrollElement.scrollLeft > 0
-      const right =
-        scrollElement.scrollLeft + scrollElement.clientWidth <
-        Math.max(0, scrollElement.scrollWidth - 1)
-      setScrollEdges((prev) =>
-        prev.left === left && prev.right === right ? prev : { left, right },
-      )
-    }
-
-    update()
-    scrollElement.addEventListener("scroll", update, { passive: true })
-    window.addEventListener("resize", update)
-    return () => {
-      scrollElement.removeEventListener("scroll", update)
-      window.removeEventListener("resize", update)
-    }
-  }, [])
 
   const leftPinned = dt.table.getLeftLeafColumns()
   const rightPinned = dt.table.getRightLeafColumns()
@@ -102,10 +81,75 @@ export function DataTableTable<TData>({
   const isInitialLoading = dt.activity.isInitialLoading || !dt.activity.preferencesReady
   const isFetching = dt.activity.isFetching
 
-  const headerClassName = cn(
-    isStickyHeader && "sticky top-[var(--dt-sticky-top,0px)] z-10 bg-table-header",
-    "[&_tr]:border-border/50",
-  )
+  useEffect(() => {
+    const defaultScrollElement = wrapperRef.current?.querySelector<HTMLDivElement>(
+      '[data-slot="table-container"]',
+    )
+    const headerScrollElement = useSplitHeaderBody ? splitHeaderScrollRef.current : null
+    const bodyHorizontalScrollElement = useSplitHeaderBody
+      ? splitBodyViewportRef.current
+      : defaultScrollElement
+
+    if (!bodyHorizontalScrollElement) return
+
+    const updateEdges = () => {
+      const left = bodyHorizontalScrollElement.scrollLeft > 0
+      const right =
+        bodyHorizontalScrollElement.scrollLeft + bodyHorizontalScrollElement.clientWidth <
+        Math.max(0, bodyHorizontalScrollElement.scrollWidth - 1)
+      setScrollEdges((prev) =>
+        prev.left === left && prev.right === right ? prev : { left, right },
+      )
+    }
+
+    const syncHeaderScroll = () => {
+      if (!headerScrollElement) return
+      if (headerScrollElement.scrollLeft !== bodyHorizontalScrollElement.scrollLeft) {
+        headerScrollElement.scrollLeft = bodyHorizontalScrollElement.scrollLeft
+      }
+    }
+
+    const handleBodyHorizontalScroll = () => {
+      updateEdges()
+      syncHeaderScroll()
+    }
+
+    updateEdges()
+    syncHeaderScroll()
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(() => {
+            updateEdges()
+            syncHeaderScroll()
+          })
+
+    if (resizeObserver) {
+      resizeObserver.observe(bodyHorizontalScrollElement)
+      const bodyContent = bodyHorizontalScrollElement.firstElementChild
+      if (bodyContent) {
+        resizeObserver.observe(bodyContent)
+      }
+    }
+
+    const handleResize = () => {
+      updateEdges()
+      syncHeaderScroll()
+    }
+
+    bodyHorizontalScrollElement.addEventListener("scroll", handleBodyHorizontalScroll, {
+      passive: true,
+    })
+    window.addEventListener("resize", handleResize)
+    return () => {
+      bodyHorizontalScrollElement.removeEventListener("scroll", handleBodyHorizontalScroll)
+      window.removeEventListener("resize", handleResize)
+      resizeObserver?.disconnect()
+    }
+  }, [useSplitHeaderBody])
+
+  const headerClassName = cn("[&_tr]:border-border/50")
 
   const rowClassName = "border-border/50"
   const dragSortEnabled = dt.dragSort.enabled
@@ -193,7 +237,7 @@ export function DataTableTable<TData>({
     rowClassName,
     cellDensityClass,
     canVirtualize,
-    wrapperRef,
+    wrapperRef: useSplitHeaderBody ? splitBodyViewportRef : wrapperRef,
     virtualizationMeta,
     analyticsMeta,
     renderDataRow,
@@ -215,6 +259,132 @@ export function DataTableTable<TData>({
       renderExpandedRow={renderExpandedRow}
     />
   )
+
+  const isStickyHeaderInTable = isStickyHeader && !useSplitHeaderBody
+
+  const headerRows = dt.table.getHeaderGroups().map((headerGroup) => (
+    <TableRow key={headerGroup.id} className={rowClassName}>
+      {headerGroup.headers.map((header) => {
+        const headerMetaClass = getMetaClass(header.column.columnDef.meta, "headerClassName")
+        const headerAlign = getMetaAlign(header.column.columnDef.meta, "header")
+        const pinned = header.column.getIsPinned()
+        const isPinned = pinned === "left" || pinned === "right"
+        return (
+          <TableHead
+            key={header.id}
+            style={{
+              width: `${header.getSize()}px`,
+              minWidth: `${header.getSize()}px`,
+              ...(isStickyHeaderInTable || isPinned
+                ? {
+                    position: "sticky",
+                    ...(isStickyHeaderInTable
+                      ? {
+                          top: "var(--dt-sticky-top,0px)",
+                        }
+                      : {}),
+                    ...(isPinned
+                      ? pinned === "left"
+                        ? {
+                            left: `${header.column.getStart("left")}px`,
+                          }
+                        : {
+                            right: `${header.column.getAfter("right")}px`,
+                          }
+                      : {}),
+                  }
+                : {}),
+              zIndex: isStickyHeaderInTable ? (isPinned ? 30 : 15) : isPinned ? 20 : undefined,
+            }}
+            className={cn(
+              "relative",
+              (isStickyHeaderInTable || isPinned || useSplitHeaderBody) && "bg-table-header",
+              scrollEdges.left &&
+                header.column.id === lastLeftPinnedId &&
+                "after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
+              scrollEdges.right &&
+                header.column.id === firstRightPinnedId &&
+                "before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
+              headerAlign === "center" && "text-center",
+              headerAlign === "right" && "text-right",
+              headerMetaClass,
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  "min-w-0 flex-1",
+                  headerAlign === "center" && "flex justify-center",
+                  headerAlign === "right" && "flex justify-end",
+                )}
+              >
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+              </div>
+              {header.column.getCanResize() && (
+                <button
+                  type="button"
+                  onMouseDown={header.getResizeHandler()}
+                  onTouchStart={header.getResizeHandler()}
+                  aria-label={i18n.columnResizeHandleLabel}
+                  className={cn(
+                    "absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none border-0 bg-transparent p-0",
+                    header.column.getIsResizing() && "bg-primary",
+                  )}
+                />
+              )}
+            </div>
+          </TableHead>
+        )
+      })}
+    </TableRow>
+  ))
+
+  const tableBodyContent =
+    dt.status.type === "error"
+      ? (() => {
+          const customError = renderError?.(dt.status.error, dt.actions.retry)
+          return (
+            <TableRow className={rowClassName}>
+              <TableCell colSpan={colSpan} className="h-24 text-center">
+                {customError ?? (
+                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{i18n.errorText}</span>
+                    <Button variant="outline" size="sm" onClick={() => dt.actions.retry()}>
+                      {i18n.retryText}
+                    </Button>
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
+          )
+        })()
+      : !isInitialLoading && dt.status.type === "empty"
+        ? (() => {
+            const customEmpty = renderEmpty?.()
+            return (
+              <TableRow className={rowClassName}>
+                <TableCell colSpan={colSpan} className="h-24 text-center text-muted-foreground">
+                  {customEmpty ?? i18n.emptyText}
+                </TableCell>
+              </TableRow>
+            )
+          })()
+        : isInitialLoading
+          ? SKELETON_ROW_KEYS.map((key) => (
+              <TableRow key={key} className={rowClassName}>
+                <TableCell colSpan={colSpan} className={cn("py-4", cellDensityClass)}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              </TableRow>
+            ))
+          : dragSortEnabled
+            ? dragSortRows
+            : canVirtualize
+              ? virtualizedRows
+              : (groupedRows ?? regularRows)
 
   return (
     <div
@@ -249,145 +419,63 @@ export function DataTableTable<TData>({
           ) : null}
         </div>
       ) : null}
-      <div
-        ref={wrapperRef}
-        className={cn("min-h-0 w-full", scrollContainer === "root" ? "flex-1 overflow-y-auto" : "")}
-      >
-        <Table className="table-fixed">
-          <TableHeader className={headerClassName}>
-            {dt.table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className={rowClassName}>
-                {headerGroup.headers.map((header) => {
-                  const headerMetaClass = getMetaClass(
-                    header.column.columnDef.meta,
-                    "headerClassName",
-                  )
-                  const headerAlign = getMetaAlign(header.column.columnDef.meta, "header")
-                  return (
-                    <TableHead
-                      key={header.id}
-                      style={{
-                        width: `${header.getSize()}px`,
-                        minWidth: `${header.getSize()}px`,
-                        ...(header.column.getIsPinned()
-                          ? header.column.getIsPinned() === "left"
-                            ? {
-                                position: "sticky",
-                                left: `${header.column.getStart("left")}px`,
-                              }
-                            : {
-                                position: "sticky",
-                                right: `${header.column.getAfter("right")}px`,
-                              }
-                          : {}),
-                        zIndex: header.column.getIsPinned() ? 20 : undefined,
-                      }}
-                      className={cn(
-                        "relative",
-                        header.column.getIsPinned() && "bg-table-header",
-                        scrollEdges.left &&
-                          header.column.id === lastLeftPinnedId &&
-                          "after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
-                        scrollEdges.right &&
-                          header.column.id === firstRightPinnedId &&
-                          "before:absolute before:inset-y-0 before:left-0 before:w-2 before:-translate-x-full before:bg-linear-to-l before:from-border/50 before:to-transparent before:pointer-events-none",
-                        headerAlign === "center" && "text-center",
-                        headerAlign === "right" && "text-right",
-                        headerMetaClass,
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={cn(
-                            "min-w-0 flex-1",
-                            headerAlign === "center" && "flex justify-center",
-                            headerAlign === "right" && "flex justify-end",
-                          )}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </div>
-                        {header.column.getCanResize() && (
-                          <button
-                            type="button"
-                            onMouseDown={header.getResizeHandler()}
-                            onTouchStart={header.getResizeHandler()}
-                            aria-label={i18n.columnResizeHandleLabel}
-                            className={cn(
-                              "absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none border-0 bg-transparent p-0",
-                              header.column.getIsResizing() && "bg-primary",
-                            )}
-                          />
-                        )}
-                      </div>
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {dt.status.type === "error"
-              ? (() => {
-                  const customError = renderError?.(dt.status.error, dt.actions.retry)
-                  return (
-                    <TableRow className={rowClassName}>
-                      <TableCell colSpan={colSpan} className="h-24 text-center">
-                        {customError ?? (
-                          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                            <AlertCircle className="h-4 w-4" />
-                            <span>{i18n.errorText}</span>
-                            <Button variant="outline" size="sm" onClick={() => dt.actions.retry()}>
-                              {i18n.retryText}
-                            </Button>
-                          </div>
-                        )}
+      {useSplitHeaderBody ? (
+        <>
+          <div className="w-full shrink-0 overflow-hidden">
+            <div
+              ref={splitHeaderScrollRef}
+              className="scrollbar-none overflow-x-auto overflow-y-hidden"
+            >
+              <table data-slot="table" className="w-full caption-bottom text-sm table-fixed">
+                <TableHeader className={headerClassName}>{headerRows}</TableHeader>
+              </table>
+            </div>
+          </div>
+
+          <ScrollArea
+            className="min-h-0 w-full flex-1"
+            viewportRef={splitBodyViewportRef}
+            viewportClassName="min-h-0 h-full w-full"
+            scrollbars="both"
+          >
+            <table data-slot="table" className="w-full caption-bottom text-sm table-fixed">
+              <TableBody>{tableBodyContent}</TableBody>
+              {summaryCells ? (
+                <TableFooter>
+                  <TableRow className={rowClassName}>
+                    {summaryCells.map((value, index) => (
+                      <TableCell key={`__summary__${String(index)}`} className={cellDensityClass}>
+                        {value}
                       </TableCell>
-                    </TableRow>
-                  )
-                })()
-              : !isInitialLoading && dt.status.type === "empty"
-                ? (() => {
-                    const customEmpty = renderEmpty?.()
-                    return (
-                      <TableRow className={rowClassName}>
-                        <TableCell
-                          colSpan={colSpan}
-                          className="h-24 text-center text-muted-foreground"
-                        >
-                          {customEmpty ?? i18n.emptyText}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })()
-                : isInitialLoading
-                  ? SKELETON_ROW_KEYS.map((key) => (
-                      <TableRow key={key} className={rowClassName}>
-                        <TableCell colSpan={colSpan} className={cn("py-4", cellDensityClass)}>
-                          <Skeleton className="h-4 w-full" />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  : dragSortEnabled
-                    ? dragSortRows
-                    : canVirtualize
-                      ? virtualizedRows
-                      : (groupedRows ?? regularRows)}
-          </TableBody>
-          {summaryCells ? (
-            <TableFooter>
-              <TableRow className={rowClassName}>
-                {summaryCells.map((value, index) => (
-                  <TableCell key={`__summary__${String(index)}`} className={cellDensityClass}>
-                    {value}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableFooter>
-          ) : null}
-        </Table>
-      </div>
+                    ))}
+                  </TableRow>
+                </TableFooter>
+              ) : null}
+            </table>
+          </ScrollArea>
+        </>
+      ) : (
+        <div
+          ref={wrapperRef}
+          className={cn("min-h-0 w-full", scrollContainer === "root" && "flex-1 overflow-y-auto")}
+        >
+          <Table className="table-fixed">
+            <TableHeader className={headerClassName}>{headerRows}</TableHeader>
+            <TableBody>{tableBodyContent}</TableBody>
+            {summaryCells ? (
+              <TableFooter>
+                <TableRow className={rowClassName}>
+                  {summaryCells.map((value, index) => (
+                    <TableCell key={`__summary__${String(index)}`} className={cellDensityClass}>
+                      {value}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableFooter>
+            ) : null}
+          </Table>
+        </div>
+      )}
     </div>
   )
 }

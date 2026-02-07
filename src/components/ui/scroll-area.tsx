@@ -3,11 +3,23 @@ import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+type ScrollAreaProps = React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
+  viewportRef?: React.Ref<HTMLDivElement>
+  viewportClassName?: string
+  scrollbars?: "vertical" | "horizontal" | "both" | "none"
+}
+
 function ScrollArea({
   className,
+  viewportRef,
+  viewportClassName,
+  scrollbars = "vertical",
   children,
   ...props
-}: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+}: ScrollAreaProps) {
+  const showVertical = scrollbars === "vertical" || scrollbars === "both"
+  const showHorizontal = scrollbars === "horizontal" || scrollbars === "both"
+
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
@@ -15,13 +27,18 @@ function ScrollArea({
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
         data-slot="scroll-area-viewport"
-        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+        className={cn(
+          "focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1",
+          viewportClassName,
+        )}
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
-      <ScrollAreaPrimitive.Corner />
+      {showVertical ? <ScrollBar orientation="vertical" /> : null}
+      {showHorizontal ? <ScrollBar orientation="horizontal" /> : null}
+      {showVertical && showHorizontal ? <ScrollAreaPrimitive.Corner /> : null}
     </ScrollAreaPrimitive.Root>
   )
 }
@@ -36,7 +53,7 @@ function ScrollBar({
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
       className={cn(
-        "flex touch-none p-px transition-colors select-none",
+        "z-40 flex touch-none p-px transition-colors select-none",
         orientation === "vertical" &&
           "h-full w-2.5 border-l border-l-transparent",
         orientation === "horizontal" &&

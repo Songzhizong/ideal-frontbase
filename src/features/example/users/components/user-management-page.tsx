@@ -346,7 +346,8 @@ export function UserManagementPage() {
         <CardContent className="space-y-3">
           <DataTableRoot
             dt={dt}
-            layout={{ stickyHeader: true, stickyPagination: true }}
+            height="clamp(420px, 70vh, 720px)"
+            layout={{ scrollContainer: "root", stickyHeader: true }}
             className="overflow-hidden rounded-md border border-border/50"
           >
             <DataTableToolbar
