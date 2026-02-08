@@ -7,8 +7,9 @@ interface UseHorizontalScrollSyncArgs {
   wrapperRef: RefObject<HTMLDivElement | null>
   splitHeaderScrollRef: RefObject<HTMLDivElement | null>
   splitBodyViewportRef: RefObject<HTMLDivElement | null>
+  splitFooterScrollRef: RefObject<HTMLDivElement | null>
   syncRafRef: RefObject<number | null>
-  syncingTargetRef: RefObject<"header" | "body" | null>
+  syncingTargetRef: RefObject<"header" | "body" | "footer" | null>
   setScrollEdges: Dispatch<SetStateAction<{ left: boolean; right: boolean }>>
 }
 
@@ -19,20 +20,39 @@ export function useHorizontalScrollSync({
   wrapperRef,
   splitHeaderScrollRef,
   splitBodyViewportRef,
+  splitFooterScrollRef,
   syncRafRef,
   syncingTargetRef,
   setScrollEdges,
 }: UseHorizontalScrollSyncArgs) {
   useEffect(() => {
-    const defaultScrollElement = wrapperRef.current?.querySelector<HTMLDivElement>(
-      '[data-slot="table-container"]',
-    )
+    const wrapperElement = wrapperRef.current
+    const defaultScrollElement = wrapperElement?.matches('[data-slot="table-container"]')
+      ? wrapperElement
+      : wrapperElement?.querySelector<HTMLDivElement>('[data-slot="table-container"]')
     const headerScrollElement = useSplitHeaderBody ? splitHeaderScrollRef.current : null
     const bodyHorizontalScrollElement = useRootSplitHeaderBody
       ? splitBodyViewportRef.current
       : defaultScrollElement
+    const footerScrollElement = useWindowSplitHeaderBody ? splitFooterScrollRef.current : null
 
     if (!bodyHorizontalScrollElement) return
+
+    const setFooterContentWidth = () => {
+      if (!footerScrollElement) return
+      const footerContent = footerScrollElement.firstElementChild
+      if (!(footerContent instanceof HTMLElement)) return
+      footerContent.style.width = `${bodyHorizontalScrollElement.scrollWidth}px`
+    }
+
+    const syncFooterScroll = () => {
+      if (!footerScrollElement) return
+      setFooterContentWidth()
+      if (Math.abs(footerScrollElement.scrollLeft - bodyHorizontalScrollElement.scrollLeft) > 0.5) {
+        syncingTargetRef.current = "footer"
+        footerScrollElement.scrollLeft = bodyHorizontalScrollElement.scrollLeft
+      }
+    }
 
     const updateEdges = () => {
       const left = bodyHorizontalScrollElement.scrollLeft > 0
@@ -47,6 +67,9 @@ export function useHorizontalScrollSync({
     const syncHeaderScroll = () => {
       if (!headerScrollElement) return
       if (headerScrollElement.scrollLeft !== bodyHorizontalScrollElement.scrollLeft) {
+        if (!useWindowSplitHeaderBody) {
+          syncingTargetRef.current = "header"
+        }
         headerScrollElement.scrollLeft = bodyHorizontalScrollElement.scrollLeft
       }
     }
@@ -58,21 +81,21 @@ export function useHorizontalScrollSync({
         return
       }
 
-      if (!headerScrollElement) {
-        updateEdges()
-        return
-      }
-
       if (syncRafRef.current != null) {
         cancelAnimationFrame(syncRafRef.current)
       }
       syncRafRef.current = requestAnimationFrame(() => {
-        if (
-          Math.abs(headerScrollElement.scrollLeft - bodyHorizontalScrollElement.scrollLeft) > 0.5
-        ) {
-          syncingTargetRef.current = "header"
-          headerScrollElement.scrollLeft = bodyHorizontalScrollElement.scrollLeft
+        if (headerScrollElement) {
+          const shouldSyncHeader =
+            Math.abs(headerScrollElement.scrollLeft - bodyHorizontalScrollElement.scrollLeft) > 0.5
+          if (shouldSyncHeader) {
+            if (!useWindowSplitHeaderBody) {
+              syncingTargetRef.current = "header"
+            }
+            headerScrollElement.scrollLeft = bodyHorizontalScrollElement.scrollLeft
+          }
         }
+        syncFooterScroll()
         updateEdges()
         syncRafRef.current = null
       })
@@ -101,6 +124,35 @@ export function useHorizontalScrollSync({
       })
     }
 
+    const handleFooterHorizontalScroll = () => {
+      if (!footerScrollElement) return
+
+      if (syncingTargetRef.current === "footer") {
+        syncingTargetRef.current = null
+        return
+      }
+
+      if (syncRafRef.current != null) {
+        cancelAnimationFrame(syncRafRef.current)
+      }
+      syncRafRef.current = requestAnimationFrame(() => {
+        if (
+          Math.abs(bodyHorizontalScrollElement.scrollLeft - footerScrollElement.scrollLeft) > 0.5
+        ) {
+          syncingTargetRef.current = "body"
+          bodyHorizontalScrollElement.scrollLeft = footerScrollElement.scrollLeft
+        }
+        if (
+          headerScrollElement &&
+          Math.abs(headerScrollElement.scrollLeft - footerScrollElement.scrollLeft) > 0.5
+        ) {
+          headerScrollElement.scrollLeft = footerScrollElement.scrollLeft
+        }
+        updateEdges()
+        syncRafRef.current = null
+      })
+    }
+
     const handleHeaderWheel = (event: WheelEvent) => {
       const deltaX = event.deltaX !== 0 ? event.deltaX : event.shiftKey ? event.deltaY : 0
       if (Math.abs(deltaX) < 0.5) return
@@ -110,6 +162,7 @@ export function useHorizontalScrollSync({
 
     updateEdges()
     syncHeaderScroll()
+    syncFooterScroll()
 
     const resizeObserver =
       typeof ResizeObserver === "undefined"
@@ -117,6 +170,7 @@ export function useHorizontalScrollSync({
         : new ResizeObserver(() => {
             updateEdges()
             syncHeaderScroll()
+            syncFooterScroll()
           })
 
     if (resizeObserver) {
@@ -130,19 +184,25 @@ export function useHorizontalScrollSync({
     const handleResize = () => {
       updateEdges()
       syncHeaderScroll()
+      syncFooterScroll()
     }
 
     bodyHorizontalScrollElement.addEventListener("scroll", handleBodyHorizontalScroll, {
       passive: true,
     })
-    headerScrollElement?.addEventListener("scroll", handleHeaderHorizontalScroll, {
-      passive: true,
-    })
+    if (!useWindowSplitHeaderBody) {
+      headerScrollElement?.addEventListener("scroll", handleHeaderHorizontalScroll, {
+        passive: true,
+      })
+    }
     if (useWindowSplitHeaderBody && headerScrollElement) {
       headerScrollElement.addEventListener("wheel", handleHeaderWheel, {
         passive: false,
       })
     }
+    footerScrollElement?.addEventListener("scroll", handleFooterHorizontalScroll, {
+      passive: true,
+    })
 
     window.addEventListener("resize", handleResize)
     return () => {
@@ -151,16 +211,20 @@ export function useHorizontalScrollSync({
         syncRafRef.current = null
       }
       bodyHorizontalScrollElement.removeEventListener("scroll", handleBodyHorizontalScroll)
-      headerScrollElement?.removeEventListener("scroll", handleHeaderHorizontalScroll)
+      if (!useWindowSplitHeaderBody) {
+        headerScrollElement?.removeEventListener("scroll", handleHeaderHorizontalScroll)
+      }
       if (useWindowSplitHeaderBody && headerScrollElement) {
         headerScrollElement.removeEventListener("wheel", handleHeaderWheel)
       }
+      footerScrollElement?.removeEventListener("scroll", handleFooterHorizontalScroll)
       window.removeEventListener("resize", handleResize)
       resizeObserver?.disconnect()
     }
   }, [
     setScrollEdges,
     splitBodyViewportRef,
+    splitFooterScrollRef,
     splitHeaderScrollRef,
     syncRafRef,
     syncingTargetRef,

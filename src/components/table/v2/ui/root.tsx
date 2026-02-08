@@ -48,6 +48,7 @@ export function DataTableRoot<TData, TFilterSchema>({
   return (
     <DataTableProvider dt={dt} {...(layout ? { layout } : {})}>
       <div
+        data-slot="data-table-root"
         className={cn(
           "flex min-h-0 flex-col overflow-clip",
           " [&>*:first-child]:rounded-t-[inherit] [&>*:last-child]:rounded-b-[inherit]",

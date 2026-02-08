@@ -71,8 +71,9 @@ export function DataTableTable<TData>({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const splitHeaderScrollRef = useRef<HTMLDivElement>(null)
   const splitBodyViewportRef = useRef<HTMLDivElement>(null)
+  const splitFooterScrollRef = useRef<HTMLDivElement>(null)
   const syncRafRef = useRef<number | null>(null)
-  const syncingTargetRef = useRef<"header" | "body" | null>(null)
+  const syncingTargetRef = useRef<"header" | "body" | "footer" | null>(null)
   const [scrollEdges, setScrollEdges] = useState({ left: false, right: false })
 
   const leftPinned = dt.table.getLeftLeafColumns()
@@ -93,6 +94,7 @@ export function DataTableTable<TData>({
     wrapperRef,
     splitHeaderScrollRef,
     splitBodyViewportRef,
+    splitFooterScrollRef,
     syncRafRef,
     syncingTargetRef,
     setScrollEdges,
@@ -411,6 +413,7 @@ export function DataTableTable<TData>({
           >
             <div
               ref={splitHeaderScrollRef}
+              data-slot="table-header-scroll"
               className="scrollbar-none overflow-x-hidden overflow-y-hidden"
             >
               <table data-slot="table" className="w-full caption-bottom text-sm table-fixed">
@@ -420,7 +423,7 @@ export function DataTableTable<TData>({
           </div>
 
           <div ref={wrapperRef} className="min-h-0 w-full">
-            <Table className="table-fixed">
+            <Table className="table-fixed" containerClassName="scrollbar-none">
               <TableBody>{tableBodyContent}</TableBody>
               {summaryCells ? (
                 <TableFooter>
@@ -435,13 +438,37 @@ export function DataTableTable<TData>({
               ) : null}
             </Table>
           </div>
+          <div
+            data-slot="table-horizontal-scrollbar-wrapper"
+            className={cn(
+              "sticky bottom-0 z-12 w-full shrink-0 bg-transparent",
+              !(scrollEdges.left || scrollEdges.right) && "hidden",
+            )}
+            style={{
+              bottom:
+                "calc(var(--dt-sticky-bottom, 0px) + var(--dt-sticky-pagination-height, 0px))",
+            }}
+          >
+            <div
+              ref={splitFooterScrollRef}
+              data-slot="table-horizontal-scrollbar"
+              className="overflow-x-auto overflow-y-hidden"
+            >
+              <div className="h-px min-w-full" />
+            </div>
+          </div>
         </>
       ) : (
         <div
-          ref={wrapperRef}
-          className={cn("min-h-0 w-full", scrollContainer === "root" && "flex-1 overflow-y-auto")}
+          ref={scrollContainer === "root" ? undefined : wrapperRef}
+          className={cn("min-h-0 w-full", scrollContainer === "root" && "flex-1")}
         >
-          <Table className="table-fixed">
+          <Table
+            className="table-fixed"
+            {...(scrollContainer === "root"
+              ? { containerRef: wrapperRef, containerClassName: "min-h-0 h-full overflow-auto" }
+              : {})}
+          >
             <TableHeader className={headerClassName}>{headerRows}</TableHeader>
             <TableBody>{tableBodyContent}</TableBody>
             {summaryCells ? (

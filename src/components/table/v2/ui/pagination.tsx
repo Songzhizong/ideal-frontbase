@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { type MouseEvent, useMemo } from "react"
+import { type MouseEvent, useLayoutEffect, useMemo, useRef } from "react"
 import {
   Pagination,
   PaginationContent,
@@ -96,6 +96,7 @@ export function DataTablePagination({
   const isStickyPagination =
     scrollContainer === "window" &&
     (stickyPagination === true || typeof stickyPagination === "object")
+  const rootRef = useRef<HTMLDivElement>(null)
 
   const pageCount = Math.max(0, dt.pagination.pageCount)
   const page = Math.min(Math.max(1, dt.pagination.page), Math.max(1, pageCount))
@@ -119,8 +120,42 @@ export function DataTablePagination({
     dt.actions.setPageSize(nextSize)
   }
 
+  useLayoutEffect(() => {
+    const paginationElement = rootRef.current
+    if (!paginationElement) return
+
+    const dataTableRoot = paginationElement.closest<HTMLElement>('[data-slot="data-table-root"]')
+    if (!dataTableRoot) return
+
+    const updateStickyHeight = () => {
+      const height = isStickyPagination ? paginationElement.offsetHeight : 0
+      dataTableRoot.style.setProperty("--dt-sticky-pagination-height", `${height}px`)
+    }
+
+    updateStickyHeight()
+
+    if (typeof ResizeObserver === "undefined") {
+      return () => {
+        dataTableRoot.style.removeProperty("--dt-sticky-pagination-height")
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateStickyHeight()
+    })
+    resizeObserver.observe(paginationElement)
+    window.addEventListener("resize", updateStickyHeight)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", updateStickyHeight)
+      dataTableRoot.style.removeProperty("--dt-sticky-pagination-height")
+    }
+  }, [isStickyPagination])
+
   return (
     <div
+      ref={rootRef}
       className={cn(
         "flex w-full flex-col gap-3 border-t border-border/50 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
         isStickyPagination && "sticky bottom-(--dt-sticky-bottom,0px) z-10",
