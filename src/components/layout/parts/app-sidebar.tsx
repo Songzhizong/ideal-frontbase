@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Pin, PinOff } from "lucide-react"
+import * as React from "react"
+import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import {
   Sidebar,
   SidebarContent,
@@ -13,10 +16,30 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import type { NavItem } from "../nav-config"
 import { SidebarBrand } from "./sidebar-brand"
+
+type ParentNavItem = NavItem & {
+  children: readonly NavItem[]
+}
+
+function hasChildren(item: NavItem): item is ParentNavItem {
+  return Array.isArray(item.children) && item.children.length > 0
+}
+
+function isParentActive(item: ParentNavItem, pathname: string) {
+  return item.children.some((child) => child.to === pathname) || pathname.startsWith(`${item.to}/`)
+}
+
+function isLeafActive(item: NavItem, pathname: string) {
+  if (item.to === "/") {
+    return pathname === "/"
+  }
+  return pathname === item.to || pathname.startsWith(`${item.to}/`)
+}
 
 export function AppSidebar({
   items,
@@ -30,7 +53,213 @@ export function AppSidebar({
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
+  const { isMobile, state } = useSidebar()
+  const appTitle = import.meta.env.VITE_APP_TITLE ?? "App"
   const iconOnly = !showLabel
+  const isDualMode = collapsible === "none" && iconOnly
+  const isCollapsed = collapsible === "icon" && state === "collapsed" && !isMobile
+  const isIconMode = iconOnly || isCollapsed
+
+  const activeRouteItem = React.useMemo(() => {
+    return (
+      items.find((item) =>
+        hasChildren(item) ? isParentActive(item, pathname) : isLeafActive(item, pathname),
+      ) ?? null
+    )
+  }, [items, pathname])
+
+  const activeChildParent = React.useMemo(() => {
+    if (!activeRouteItem || !hasChildren(activeRouteItem)) {
+      return null
+    }
+    return activeRouteItem
+  }, [activeRouteItem])
+
+  const activeLeafItem = React.useMemo(() => {
+    if (!activeRouteItem || hasChildren(activeRouteItem)) {
+      return null
+    }
+    return activeRouteItem
+  }, [activeRouteItem])
+
+  const [dualPinned, setDualPinned] = React.useState(false)
+  const [dualPanelOpen, setDualPanelOpen] = React.useState(() => Boolean(activeChildParent))
+  const [dualParentTo, setDualParentTo] = React.useState<string | null>(
+    activeChildParent?.to ?? null,
+  )
+
+  const dualParent = React.useMemo(() => {
+    if (!dualParentTo) {
+      return null
+    }
+    return (
+      items.find((item): item is ParentNavItem => hasChildren(item) && item.to === dualParentTo) ??
+      null
+    )
+  }, [dualParentTo, items])
+
+  React.useEffect(() => {
+    if (!isDualMode) {
+      return
+    }
+    if (!activeChildParent) {
+      setDualPanelOpen(false)
+      setDualParentTo(null)
+      return
+    }
+    setDualParentTo(activeChildParent.to)
+    setDualPanelOpen(true)
+  }, [activeChildParent, isDualMode])
+
+  const openDualPanel = React.useCallback((item: ParentNavItem) => {
+    setDualParentTo(item.to)
+    setDualPanelOpen(true)
+  }, [])
+
+  const handleDualMouseLeave = React.useCallback(() => {
+    if (!dualPinned) {
+      setDualPanelOpen(false)
+    }
+  }, [dualPinned])
+
+  const dualExpanded = isDualMode && dualPanelOpen && Boolean(dualParent)
+
+  if (isDualMode) {
+    return (
+      <Sidebar
+        collapsible={collapsible}
+        onMouseLeave={handleDualMouseLeave}
+        className={cn(
+          "sticky top-0 h-screen overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-linear",
+          dualExpanded ? "w-(--sidebar-width)" : "w-(--sidebar-width-icon)",
+        )}
+      >
+        <div className="flex h-full min-h-0">
+          <div className="flex w-(--sidebar-width-icon) shrink-0 flex-col">
+            <SidebarHeader className="border-sidebar-border/50 border-b px-2">
+              <SidebarBrand />
+            </SidebarHeader>
+            <SidebarContent className="px-2 py-3">
+              <SidebarGroup className="p-0">
+                <SidebarGroupContent>
+                  <SidebarMenu className="gap-2">
+                    {items.map((item) => {
+                      if (hasChildren(item)) {
+                        const itemSelected = dualPanelOpen && dualParentTo === item.to
+                        const itemActive =
+                          itemSelected ||
+                          (activeChildParent?.to === item.to &&
+                            (!dualPanelOpen || dualParentTo === activeChildParent.to))
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                              type="button"
+                              aria-label={item.title}
+                              tooltip={item.title}
+                              isActive={itemActive}
+                              onClick={() => openDualPanel(item)}
+                              onMouseEnter={() => {
+                                if (!dualPinned) {
+                                  openDualPanel(item)
+                                }
+                              }}
+                              className="mx-auto justify-center gap-0 px-0 data-[active=true]:text-sidebar-primary"
+                            >
+                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              <span className="sr-only">{item.title}</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        )
+                      }
+
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={activeLeafItem?.to === item.to}
+                            tooltip={item.title}
+                            onMouseEnter={() => {
+                              if (!dualPinned) {
+                                setDualPanelOpen(false)
+                                setDualParentTo(null)
+                              }
+                            }}
+                            onClick={() => {
+                              setDualPanelOpen(false)
+                              setDualParentTo(null)
+                            }}
+                            className="mx-auto justify-center gap-0 pl-2 data-[active=true]:font-medium data-[active=true]:text-sidebar-primary"
+                          >
+                            <Link to={item.to}>
+                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              <span className="sr-only">{item.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </div>
+
+          <div
+            className={cn(
+              "border-sidebar-border/50 min-h-0 overflow-hidden border-l transition-[width,opacity] duration-200 ease-linear",
+              dualExpanded
+                ? "w-[calc(var(--sidebar-width)-var(--sidebar-width-icon))] opacity-100"
+                : "w-0 opacity-0",
+            )}
+          >
+            {dualParent && (
+              <div className="flex h-full min-h-0 flex-col">
+                <div className="border-sidebar-border/50 flex items-center justify-between border-b px-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-sidebar-foreground">
+                      {appTitle}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{dualParent.title}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 text-muted-foreground hover:text-foreground"
+                    onClick={() => setDualPinned((value) => !value)}
+                    aria-label={dualPinned ? "取消固定二级菜单" : "固定二级菜单"}
+                  >
+                    {dualPinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+                  </Button>
+                </div>
+
+                <div className="flex-1 overflow-auto p-2">
+                  <ul className="space-y-1">
+                    {dualParent.children.map((subItem) => (
+                      <li key={subItem.title}>
+                        <Link
+                          to={subItem.to}
+                          className={cn(
+                            "flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors",
+                            pathname === subItem.to
+                              ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          )}
+                        >
+                          {subItem.icon && <subItem.icon className="size-4 shrink-0" />}
+                          <span className="truncate">{subItem.title}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </Sidebar>
+    )
+  }
 
   return (
     <Sidebar
@@ -45,10 +274,55 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {items.map((item) => {
-                if (item.children?.length) {
-                  const isActive =
-                    item.children.some((child) => child.to === pathname) ||
-                    pathname.startsWith(`${item.to}/`)
+                if (hasChildren(item)) {
+                  const isActive = isParentActive(item, pathname)
+
+                  if (isIconMode) {
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <HoverCard openDelay={0} closeDelay={100}>
+                          <HoverCardTrigger asChild>
+                            <SidebarMenuButton
+                              type="button"
+                              aria-label={item.title}
+                              isActive={isActive}
+                              className="mx-auto justify-center gap-0 data-[active=true]:text-sidebar-primary"
+                            >
+                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              <span className="sr-only">{item.title}</span>
+                            </SidebarMenuButton>
+                          </HoverCardTrigger>
+                          <HoverCardContent
+                            side="right"
+                            align="start"
+                            sideOffset={10}
+                            className="w-52 border-border/50 bg-popover p-2"
+                          >
+                            <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
+                              {item.title}
+                            </p>
+                            <ul className="space-y-1">
+                              {item.children.map((subItem) => (
+                                <li key={subItem.title}>
+                                  <Link
+                                    to={subItem.to}
+                                    className={cn(
+                                      "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                                      pathname === subItem.to
+                                        ? "bg-accent text-accent-foreground font-medium"
+                                        : "text-foreground",
+                                    )}
+                                  >
+                                    {subItem.title}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </HoverCardContent>
+                        </HoverCard>
+                      </SidebarMenuItem>
+                    )
+                  }
 
                   return (
                     <Collapsible
@@ -60,9 +334,10 @@ export function AppSidebar({
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton
+                            type="button"
                             tooltip={item.title}
                             isActive={false}
-                            className="font-medium pl-3.5"
+                            className="mx-auto font-medium pl-3.5"
                           >
                             {item.icon && <item.icon className="size-4 shrink-0" />}
                             <span>{item.title}</span>
@@ -95,7 +370,7 @@ export function AppSidebar({
                       tooltip={item.title}
                       className={cn(
                         "pl-3.5 data-[active=true]:text-sidebar-primary data-[active=true]:font-medium mx-auto",
-                        iconOnly && "justify-center gap-0 pl-2",
+                        isIconMode && "justify-center gap-0 pl-2",
                       )}
                     >
                       <Link to={item.to}>
