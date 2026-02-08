@@ -16,6 +16,7 @@ interface HeaderProps {
 
 export function Header({ navItems, onSearchOpen }: HeaderProps) {
   const headerHeight = useThemeStore((state) => state.layout.headerHeight)
+  const menuLayout = useThemeStore((state) => state.layout.menuLayout)
   const [isScrolled, setIsScrolled] = React.useState(false)
 
   const [isMac, setIsMac] = React.useState(true)
@@ -37,7 +38,7 @@ export function Header({ navItems, onSearchOpen }: HeaderProps) {
       style={{ height: `${headerHeight}px` }}
     >
       <div className="flex items-center gap-4">
-        <SidebarTrigger />
+        {menuLayout !== "dual" && <SidebarTrigger />}
         <Breadcrumbs navItems={navItems} />
       </div>
       <div className="flex items-center gap-2">

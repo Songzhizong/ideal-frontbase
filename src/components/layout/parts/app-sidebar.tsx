@@ -136,7 +136,7 @@ export function AppSidebar({
       >
         <div className="flex h-full min-h-0">
           <div className="flex w-(--sidebar-width-icon) shrink-0 flex-col">
-            <SidebarHeader className="border-sidebar-border/50 border-b px-2">
+            <SidebarHeader className="px-2">
               <SidebarBrand />
             </SidebarHeader>
             <SidebarContent className="px-2 py-3">
