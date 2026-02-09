@@ -19,6 +19,7 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
+  const enableRouteRemount = pageAnimation !== "none" && !import.meta.env.DEV
 
   const [searchOpen, setSearchOpen] = React.useState(false)
 
@@ -37,6 +38,14 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
       return !item.permission || hasPermission(item.permission)
     })
   }, [hasPermission])
+
+  const contentClassName = cn(
+    "h-full w-full",
+    containerWidth === "fixed" ? "mx-auto max-w-7xl" : "",
+    pageAnimation !== "none" && `animate-${pageAnimation}`,
+  )
+
+  const pageContent = filteredPrimaryNav.length === 0 ? <NoAccess /> : children
 
   return (
     <SidebarProvider
@@ -57,17 +66,14 @@ export function BaseLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen flex-1 flex-col overflow-hidden">
         <Header navItems={filteredAllNav} onSearchOpen={() => setSearchOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto relative">
-          <div
-            key={pathname}
-            className={cn(
-              "h-full w-full",
-              containerWidth === "fixed" ? "mx-auto max-w-7xl" : "",
-              pageAnimation !== "none" && `animate-${pageAnimation}`,
-            )}
-          >
-            {filteredPrimaryNav.length === 0 ? <NoAccess /> : children}
-          </div>
+        <main className="relative flex-1 overflow-y-auto">
+          {enableRouteRemount ? (
+            <div key={pathname} className={contentClassName}>
+              {pageContent}
+            </div>
+          ) : (
+            <div className={contentClassName}>{pageContent}</div>
+          )}
         </main>
       </div>
       <SearchCommand open={searchOpen} onOpenChange={setSearchOpen} />

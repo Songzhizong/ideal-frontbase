@@ -222,7 +222,7 @@ export const coreBlue: ThemePreset = {
           fg: "#020617",
           border: "#e2e8f0",
           ring: "#2563eb",
-          accent: "rgba(37,99,235,0.1)",
+          accent: "#ecf2fd",
           onAccent: "#1e40af",
         },
       },

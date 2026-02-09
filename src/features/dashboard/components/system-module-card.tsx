@@ -41,7 +41,7 @@ export function SystemModuleCard({ module }: SystemModuleCardProps) {
   }
 
   return (
-    <Card className="group relative overflow-hidden border-border bg-card transition-all duration-300 hover:shadow-lg">
+    <Card className="group relative overflow-hidden border-border bg-card transition-colors duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">

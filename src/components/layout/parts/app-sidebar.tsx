@@ -136,13 +136,13 @@ export function AppSidebar({
       >
         <div className="flex h-full min-h-0">
           <div className="flex w-(--sidebar-width-icon) shrink-0 flex-col">
-            <SidebarHeader className="px-2">
+            <SidebarHeader className="p-0">
               <SidebarBrand />
             </SidebarHeader>
-            <SidebarContent className="px-2 py-3">
+            <SidebarContent className="scrollbar-thin px-3 py-2">
               <SidebarGroup className="p-0">
                 <SidebarGroupContent>
-                  <SidebarMenu className="gap-2">
+                  <SidebarMenu className="gap-0.5">
                     {items.map((item) => {
                       if (hasChildren(item)) {
                         const itemSelected = dualPanelOpen && dualParentTo === item.to
@@ -163,9 +163,9 @@ export function AppSidebar({
                                   openDualPanel(item)
                                 }
                               }}
-                              className="mx-auto justify-center gap-0 px-0 data-[active=true]:text-sidebar-primary"
+                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
-                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              {item.icon && <item.icon className="size-4.5! shrink-0" />}
                               <span className="sr-only">{item.title}</span>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -188,10 +188,10 @@ export function AppSidebar({
                               setDualPanelOpen(false)
                               setDualParentTo(null)
                             }}
-                            className="mx-auto justify-center gap-0 pl-2 data-[active=true]:font-medium data-[active=true]:text-sidebar-primary"
+                            className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                           >
                             <Link to={item.to}>
-                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              {item.icon && <item.icon className="size-4.5! shrink-0" />}
                               <span className="sr-only">{item.title}</span>
                             </Link>
                           </SidebarMenuButton>
@@ -206,7 +206,7 @@ export function AppSidebar({
 
           <div
             className={cn(
-              "border-sidebar-border/50 min-h-0 overflow-hidden border-l transition-[width,opacity] duration-200 ease-linear",
+              "border-sidebar-border min-h-0 overflow-hidden border-l bg-sidebar transition-[width,opacity] duration-200 ease-linear",
               dualExpanded
                 ? "w-[calc(var(--sidebar-width)-var(--sidebar-width-icon))] opacity-100"
                 : "w-0 opacity-0",
@@ -214,7 +214,7 @@ export function AppSidebar({
           >
             {dualParent && (
               <div className="flex h-full min-h-0 flex-col">
-                <div className="border-sidebar-border/50 flex items-center justify-between border-b px-3 py-3">
+                <div className="flex h-14 items-center justify-between px-4">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-sidebar-foreground">
                       {appTitle}
@@ -225,7 +225,7 @@ export function AppSidebar({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="size-7 text-muted-foreground hover:text-foreground"
+                    className="size-7 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     onClick={() => setDualPinned((value) => !value)}
                     aria-label={dualPinned ? "取消固定二级菜单" : "固定二级菜单"}
                   >
@@ -233,20 +233,20 @@ export function AppSidebar({
                   </Button>
                 </div>
 
-                <div className="flex-1 overflow-auto p-2">
-                  <ul className="space-y-1">
+                <div className="scrollbar-thin flex-1 overflow-auto px-3 py-2">
+                  <ul className="space-y-0.5">
                     {dualParent.children.map((subItem) => (
                       <li key={subItem.title}>
                         <Link
                           to={subItem.to}
                           className={cn(
-                            "flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors",
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors [&>svg]:size-4.5!",
                             pathname === subItem.to
-                              ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                              ? "bg-sidebar-accent font-medium text-primary!"
+                              : "text-sidebar-foreground/75! hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
                           )}
                         >
-                          {subItem.icon && <subItem.icon className="size-4 shrink-0" />}
+                          {subItem.icon && <subItem.icon className="size-4.5! shrink-0" />}
                           <span className="truncate">{subItem.title}</span>
                         </Link>
                       </li>
@@ -264,15 +264,15 @@ export function AppSidebar({
   return (
     <Sidebar
       collapsible={collapsible}
-      className="sticky top-0 h-screen bg-sidebar border-sidebar-border text-sidebar-foreground"
+      className="border-sidebar-border sticky top-0 h-screen overflow-hidden border-r bg-sidebar text-sidebar-foreground"
     >
-      <SidebarHeader>
+      <SidebarHeader className="p-0">
         <SidebarBrand />
       </SidebarHeader>
-      <SidebarContent className="space-y-6">
-        <SidebarGroup>
+      <SidebarContent className="scrollbar-thin px-3 py-2">
+        <SidebarGroup className="p-0">
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
+            <SidebarMenu className="gap-0.5">
               {items.map((item) => {
                 if (hasChildren(item)) {
                   const isActive = isParentActive(item, pathname)
@@ -286,9 +286,9 @@ export function AppSidebar({
                               type="button"
                               aria-label={item.title}
                               isActive={isActive}
-                              className="mx-auto justify-center gap-0 data-[active=true]:text-sidebar-primary"
+                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
-                              {item.icon && <item.icon className="size-4 shrink-0" />}
+                              {item.icon && <item.icon className="size-4.5! shrink-0" />}
                               <span className="sr-only">{item.title}</span>
                             </SidebarMenuButton>
                           </HoverCardTrigger>
@@ -296,7 +296,7 @@ export function AppSidebar({
                             side="right"
                             align="start"
                             sideOffset={10}
-                            className="w-52 border-border/50 bg-popover p-2"
+                            className="w-56 border-sidebar-border bg-popover p-2"
                           >
                             <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
                               {item.title}
@@ -307,10 +307,10 @@ export function AppSidebar({
                                   <Link
                                     to={subItem.to}
                                     className={cn(
-                                      "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                                      "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
                                       pathname === subItem.to
-                                        ? "bg-accent text-accent-foreground font-medium"
-                                        : "text-foreground",
+                                        ? "bg-sidebar-accent font-medium text-primary!"
+                                        : "text-sidebar-foreground/75!",
                                     )}
                                   >
                                     {subItem.title}
@@ -336,19 +336,23 @@ export function AppSidebar({
                           <SidebarMenuButton
                             type="button"
                             tooltip={item.title}
-                            isActive={false}
-                            className="mx-auto font-medium pl-3.5"
+                            isActive={isActive}
+                            className="mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                           >
-                            {item.icon && <item.icon className="size-4 shrink-0" />}
+                            {item.icon && <item.icon className="size-4.5! shrink-0" />}
                             <span>{item.title}</span>
-                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            <ChevronRight className="ml-auto size-4 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                          <SidebarMenuSub>
+                          <SidebarMenuSub className="ml-8 mr-0 space-y-0.5 border-none px-0 py-0.5">
                             {item.children.map((subItem) => (
                               <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild isActive={pathname === subItem.to}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={pathname === subItem.to}
+                                  className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
+                                >
                                   <Link to={subItem.to}>
                                     <span>{subItem.title}</span>
                                   </Link>
@@ -369,12 +373,12 @@ export function AppSidebar({
                       isActive={pathname === item.to}
                       tooltip={item.title}
                       className={cn(
-                        "pl-3.5 data-[active=true]:text-sidebar-primary data-[active=true]:font-medium mx-auto",
-                        isIconMode && "justify-center gap-0 pl-2",
+                        "mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!",
+                        isIconMode && "mx-auto size-9 justify-center p-0",
                       )}
                     >
                       <Link to={item.to}>
-                        {item.icon && <item.icon className="size-4 shrink-0" />}
+                        {item.icon && <item.icon className="size-4.5! shrink-0" />}
                         {showLabel && (
                           <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                         )}
