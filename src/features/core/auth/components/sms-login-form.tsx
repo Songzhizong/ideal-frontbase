@@ -4,6 +4,15 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
+import {
+  getCertificate,
+  type LoginResponse,
+  LoginResponseType,
+  useGetCaptcha,
+  useSendSmsLoginCode,
+  useSmsCodeLogin,
+} from "@/packages/auth-core"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,20 +20,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useGetCaptcha } from "@/features/core/auth/api/get-captcha"
-import type { LoginResponse } from "@/features/core/auth/api/login"
-import {
-  LoginResponseType,
-  useSendSmsLoginCode,
-  useSmsCodeLogin,
-} from "@/features/core/auth/api/login"
-import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
-import { getCertificate } from "@/features/core/auth/utils/certificate"
+} from "@/packages/ui/alert-dialog"
+import { Button } from "@/packages/ui/button"
+import { Checkbox } from "@/packages/ui/checkbox"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
 
 // Unified Schema for the UI form
 const SmsLoginFormSchema = z.object({

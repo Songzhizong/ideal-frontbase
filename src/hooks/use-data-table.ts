@@ -3,7 +3,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useCallback, useEffect, useMemo } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { useTablePagination } from "@/components/table"
-import type { PageInfo } from "@/types/pagination"
+import type { PageInfo } from "@/packages/shared-types"
 
 /**
  * Options for useDataTable hook

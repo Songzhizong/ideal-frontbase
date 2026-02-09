@@ -19,11 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/packages/ui/alert-dialog"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
 
 export function AdvancedSettings() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("")

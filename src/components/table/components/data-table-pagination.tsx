@@ -1,13 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useTableConfig, useTableContext } from "@/components/table"
-import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Button } from "@/packages/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/ui/select"
 
 export interface DataTablePaginationProps {
   className?: string

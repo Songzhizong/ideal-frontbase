@@ -1,14 +1,14 @@
 import type { Table } from "@tanstack/react-table"
 import { Settings2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/packages/ui/button"
+import { Checkbox } from "@/packages/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/packages/ui/dropdown-menu"
 
 export interface DataTableColumnToggleProps<TData = unknown> {
   /**

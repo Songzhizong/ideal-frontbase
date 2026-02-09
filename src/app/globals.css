@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "../styles/variables.css";
-@import "../styles/theme.css";
-@import "../styles/base.css";
-@import "../styles/animations.css";
-@import "../styles/components.css";
+@import "../packages/theme-system/styles/variables.css";
+@import "../packages/theme-system/styles/theme.css";
+@import "../packages/theme-system/styles/base.css";
+@import "../packages/ui/styles/animations.css";
+@import "../packages/ui/styles/components.css";
 
 @custom-variant dark (&:where(.dark, .dark *));

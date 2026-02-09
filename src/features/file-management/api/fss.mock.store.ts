@@ -1,5 +1,5 @@
 import { z } from "zod"
-import type { PageInfo } from "@/types/pagination"
+import type { PageInfo } from "@/packages/shared-types"
 import type { FileCatalog, FileCatalogTrees, FileRecord } from "../types"
 
 export const BASE_PATH = "*/nexus-api/fss/tenant"

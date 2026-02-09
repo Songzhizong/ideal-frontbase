@@ -177,7 +177,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 ```tsx
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import { authStore } from "@/lib/auth-store"
+import { authStore } from "@/packages/auth-core"
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: () => {
@@ -231,7 +231,7 @@ const {
 底层 Zustand Store，用于直接操作状态（高级用法）：
 
 ```typescript
-import { useAuthStore } from "@/lib/auth-store"
+import { useAuthStore } from "@/packages/auth-core"
 
 const authStore = useAuthStore()
 
@@ -254,7 +254,7 @@ authStore.logout()
 ### 在非 React 环境中使用
 
 ```typescript
-import { authStore } from "@/lib/auth-store"
+import { authStore } from "@/packages/auth-core"
 
 // 在 api-client.ts 或其他非 React 文件中
 const token = authStore.getState().token
@@ -421,4 +421,4 @@ describe("useAuthStore", () => {
 - `src/features/auth/hooks/use-auth.ts` - 统一 Hook
 - `src/features/auth/api/` - API 层
 - `src/features/auth/components/` - 权限守卫组件
-- `src/lib/api-client.ts` - HTTP 客户端（Token 自动注入）
+- `src/packages/api-core/api-client.ts` - HTTP 客户端（Token 自动注入）

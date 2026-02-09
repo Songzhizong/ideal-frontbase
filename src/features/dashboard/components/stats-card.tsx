@@ -6,8 +6,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+} from "@/packages/ui/card"
+import { cn } from "@/packages/ui-utils"
 
 type StatsCardProps = {
   title: string

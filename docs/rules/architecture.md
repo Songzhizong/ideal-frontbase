@@ -7,7 +7,7 @@
 
 - **高内聚 (Colocation)**：将 API 定义、类型声明、业务组件、自定义 Hook 及 Mock 数据放置在同一特性目录下。
 - **公共接口 (Public API)**：每个特性通过 `index.ts` 导出必要内容，禁止跨特性直接读取内部文件。
-- **Mock 注入**：Mock 数据编写在 `features/{name}/mocks/*.mock.ts` 中，并通过 `mockRegistry` 集中注册。
+- **Mock 注入**：Mock 数据编写在 `src/features/{name}/api/*.mock.ts` 或已迁移模块的 `src/packages/{name}/api/*.mock.ts` 中，并通过 `mockRegistry` 集中注册。
 
 ## 2. API 层规范 (Data Access Layer)
 - **纯净性 (Purity)**：API 函数必须是纯函数。严禁在 API 层触发 UI 副作用（如 Toast、重定向）。

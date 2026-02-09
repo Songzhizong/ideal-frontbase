@@ -1,6 +1,6 @@
 # 数据表格开发规范（Data Table Guidelines, V2）
 
-本规范定义项目中表格开发的唯一标准：`@/components/table/v2`。
+本规范定义项目中表格开发的唯一标准：`@/packages/table`。
 
 ## 1. 核心原则
 

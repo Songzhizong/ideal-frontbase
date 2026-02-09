@@ -19,22 +19,21 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter"
 import json from "react-syntax-highlighter/dist/esm/languages/hljs/json"
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { toast } from "sonner"
-
-import { StatusBadge } from "@/components/common/status-badge"
-import { AppSheetContent } from "@/components/ui/app-sheet"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Api, fetchOperationLogDetail } from "@/features/core/operation-log/api/operation-log"
 import { OperationLogModifiedFields } from "@/features/core/operation-log/components/operation-log-modified-fields"
 import {
   getActionTypeConfig,
   getHttpMethodVariant,
 } from "@/features/core/operation-log/utils/operation-log-utils"
-import { formatTimestampToDateTime } from "@/lib/time-utils"
-import { cn } from "@/lib/utils"
+import { AppSheetContent } from "@/packages/ui/app-sheet"
+import { Badge } from "@/packages/ui/badge"
+import { Button } from "@/packages/ui/button"
+import { Separator } from "@/packages/ui/separator"
+import { Sheet, SheetDescription, SheetHeader, SheetTitle } from "@/packages/ui/sheet"
+import { StatusBadge } from "@/packages/ui/status-badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/packages/ui/tabs"
+import { cn } from "@/packages/ui-utils"
+import { formatTimestampToDateTime } from "@/packages/ui-utils/time-utils"
 
 SyntaxHighlighter.registerLanguage("json", json)
 

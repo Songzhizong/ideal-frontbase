@@ -1,10 +1,10 @@
 "use client"
 
 import { z } from "zod"
-import { api } from "@/lib/api-client"
-import { authStore } from "@/lib/auth-store"
-import { env } from "@/lib/env"
-import type { PageInfo } from "@/types/pagination"
+import { api } from "@/packages/api-core"
+import { env } from "@/packages/app-config"
+import { authStore } from "@/packages/auth-core"
+import type { PageInfo } from "@/packages/shared-types"
 import type {
   CompleteMultipartUploadArgs,
   CreateFileCatalogArgs,

@@ -2,9 +2,9 @@ import { RefreshCw } from "lucide-react"
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { DataTableColumnToggle, useTableContext } from "@/components/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { Button } from "@/packages/ui/button"
+import { Input } from "@/packages/ui/input"
+import { cn } from "@/packages/ui-utils"
 
 export interface DataTableToolbarProps {
   /**

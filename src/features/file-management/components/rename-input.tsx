@@ -1,9 +1,9 @@
 import { Loader2 } from "lucide-react"
 import type React from "react"
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
+import { Input } from "@/packages/ui/input"
+import { Textarea } from "@/packages/ui/textarea"
+import { cn } from "@/packages/ui-utils"
 
 interface RenameInputProps {
   defaultValue: string

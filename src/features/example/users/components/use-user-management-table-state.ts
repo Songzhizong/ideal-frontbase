@@ -5,7 +5,7 @@ import {
   parseAsNumberRange,
   parseAsTriStateBoolean,
   stateUrl,
-} from "@/components/table/v2"
+} from "@/packages/table"
 
 export function useUserManagementTableState() {
   return stateUrl({

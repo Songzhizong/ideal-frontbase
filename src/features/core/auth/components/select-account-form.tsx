@@ -1,17 +1,17 @@
 import { ChevronLeft, Loader2, User2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
 import {
   type LoginResponse,
   LoginResponseType,
   type SelectAccountTicket,
   useSelectAccount,
-} from "@/features/core/auth/api/login"
-import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
-import { cn } from "@/lib/utils"
+} from "@/packages/auth-core"
+import { Avatar, AvatarFallback } from "@/packages/ui/avatar"
+import { Badge } from "@/packages/ui/badge"
+import { Button } from "@/packages/ui/button"
+import { cn } from "@/packages/ui-utils"
 
 type SelectAccountFormProps = {
   ticket: SelectAccountTicket

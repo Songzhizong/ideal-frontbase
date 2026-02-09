@@ -3,10 +3,7 @@ import { ChevronLeft, KeyRound, Mail, ShieldCheck, Smartphone } from "lucide-rea
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
 import {
   FactorType,
   type LoginResponse,
@@ -17,8 +14,11 @@ import {
   useMultifactorLogin,
   useSendMfaEmailCode,
   useSendMfaSmsCode,
-} from "@/features/core/auth/api/login"
-import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
+} from "@/packages/auth-core"
+import { Button } from "@/packages/ui/button"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/packages/ui/tabs"
 
 type MfaFormProps = {
   ticket: MfaTicket

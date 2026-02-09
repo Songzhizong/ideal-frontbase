@@ -8,7 +8,7 @@ import type {
 } from "@tanstack/react-table"
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import type { PageInfo } from "@/types/pagination"
+import type { PageInfo } from "@/packages/shared-types"
 
 export interface PaginationState {
   pageNumber: number

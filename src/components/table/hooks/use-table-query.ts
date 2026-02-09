@@ -1,7 +1,7 @@
 import { keepPreviousData, type UseQueryOptions, useQuery } from "@tanstack/react-query"
 import { useEffect, useMemo } from "react"
 import type { FilterParams, SortingParams } from "@/components/table"
-import type { PageInfo } from "@/types/pagination"
+import type { PageInfo } from "@/packages/shared-types"
 
 export interface UseTableQueryOptions<TData, TResponse = PageInfo<TData>> {
   /**

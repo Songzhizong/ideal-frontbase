@@ -184,7 +184,7 @@ export const confirm = (options: ConfirmOptions) => useConfirmStore.getState().c
 这个组件需要放置在应用根节点附近，确保不会被路由切换卸载。
 
 ```tsx
-import { useConfirmStore } from "@/lib/confirm-store"
+import { useConfirmStore } from "@/packages/confirm"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -194,7 +194,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/packages/ui/alert-dialog"
 
 export function GlobalConfirmDialog() {
   const { isOpen, options, handleConfirm, handleCancel } = useConfirmStore()
@@ -237,7 +237,7 @@ export function GlobalConfirmDialog() {
 为了让业务代码调用更符合语义，封装一个简单的 Hook。
 
 ```typescript
-import { useConfirmStore } from "@/lib/confirm-store"
+import { useConfirmStore } from "@/packages/confirm"
 
 export function useConfirm() {
   const confirm = useConfirmStore((state) => state.confirm)
@@ -255,7 +255,7 @@ export function useConfirm() {
 本项目推荐直接挂载在 `src/app/provider.tsx` 的 `ThemeProvider` 内部（保证主题令牌可用），并放在 `RouterProvider` 之后：
 
 ```tsx
-import { GlobalConfirmDialog } from "@/components/common/global-confirm-dialog"
+import { GlobalConfirmDialog } from "@/packages/confirm"
 
 export function AppProvider() {
   return (

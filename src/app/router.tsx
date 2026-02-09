@@ -1,6 +1,6 @@
 import { createRouter } from "@tanstack/react-router"
 import { queryClient } from "@/app/query-client"
-import { getBasePath } from "@/lib/base-path"
+import { getBasePath } from "@/packages/platform-router"
 import { routeTree } from "@/routeTree.gen"
 
 export const router = createRouter({

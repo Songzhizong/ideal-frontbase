@@ -17,10 +17,10 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
-import { formatTimestampToDateTime } from "@/lib/time-utils.ts"
+} from "@/packages/ui/context-menu"
+import { Skeleton } from "@/packages/ui/skeleton"
+import { Spinner } from "@/packages/ui/spinner"
+import { formatTimestampToDateTime } from "@/packages/ui-utils/time-utils"
 import type { FileManagerItem } from "../types"
 import { formatFileSize, getFileStyle, parseObjectSize } from "../utils/file-utils"
 import type { FileBrowserItemActionHandlers } from "./file-browser-actions"

@@ -27,10 +27,10 @@
 ### 3. 🎨 UI 与样式 (UI & Styling)
 *   **Dark Mode 兼容**：检查是否使用了硬编码颜色（如 `bg-white`, `text-gray-500`）。必须建议替换为 Shadcn 语义变量（如 `bg-background`, `text-muted-foreground`）。
 *   **Tailwind 规范**：检查是否使用了 CSS Modules 或行内样式。必须建议使用 Utility Classes，并使用 `cn()` (clsx + tailwind-merge) 处理条件样式。
-*   **组件复用**：检查是否重复造轮子。若代码中包含基础 UI 逻辑（如按钮、弹窗），建议替换为 `@/components/ui` 中的 Shadcn 组件。
+*   **组件复用**：检查是否重复造轮子。若代码中包含基础 UI 逻辑（如按钮、弹窗），建议替换为 `@/packages/ui` 中的 Shadcn 组件。
 
 ### 4. 🏗️ 基础设施与工具 (Infra & Tooling)
-*   **HTTP Client**：严禁使用 `axios` 或原生 `fetch`。必须使用项目中封装好的 `ky` 实例 (`@/lib/api-client`)。
+*   **HTTP Client**：严禁使用 `axios` 或原生 `fetch`。必须使用项目中封装好的 `ky` 实例 (`@/packages/api-core`)。
 *   **路由鉴权**：检查是否在 `useEffect` 中处理重定向。建议迁移至 TanStack Router 的 `beforeLoad` 生命周期。
 *   **日期处理**：检查是否使用 `momentjs`。建议替换为 `date-fns`。
 

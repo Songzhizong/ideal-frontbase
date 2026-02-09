@@ -5,8 +5,8 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+} from "@/packages/ui/alert-dialog"
+import { Button } from "@/packages/ui/button"
 
 interface UnauthorizedDialogOptions {
   title?: string

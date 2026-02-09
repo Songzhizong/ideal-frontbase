@@ -1,6 +1,6 @@
 import React, { type ReactNode, useRef } from "react"
 import { useElementSize } from "@/components/table/hooks"
-import { cn } from "@/lib/utils"
+import { cn } from "@/packages/ui-utils"
 
 export interface DataTableContainerProps {
   /**

@@ -3,7 +3,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-} from "@/components/ui/context-menu"
+} from "@/packages/ui/context-menu"
 import type { FileManagerItem } from "../types"
 import type { FileBrowserItemActionHandlers } from "./file-browser-actions"
 

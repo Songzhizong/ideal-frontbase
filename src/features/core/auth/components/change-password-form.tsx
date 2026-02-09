@@ -3,9 +3,7 @@ import { ChevronLeft, Eye, EyeOff, Lock, ShieldAlert } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
 import {
   type ChangePasswordLoginRequest,
   ChangePasswordLoginRequestSchema,
@@ -13,8 +11,10 @@ import {
   type LoginResponse,
   LoginResponseType,
   useChangePasswordLogin,
-} from "@/features/core/auth/api/login"
-import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
+} from "@/packages/auth-core"
+import { Button } from "@/packages/ui/button"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
 
 type ChangePasswordFormProps = {
   ticket: ChangePasswordTicket

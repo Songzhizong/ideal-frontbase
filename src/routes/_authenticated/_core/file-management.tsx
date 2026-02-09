@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { PERMISSIONS } from "@/config/permissions"
 import { FileManagerPage } from "@/features/file-management"
-import { authStore } from "@/lib/auth-store"
+import { authStore } from "@/packages/auth-core"
 
 export const Route = createFileRoute("/_authenticated/_core/file-management")({
   beforeLoad: () => {

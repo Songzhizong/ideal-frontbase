@@ -3,16 +3,9 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import type React from "react"
 import { type ReactNode, useCallback, useContext, useEffect, useRef } from "react"
 import { TableContext, type TableContextValue, useTableConfig } from "@/components/table/context"
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { Button } from "@/packages/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/packages/ui/table"
+import { cn } from "@/packages/ui-utils"
 
 export interface DataTableProps<TData> {
   /**

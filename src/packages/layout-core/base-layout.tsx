@@ -1,0 +1,112 @@
+import { useRouterState } from "@tanstack/react-router"
+import * as React from "react"
+import { useThemeStore } from "@/packages/theme-system"
+import { SidebarProvider } from "@/packages/ui/sidebar"
+import { cn } from "@/packages/ui-utils"
+import { filterNavByPermission } from "./nav-utils"
+import { AppSidebar } from "./parts/app-sidebar"
+import { Header } from "./parts/header"
+import { SearchCommand } from "./parts/search-command"
+import type { LayoutIcon, LayoutNavItem, LayoutPermissionChecker } from "./types"
+
+interface BaseLayoutProps {
+  children: React.ReactNode
+  primaryNavItems: readonly LayoutNavItem[]
+  allNavItems?: readonly LayoutNavItem[]
+  permissionChecker?: LayoutPermissionChecker
+  sidebarBrand?: React.ReactNode
+  headerActions?: React.ReactNode
+  appTitle?: string
+  breadcrumbIconByPath?: Readonly<Record<string, LayoutIcon>>
+  searchPlaceholder?: string
+}
+
+export function BaseLayout({
+  children,
+  primaryNavItems,
+  allNavItems,
+  permissionChecker,
+  sidebarBrand,
+  headerActions,
+  appTitle,
+  breadcrumbIconByPath,
+  searchPlaceholder,
+}: BaseLayoutProps) {
+  const sidebarWidth = useThemeStore((state) => state.layout.sidebarWidth)
+  const sidebarCollapsedWidth = useThemeStore((state) => state.layout.sidebarCollapsedWidth)
+  const containerWidth = useThemeStore((state) => state.layout.containerWidth)
+  const pageAnimation = useThemeStore((state) => state.ui.pageAnimation)
+  const menuLayout = useThemeStore((state) => state.layout.menuLayout)
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+
+  const enableRouteRemount = pageAnimation !== "none" && !import.meta.env.DEV
+  const [searchOpen, setSearchOpen] = React.useState(false)
+
+  const searchableNavItems = React.useMemo(() => {
+    return filterNavByPermission(allNavItems ?? primaryNavItems, permissionChecker)
+  }, [allNavItems, permissionChecker, primaryNavItems])
+
+  const contentClassName = cn(
+    "h-full w-full",
+    containerWidth === "fixed" ? "mx-auto max-w-7xl" : null,
+    pageAnimation !== "none" ? `animate-${pageAnimation}` : null,
+  )
+
+  const onSearchOpen = searchableNavItems.length > 0 ? () => setSearchOpen(true) : undefined
+  const sidebarCollapsible: "none" | "icon" = menuLayout === "dual" ? "none" : "icon"
+
+  const sidebarProps = {
+    items: primaryNavItems,
+    ...(permissionChecker ? { permissionChecker } : {}),
+    collapsible: sidebarCollapsible,
+    showLabel: menuLayout === "single",
+    ...(sidebarBrand ? { brand: sidebarBrand } : {}),
+    ...(appTitle ? { appTitle } : {}),
+  }
+
+  const headerProps = {
+    navItems: searchableNavItems,
+    ...(onSearchOpen ? { onSearchOpen } : {}),
+    ...(headerActions ? { actions: headerActions } : {}),
+    ...(breadcrumbIconByPath ? { breadcrumbIconByPath } : {}),
+  }
+
+  const searchCommandProps = {
+    items: searchableNavItems,
+    open: searchOpen,
+    onOpenChange: setSearchOpen,
+    ...(searchPlaceholder ? { placeholder: searchPlaceholder } : {}),
+  }
+
+  return (
+    <SidebarProvider
+      className="bg-transparent"
+      style={
+        {
+          "--sidebar-width": `${sidebarWidth}px`,
+          "--sidebar-width-icon": `${sidebarCollapsedWidth}px`,
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar {...sidebarProps} />
+
+      <div className="flex h-screen flex-1 flex-col overflow-hidden">
+        <Header {...headerProps} />
+
+        <main className="relative flex-1 overflow-y-auto">
+          {enableRouteRemount ? (
+            <div key={pathname} className={contentClassName}>
+              {children}
+            </div>
+          ) : (
+            <div className={contentClassName}>{children}</div>
+          )}
+        </main>
+      </div>
+
+      <SearchCommand {...searchCommandProps} />
+    </SidebarProvider>
+  )
+}

@@ -2,16 +2,9 @@ import { flexRender, type Table as ReactTable, type Row } from "@tanstack/react-
 import { Folder } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import React, { type DragEvent, type MouseEvent, memo } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { Skeleton } from "@/packages/ui/skeleton"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/packages/ui/table"
+import { cn } from "@/packages/ui-utils"
 import type { FileManagerItem } from "../types"
 
 interface FileBrowserTableProps {

@@ -8,7 +8,7 @@ import {
   PanelResizeHandle,
 } from "react-resizable-panels"
 
-import { useThemeStore } from "@/hooks/use-theme-store"
+import { useThemeStore } from "@/packages/theme-system"
 
 interface FileManagerLayoutProps {
   sidebar: ReactNode

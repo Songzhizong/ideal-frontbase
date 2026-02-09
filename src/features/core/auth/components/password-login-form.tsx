@@ -2,23 +2,23 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Lock, Mail, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { BaseLink } from "@/components/common/base-link"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useCheckCaptcha } from "@/features/core/auth/api/check-captcha"
-import { useGetCaptcha } from "@/features/core/auth/api/get-captcha"
-import type { LoginResponse } from "@/features/core/auth/api/login"
+import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
+import { env } from "@/packages/app-config"
 import {
+  getCertificate,
+  type LoginResponse,
   LoginResponseType,
   type PasswordLoginRequest,
   PasswordLoginRequestSchema,
+  useCheckCaptcha,
+  useGetCaptcha,
   usePasswordLogin,
-} from "@/features/core/auth/api/login"
-import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
-import { getCertificate } from "@/features/core/auth/utils/certificate"
-import { env } from "@/lib/env"
+} from "@/packages/auth-core"
+import { BaseLink } from "@/packages/platform-router"
+import { Button } from "@/packages/ui/button"
+import { Checkbox } from "@/packages/ui/checkbox"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
 
 export function PasswordLoginForm({
   onResponse,

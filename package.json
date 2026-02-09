@@ -12,7 +12,8 @@
 		"test": "vitest",
 		"test:watch": "vitest --watch",
 		"typecheck": "tsc --noEmit",
-		"lint": "biome check .",
+		"lint:packages-boundary": "node scripts/check-packages-boundary.mjs",
+		"lint": "biome check . && pnpm lint:packages-boundary",
 		"format": "biome format . --write",
 		"msw:init": "msw init public/ --save",
 		"routes:generate": "node scripts/generate-route-tree.mjs"

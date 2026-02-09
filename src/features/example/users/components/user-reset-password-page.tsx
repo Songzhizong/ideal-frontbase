@@ -3,20 +3,13 @@ import { ArrowLeft, KeyRound } from "lucide-react"
 import { useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { PageContainer } from "@/components/common/page-container"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { useBaseNavigate } from "@/hooks/use-base-navigate"
+import { PageContainer } from "@/packages/layout-core"
+import { useBaseNavigate } from "@/packages/platform-router"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/packages/ui/form"
+import { Input } from "@/packages/ui/input"
+import { Switch } from "@/packages/ui/switch"
 import { getDemoUserById } from "../demo/users"
 
 const ResetPasswordSchema = z

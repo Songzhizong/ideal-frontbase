@@ -13,15 +13,15 @@ import {
 } from "lucide-react"
 import { memo } from "react"
 import { DataTableSearch } from "@/components/table/components/data-table-search"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/packages/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+} from "@/packages/ui/dropdown-menu"
+import { Separator } from "@/packages/ui/separator"
+import { cn } from "@/packages/ui-utils"
 
 export interface BreadcrumbItem {
   id: string | null

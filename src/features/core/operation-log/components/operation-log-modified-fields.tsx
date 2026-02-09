@@ -1,16 +1,9 @@
 import { Diff } from "lucide-react"
 import { useMemo } from "react"
-import { StatusBadge } from "@/components/common/status-badge"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import type { Api } from "@/features/core/operation-log/api/operation-log"
+import { Badge } from "@/packages/ui/badge"
+import { StatusBadge } from "@/packages/ui/status-badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/packages/ui/table"
 
 interface OperationLogModifiedFieldsProps {
   modification: Api.Modification | Api.ModifiedFields | null | undefined

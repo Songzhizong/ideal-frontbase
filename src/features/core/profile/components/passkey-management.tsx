@@ -1,6 +1,7 @@
 import { Check, Edit2, Fingerprint, Key, Plus, Trash2, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useConfirm } from "@/packages/confirm"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +12,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useConfirm } from "@/hooks/use-confirm"
-import { formatTimestampToDateTime, formatTimestampToRelativeTime } from "@/lib/time-utils.ts"
+} from "@/packages/ui/alert-dialog"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
+import {
+  formatTimestampToDateTime,
+  formatTimestampToRelativeTime,
+} from "@/packages/ui-utils/time-utils"
 import { useDeletePasskey, usePasskeys, useRegisterPasskey, useUpdatePasskey } from "../api/passkey"
 
 export function PasskeyManagement() {

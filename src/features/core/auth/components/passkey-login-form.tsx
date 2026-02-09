@@ -1,9 +1,8 @@
 import { useNavigate } from "@tanstack/react-router"
 import { Fingerprint } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { useLoginHandler } from "@/features/core/auth/hooks/use-login-handler"
-import { type LoginResponse, LoginResponseType } from "../api/login"
-import { usePasskeyLogin } from "../api/passkey"
+import { type LoginResponse, LoginResponseType, usePasskeyLogin } from "@/packages/auth-core"
+import { Button } from "@/packages/ui/button"
 
 export function PasskeyLoginForm({
   onResponse,

@@ -1,7 +1,7 @@
 import { router } from "@/app/router"
 import { showUnauthorizedDialog } from "@/features/core/auth"
-import { authStore } from "@/lib/auth-store"
-import { getAppLocationPath } from "@/lib/base-path"
+import { authStore } from "@/packages/auth-core"
+import { getAppLocationPath } from "@/packages/platform-router"
 
 /**
  * 未授权处理器的状态管理

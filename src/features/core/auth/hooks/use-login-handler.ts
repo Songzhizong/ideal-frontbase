@@ -1,10 +1,14 @@
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
-import { PRIMARY_NAV } from "@/components/layout/nav-config"
-import { useUserProfile } from "@/features/core/auth/api/get-current-user.ts"
-import { usePermissions } from "@/features/core/auth/api/get-permissions"
-import { type LoginResponse, LoginResponseType } from "@/features/core/auth/api/login"
-import { useAuthStore } from "@/lib/auth-store"
+import { PRIMARY_NAV } from "@/app/layout/nav-config"
+import {
+  type LoginResponse,
+  LoginResponseType,
+  useAuthStore,
+  usePermissionIdents,
+  useUserProfile,
+} from "@/packages/auth-core"
+import { findFirstAccessibleNav } from "@/packages/layout-core"
 
 /**
  * Hook to handle successful login flow
@@ -16,7 +20,7 @@ export function useLoginHandler() {
   // 避免 token、user、permissions 等状态变化导致组件重新渲染
   const hasPermission = useAuthStore((state) => state.hasPermission)
   const { refetch: refetchUser } = useUserProfile({ enabled: false })
-  const { refetch: refetchPermissions } = usePermissions({ enabled: false })
+  const { refetch: refetchPermissionIdents } = usePermissionIdents({ enabled: false })
 
   const handleLoginSuccess = async (response: LoginResponse) => {
     const token = response.token
@@ -40,16 +44,13 @@ export function useLoginHandler() {
           throw new Error("Failed to fetch user data")
         }
 
-        const permissionsResult = await refetchPermissions()
+        const permissionsResult = await refetchPermissionIdents()
         if (permissionsResult.data) {
           authStore.setPermissions(permissionsResult.data)
 
           toast.success("登录成功!")
 
-          // Find first accessible page based on user permissions
-          const firstAccessiblePage = PRIMARY_NAV.find((item) => {
-            return !item.permission || hasPermission(item.permission)
-          })
+          const firstAccessiblePage = findFirstAccessibleNav(PRIMARY_NAV, hasPermission)
 
           // Redirect to first accessible page or 403 if no access
           if (firstAccessiblePage) {

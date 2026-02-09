@@ -16,7 +16,7 @@
 - 约束：与 sticky header 和 selection 需保持兼容
 - Selection 必须基于 rowId，不能依赖 DOM 索引
 - 当前实现生效条件：`scrollContainer="root"` 且未启用 `dragSort/tree/renderSubComponent/analytics.groupBy`
-- 后续可继续优化：更复杂组合场景下的共存策略（见 `src/components/table/v2/TODO.md`）
+- 后续可继续优化：更复杂组合场景下的共存策略（见本文档“能力边界与扩展建议”章节）
 
 ---
 

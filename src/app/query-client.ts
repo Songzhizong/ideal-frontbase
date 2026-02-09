@@ -1,7 +1,7 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
-import { getApiErrorMessage, isApiError, isUnauthorizedError } from "@/lib/api-error"
+import { getApiErrorMessage, isApiError, isUnauthorizedError } from "@/packages/error-core"
 
 type OnUnauthorizedFn = () => void
 

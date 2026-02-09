@@ -1,6 +1,7 @@
 import { AlertCircle, Copy, Download, Key, Lock, Shield, Smartphone, Trash2 } from "lucide-react"
 import React, { type ChangeEvent, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+import { useAuthStore } from "@/packages/auth-core"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,17 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { useAuthStore } from "@/lib/auth-store"
-import { validateWithToast } from "@/lib/utils"
+} from "@/packages/ui/alert-dialog"
+import { Badge } from "@/packages/ui/badge"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Input } from "@/packages/ui/input"
+import { Label } from "@/packages/ui/label"
+import { Progress } from "@/packages/ui/progress"
+import { Separator } from "@/packages/ui/separator"
+import { Switch } from "@/packages/ui/switch"
+import { validateWithToast } from "@/packages/ui-utils"
 import { ChangePasswordRequestSchema, useChangePassword, usePasswordStatus } from "../api/password"
 import {
   useDeleteRecoveryCode,

@@ -3,26 +3,13 @@ import { ArrowLeft, Save } from "lucide-react"
 import { useCallback, useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { PageContainer } from "@/components/common/page-container"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { useBaseNavigate } from "@/hooks/use-base-navigate"
+import { PageContainer } from "@/packages/layout-core"
+import { useBaseNavigate } from "@/packages/platform-router"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/packages/ui/form"
+import { Input } from "@/packages/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/ui/select"
 import { getDemoUserById } from "../demo/users"
 import { DEMO_USER_DEPARTMENTS, DEMO_USER_ROLES, DEMO_USER_STATUSES } from "../types"
 

@@ -1,14 +1,14 @@
 "use client"
 
 import { Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/packages/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/packages/ui/dialog"
 import type { FileManagerItem } from "../types"
 import { isImageType, isOfficeType, isPdfType, isVideoType } from "../utils/file-utils"
 

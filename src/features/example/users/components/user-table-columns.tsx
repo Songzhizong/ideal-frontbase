@@ -1,10 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Ellipsis, KeyRound, Pencil } from "lucide-react"
-import { BaseLink } from "@/components/common/base-link"
-import { createColumnHelper, DataTableSortableHeader } from "@/components/table/v2"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { BaseLink } from "@/packages/platform-router"
+import { createColumnHelper, DataTableSortableHeader } from "@/packages/table"
+import { Avatar, AvatarFallback } from "@/packages/ui/avatar"
+import { Badge } from "@/packages/ui/badge"
+import { Button } from "@/packages/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+} from "@/packages/ui/dropdown-menu"
+import { cn } from "@/packages/ui-utils"
 import type { DemoUser, DemoUserRole, DemoUserStatus } from "../types"
 
 const helper = createColumnHelper<DemoUser>()

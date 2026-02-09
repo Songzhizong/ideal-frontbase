@@ -7,8 +7,8 @@
 
 import { configureQueryClient } from "@/app/query-client"
 import { createDebouncedUnauthorizedHandler } from "@/features/core/auth"
-import { configureApiClient } from "@/lib/api-client"
-import { authStore } from "@/lib/auth-store"
+import { configureApiClient } from "@/packages/api-core"
+import { authStore } from "@/packages/auth-core"
 
 /**
  * 配置 API Client 的认证行为

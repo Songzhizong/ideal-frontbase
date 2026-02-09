@@ -12,7 +12,7 @@
 ## 1. 基础表格
 
 ```tsx
-import { createColumnHelper, DataTablePreset, local, stateInternal, useDataTable } from "@/components/table/v2"
+import { createColumnHelper, DataTablePreset, local, stateInternal, useDataTable } from "@/packages/table"
 
 interface UserRow {
   id: string
@@ -58,7 +58,7 @@ import {
   remote,
   stateUrl,
   useDataTable,
-} from "@/components/table/v2"
+} from "@/packages/table"
 
 interface InvoiceRow {
   id: string
@@ -115,13 +115,13 @@ export function RemotePaginationExample({ columns }: { columns: Array<unknown> }
 ## 3. 带筛选的表格
 
 ```tsx
-import type { FilterDefinition } from "@/components/table/v2"
+import type { FilterDefinition } from "@/packages/table"
 import {
   DataTableActiveFilters,
   DataTableFilterBar,
   DataTableSearch,
   DataTableToolbar,
-} from "@/components/table/v2"
+} from "@/packages/table"
 
 interface UserFilters {
   q: string
@@ -168,8 +168,8 @@ export function FilterTableToolbar() {
 ## 4. 带选择的表格
 
 ```tsx
-import { createColumnHelper, DataTableSelectionBar, useDataTable } from "@/components/table/v2"
-import { Button } from "@/components/ui/button"
+import { createColumnHelper, DataTableSelectionBar, useDataTable } from "@/packages/table"
+import { Button } from "@/packages/ui/button"
 
 interface RowItem {
   id: string
@@ -228,7 +228,7 @@ export function SelectionExample(props: {
 
 ```tsx
 import type { ColumnDef } from "@tanstack/react-table"
-import { DataTableTreeCell, useDataTable } from "@/components/table/v2"
+import { DataTableTreeCell, useDataTable } from "@/packages/table"
 
 interface TreeRow {
   id: string
@@ -276,7 +276,7 @@ export function TreeExample(props: {
 ## 6. 可拖拽排序的表格
 
 ```tsx
-import { createColumnHelper, useDataTable } from "@/components/table/v2"
+import { createColumnHelper, useDataTable } from "@/packages/table"
 
 interface TaskRow {
   id: string

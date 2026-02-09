@@ -1,23 +1,16 @@
 import { useLayoutEffect, useRef } from "react"
 import type { UseFormReturn } from "react-hook-form"
 import type { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/packages/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/packages/ui/dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/packages/ui/form"
+import { Input } from "@/packages/ui/input"
 import type { FileCatalog } from "../types"
 import type { FolderSchema } from "./file-manager-helpers"
 import { FileManagerTree } from "./file-manager-tree"

@@ -1,7 +1,7 @@
-import { StatusBadge } from "@/components/common/status-badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import type { SystemModule } from "../types/infrastructure"
+import type { SystemModule } from "@/features/dashboard"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { StatusBadge } from "@/packages/ui/status-badge"
+import { cn } from "@/packages/ui-utils"
 
 interface SystemModuleCardProps {
   module: SystemModule

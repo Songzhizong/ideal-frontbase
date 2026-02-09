@@ -4,7 +4,7 @@
 
 ## 3.1 实现对齐补充（截至 2026-02-07）
 
-以下为当前实现与本文原始设计草案的关键对齐点（以 `src/components/table/v2/core/types.ts`、`use-data-table.ts` 为准）：
+以下为当前实现与本文原始设计草案的关键对齐点（以 `src/packages/table/core/types.ts`、`use-data-table.ts` 为准）：
 
 - `DataTableInstance` 当前包含 `__version: "2.0"`。
 - `DataTableInstance.meta.feature` 额外包含：

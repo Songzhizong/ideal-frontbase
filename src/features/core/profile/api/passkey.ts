@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/lib/api-client"
-import { webauthnUtils } from "@/lib/webauthn"
+import { api } from "@/packages/api-core"
+import { webauthnUtils } from "@/packages/auth-core"
 
 export interface Passkey {
   id: string

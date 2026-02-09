@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type { z } from "zod"
-import { useConfirm } from "@/hooks/use-confirm"
+import { useConfirm } from "@/packages/confirm"
 import {
   fetchBatchDeleteFile,
   fetchBatchHardDeleteFile,

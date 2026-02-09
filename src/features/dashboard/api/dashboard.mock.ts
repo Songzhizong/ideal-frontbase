@@ -1,6 +1,6 @@
 import { addMinutes } from "date-fns"
 import { delay, HttpResponse, http } from "msw"
-import { mockRegistry } from "@/mocks/registry"
+import { mockRegistry } from "@/packages/mock-core"
 import type { DashboardStats } from "./get-stats"
 import { ProfileSchema, type UpdateProfileResponse } from "./update-profile"
 

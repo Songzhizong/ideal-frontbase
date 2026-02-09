@@ -10,17 +10,17 @@ import {
   Users,
 } from "lucide-react"
 import { motion } from "motion/react"
-import { PageContainer } from "@/components/common/page-container"
-import { StatusBadge } from "@/components/common/status-badge"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useInfrastructureStats } from "@/features/dashboard/api/get-infrastructure-stats"
 import { useRecentActivities } from "@/features/dashboard/api/get-recent-activities"
 import { useSystemModules } from "@/features/dashboard/api/get-system-modules"
 import { RecentActivityList } from "@/features/dashboard/components/recent-activity-list"
 import { StatsCard } from "@/features/dashboard/components/stats-card"
 import { SystemModuleCard } from "@/features/dashboard/components/system-module-card"
+import { PageContainer } from "@/packages/layout-core"
+import { Badge } from "@/packages/ui/badge"
+import { Button } from "@/packages/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { StatusBadge } from "@/packages/ui/status-badge"
 
 export function InfrastructureDashboard() {
   const { data: stats } = useInfrastructureStats()

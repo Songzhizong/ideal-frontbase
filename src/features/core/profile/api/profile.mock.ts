@@ -1,6 +1,6 @@
 import { delay, HttpResponse, http } from "msw"
-import { mockRegistry } from "@/mocks/registry"
-import type { UserProfile } from "@/types/auth"
+import type { UserProfile } from "@/packages/auth-core"
+import { mockRegistry } from "@/packages/mock-core"
 import { Api } from "./login-log"
 import type { Passkey } from "./passkey"
 import type { PasswordStatus } from "./password"

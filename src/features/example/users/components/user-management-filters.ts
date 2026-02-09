@@ -1,4 +1,4 @@
-import type { FilterDefinition } from "@/components/table/v2"
+import type { FilterDefinition } from "@/packages/table"
 import {
   DEMO_USER_DEPARTMENTS,
   DEMO_USER_ROLES,

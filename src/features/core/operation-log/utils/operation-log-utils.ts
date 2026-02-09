@@ -1,7 +1,7 @@
 import type { VariantProps } from "class-variance-authority"
-import type { StatusBadgeTone } from "@/components/common/status-badge"
-import type { badgeVariants } from "@/components/ui/badge"
 import { Api } from "@/features/core/operation-log/api/operation-log"
+import type { badgeVariants } from "@/packages/ui/badge"
+import type { StatusBadgeTone } from "@/packages/ui/status-badge"
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"]
 

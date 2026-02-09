@@ -6,77 +6,29 @@
  */
 
 // ============================================
-// API Hooks (Public API)
-// ============================================
-export { useUserProfile } from "@/features/core/auth/api/get-current-user.ts"
-export { useLogout } from "@/features/core/auth/api/logout.ts"
-// ============================================
 // Hooks (Public API)
 // ============================================
 export { useLogoutHandler } from "@/hooks/use-logout-handler"
 // ============================================
-// Stores (Public API)
-// ============================================
-export { authStore, useAuthStore } from "@/lib/auth-store"
-// ============================================
 // Types & Schemas (Public API)
 // ============================================
-export type { Permission, UserProfile as User } from "@/types/auth"
-export { PermissionSchema } from "@/types/auth"
-export {
-  type CheckCaptchaRequest,
-  CheckCaptchaRequestSchema,
-  type CheckCaptchaResponse,
-  useCheckCaptcha,
-} from "./api/check-captcha"
-export { type PermissionIdents, usePermissions } from "./api/get-permissions"
-export {
-  type ChangePasswordLoginRequest,
-  // Change Password
-  ChangePasswordLoginRequestSchema,
-  type ChangePasswordTicket,
-  FactorType,
-  type LoginResponse,
-  // Response Types & Schemas
-  LoginResponseType,
-  type MfaTicket,
-  type MultifactorLoginRequest,
-  MultifactorLoginRequestSchema,
-  type PasswordLoginRequest,
-  // Password Login
-  PasswordLoginRequestSchema,
-  type SelectAccountRequest,
-  // Account Selection
-  SelectAccountRequestSchema,
-  type SelectAccountTicket,
-  type SelectableAccount,
-  type SendSmsCodeRequest,
-  // SMS Login
-  SendSmsCodeRequestSchema,
-  type SmsCodeLoginRequest,
-  SmsCodeLoginRequestSchema,
-  useChangePasswordLogin,
-  useMultifactorLogin,
-  usePasswordLogin,
-  useSelectAccount,
-  useSendMfaEmailCode,
-  // Multifactor Authentication
-  useSendMfaSmsCode,
-  useSendSmsLoginCode,
-  useSmsCodeLogin,
-  type VisibleToken,
-} from "./api/login"
+export type { Permission, UserProfile as User } from "@/packages/auth-core"
+// ============================================
+// Stores (Public API)
+// ============================================
+export { authStore, PermissionSchema, useAuthStore } from "@/packages/auth-core"
 // ============================================
 // Components (Public API)
 // ============================================
 export { LoginPage } from "./components/login-page"
+export { NoAccess } from "./components/no-access"
 export { PermissionGuard } from "./components/permission-guard"
+export { UserMenu } from "./components/user-menu"
 export { useLoginHandler } from "./hooks/use-login-handler"
 export type { AuthResponse } from "./types"
 
 // ============================================
 // Utils (Public API)
 // ============================================
-export { getCertificate } from "./utils/certificate"
 export { showUnauthorizedDialog } from "./utils/show-unauthorized-dialog"
 export { createDebouncedUnauthorizedHandler } from "./utils/unauthorized-handler"

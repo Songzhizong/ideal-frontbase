@@ -1,8 +1,8 @@
 import { Bell, CheckCircle, FileText, LogIn, Settings } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { RecentActivity } from "@/features/dashboard"
-import { cn } from "@/lib/utils"
+import { Badge } from "@/packages/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { cn } from "@/packages/ui-utils"
 
 interface RecentActivityListProps {
   activities: RecentActivity[]

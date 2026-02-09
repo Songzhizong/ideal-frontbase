@@ -69,7 +69,7 @@ export { UserSchema, PermissionSchema, AuthResponseSchema } from "./types"
 // Hooks (Public API)
 // ============================================
 export { useAuth } from "./hooks/use-auth"
-export { useAuthStore } from "@/lib/auth-store"
+export { useAuthStore } from "@/packages/auth-core"
 
 // ============================================
 // API Hooks (Public API)
@@ -109,7 +109,7 @@ export function Header() {
 
 ```typescript
 // src/routes/_authenticated.tsx
-import { authStore } from "@/lib/auth-store"
+import { authStore } from "@/packages/auth-core"
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ location }) => {

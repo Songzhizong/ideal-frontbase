@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
-import { BaseLayout } from "@/components/layout/base-layout"
-import { authStore } from "@/lib/auth-store"
+import { AppLayout } from "@/app/layout"
+import { authStore } from "@/packages/auth-core"
 
 function NotFoundRedirect() {
   const navigate = useNavigate()
@@ -39,8 +39,8 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <BaseLayout>
+    <AppLayout>
       <Outlet />
-    </BaseLayout>
+    </AppLayout>
   )
 }

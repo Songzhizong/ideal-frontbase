@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import type { ImperativePanelHandle } from "react-resizable-panels"
 
-import { useThemeStore } from "@/hooks/use-theme-store"
+import { useThemeStore } from "@/packages/theme-system"
 import { FILE_MANAGER_BIZ_TYPE } from "../config"
 // Hooks
 import { useFileManagerActions } from "../hooks/use-file-manager-actions"

@@ -1,4 +1,4 @@
-import type { Permission } from "@/types/auth"
+import type { Permission } from "@/packages/auth-core"
 
 /**
  * User Interface - 当前登录用户信息

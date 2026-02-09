@@ -1,4 +1,4 @@
-import type { DataTableDataResult } from "@/components/table/v2"
+import type { DataTableDataResult } from "@/packages/table"
 import {
   DEMO_USER_DEPARTMENTS,
   DEMO_USER_ROLES,

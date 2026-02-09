@@ -2,9 +2,9 @@ import { ChevronDown, ChevronUp, RefreshCw, X } from "lucide-react"
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { DataTableColumnToggle, useTableContext } from "@/components/table"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { Button } from "@/packages/ui/button"
+import { Separator } from "@/packages/ui/separator"
+import { cn } from "@/packages/ui-utils"
 
 export interface DataTableFilterBarProps {
   /**

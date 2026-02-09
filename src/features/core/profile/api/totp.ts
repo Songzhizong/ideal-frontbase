@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/lib/api-client"
+import { api } from "@/packages/api-core"
 
 /** TOTP: 获取设置状态 */
 export async function fetchTotpStatus() {

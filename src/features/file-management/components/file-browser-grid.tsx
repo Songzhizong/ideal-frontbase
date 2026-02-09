@@ -1,7 +1,7 @@
 import { Folder } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { type DragEvent, type MouseEvent, memo } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/packages/ui-utils"
 import type { FileManagerItem } from "../types"
 import { formatFileSize, getFileStyle, isImageType, parseObjectSize } from "../utils/file-utils"
 

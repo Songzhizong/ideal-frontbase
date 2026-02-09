@@ -2,11 +2,11 @@
 
 import { Files, FolderTree, FoldVertical, HardDrive, LocateFixed, Trash2 } from "lucide-react"
 import { memo, useCallback, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
+import { Button } from "@/packages/ui/button"
+import { Progress } from "@/packages/ui/progress"
+import { Separator } from "@/packages/ui/separator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/ui/tooltip"
+import { cn } from "@/packages/ui-utils"
 import type { FileCatalog } from "../types"
 import { FileManagerTree, type TreeAction } from "./file-manager-tree"
 

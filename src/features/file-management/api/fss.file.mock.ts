@@ -1,6 +1,6 @@
 import { delay, HttpResponse, http } from "msw"
 import { z } from "zod"
-import { mockRegistry } from "@/mocks/registry"
+import { mockRegistry } from "@/packages/mock-core"
 import {
   BASE_PATH,
   BatchMoveSchema,

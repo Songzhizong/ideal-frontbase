@@ -4,7 +4,7 @@
 
 ## 7.1 实现对齐补充（截至 2026-02-07）
 
-以下与当前实现对齐（以 `src/components/table/v2/core/types.ts`、`core/features/*`、`ui/table/helpers.ts` 为准）：
+以下与当前实现对齐（以 `src/packages/table/core/types.ts`、`core/features/*`、`ui/table/helpers.ts` 为准）：
 
 - `DataTableFeatures` 实际包含 11 个能力：
   - `selection` / `columnVisibility` / `columnSizing` / `pinning` / `columnOrder`

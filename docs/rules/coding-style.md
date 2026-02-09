@@ -12,7 +12,7 @@
 - **TypeScript 接口/类型**：使用 `PascalCase`。
 
 ## 2. 导入导出规范
-- **绝对路径**：必须使用 `@/` 别名（例如：`@/components/ui`）。
+- **绝对路径**：必须使用 `@/` 别名（例如：`@/packages/ui`）。
 - **组件导出**：统一使用有名导出 `export function ComponentName() {}`。
 
 ## 3. 格式化工具

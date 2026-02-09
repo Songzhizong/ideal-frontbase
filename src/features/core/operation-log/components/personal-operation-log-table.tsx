@@ -2,7 +2,6 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { CircleAlert, CircleCheck, Eye, MapPin, Plus, Shield } from "lucide-react"
 import { parseAsInteger, parseAsString } from "nuqs"
 import { useCallback, useEffect, useMemo } from "react"
-import { StatusBadge } from "@/components/common/status-badge"
 import {
   DataTable,
   DataTableContainer,
@@ -10,8 +9,14 @@ import {
   DataTablePagination,
   TableProvider,
 } from "@/components/table"
-import { Button } from "@/components/ui/button"
-import { DateRangePicker } from "@/components/ui/date-picker-rac"
+import { type Api, fetchOperationLogList } from "@/features/core/operation-log/api/operation-log"
+import {
+  actionTypeOptions,
+  getActionTypeConfig,
+} from "@/features/core/operation-log/utils/operation-log-utils"
+import { useDataTable } from "@/hooks"
+import { Button } from "@/packages/ui/button"
+import { DateRangePicker } from "@/packages/ui/date-picker-rac"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,16 +25,14 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { type Api, fetchOperationLogList } from "@/features/core/operation-log/api/operation-log"
+} from "@/packages/ui/dropdown-menu"
+import { StatusBadge } from "@/packages/ui/status-badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/packages/ui/tooltip"
+import { cn } from "@/packages/ui-utils"
 import {
-  actionTypeOptions,
-  getActionTypeConfig,
-} from "@/features/core/operation-log/utils/operation-log-utils"
-import { useDataTable } from "@/hooks"
-import { formatTimestampToDateTime, formatTimestampToRelativeTime } from "@/lib/time-utils"
-import { cn } from "@/lib/utils"
+  formatTimestampToDateTime,
+  formatTimestampToRelativeTime,
+} from "@/packages/ui-utils/time-utils"
 
 interface PersonalOperationLogTableProps {
   userId: string

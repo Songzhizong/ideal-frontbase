@@ -1,9 +1,6 @@
 import { Activity, Menu, Shield, User } from "lucide-react"
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useUserProfile } from "@/features/core/auth/api/get-current-user"
 // Import settings components
 import {
   ActivitySettings,
@@ -11,8 +8,10 @@ import {
   PreferencesSettings,
   SecuritySettings,
 } from "@/features/core/profile"
-import { useAuthStore } from "@/lib/auth-store"
-import { cn } from "@/lib/utils"
+import { useAuthStore, useUserProfile } from "@/packages/auth-core"
+import { Button } from "@/packages/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/packages/ui/sheet"
+import { cn } from "@/packages/ui-utils"
 import { GeneralSettings } from "./general-settings"
 
 const navItems = [

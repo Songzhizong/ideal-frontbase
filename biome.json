@@ -21,6 +21,11 @@
       "src/hooks/**",
       "src/lib/**",
       "src/mocks/**",
+      "src/packages/confirm/**",
+      "src/packages/error-core/**",
+      "src/packages/platform-router/**",
+      "src/packages/theme-system/**",
+      "src/packages/ui-utils/**",
       "src/routes/**",
       "src/test/**",
       "src/types/**"

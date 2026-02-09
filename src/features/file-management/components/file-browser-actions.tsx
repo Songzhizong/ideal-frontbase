@@ -1,13 +1,13 @@
 import { Download, Eye, FolderInput, Link, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { memo } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/packages/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/packages/ui/dropdown-menu"
 import type { FileManagerItem } from "../types"
 
 export interface FileBrowserItemActionHandlers {

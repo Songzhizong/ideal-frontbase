@@ -5,8 +5,8 @@ import { NuqsAdapter } from "nuqs/adapters/react"
 import { Toaster } from "sonner"
 import { queryClient } from "@/app/query-client"
 import { router } from "@/app/router"
-import { GlobalConfirmDialog } from "@/components/common/global-confirm-dialog"
-import { ThemeProvider } from "@/components/theme/theme-provider"
+import { GlobalConfirmDialog } from "@/packages/confirm"
+import { ThemeProvider } from "@/packages/theme-system"
 
 export function AppProvider() {
   return (

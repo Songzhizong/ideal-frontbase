@@ -1,5 +1,5 @@
-import { api } from "@/lib/api-client"
-import type { PageInfo } from "@/types/pagination"
+import { api } from "@/packages/api-core"
+import type { PageInfo } from "@/packages/shared-types"
 
 export namespace Api {
   export enum ActionType {

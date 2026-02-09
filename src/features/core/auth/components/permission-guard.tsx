@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
-import { useAuthStore } from "@/lib/auth-store"
-import type { Permission } from "@/types/auth"
+import type { Permission } from "@/packages/auth-core"
+import { useAuthStore } from "@/packages/auth-core"
 
 type PermissionGuardProps = {
   /**

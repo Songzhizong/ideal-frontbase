@@ -4,7 +4,7 @@
 
 ## 8.1 实现对齐补充（截至 2026-02-07）
 
-以当前导出与实现为准（`src/components/table/v2/ui/*`）：
+以当前导出与实现为准（`src/packages/table/ui/*`）：
 
 - `DataTableSelectionBar.actions` 回调参数当前额外包含：
   - `selectionScope`

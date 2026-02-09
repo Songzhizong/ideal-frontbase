@@ -1,6 +1,6 @@
 # 表格组件 V2 渐进式使用说明（实现对齐版）
 
-适用范围：`/src/components/table/v2` 当前实现（`DataTableInstance.__version = "2.0"`）。
+适用范围：`/src/packages/table` 当前实现（`DataTableInstance.__version = "2.0"`）。
 
 参考示例：
 - `src/features/example/table/stages/stage-1-basic.tsx`
@@ -33,7 +33,7 @@ V2 的核心是一个统一实例 `dt`，通过 `useDataTable()` 产出：
 ## 2. 快速开始（最小可运行版本）
 
 ```tsx
-import { createColumnHelper, DataTablePreset, local, stateInternal, useDataTable } from "@/components/table/v2"
+import { createColumnHelper, DataTablePreset, local, stateInternal, useDataTable } from "@/packages/table"
 
 interface UserRow {
   id: string

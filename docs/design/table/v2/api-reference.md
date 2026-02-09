@@ -1,6 +1,6 @@
 # 表格组件 V2 API 文档（实现对齐）
 
-适用版本：`@/components/table/v2`（`DataTableInstance.__version = "2.0"`）。
+适用版本：`@/packages/table`（`DataTableInstance.__version = "2.0"`）。
 
 ---
 
@@ -176,7 +176,7 @@ export function stateUrl<TParsers extends ParserMap | undefined>(options: {
 
 ### 2.4 内置 URL Parser
 
-`@/components/table/v2` 额外导出以下可复用 parser：
+`@/packages/table` 额外导出以下可复用 parser：
 
 - `parseAsNumberRange`：`"10~20"`、`"10~"`、`"~20"`。
 - `parseAsLocalDate`：本地日期 `YYYY-MM-DD`。

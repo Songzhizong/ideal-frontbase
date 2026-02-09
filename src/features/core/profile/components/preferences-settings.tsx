@@ -1,11 +1,11 @@
 import { Bell, Globe, Lock, Mail, MessageSquare } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
+import { Label } from "@/packages/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/packages/ui/radio-group"
+import { Separator } from "@/packages/ui/separator"
+import { Switch } from "@/packages/ui/switch"
 
 export function PreferencesSettings() {
   const [emailNotifications, setEmailNotifications] = useState({

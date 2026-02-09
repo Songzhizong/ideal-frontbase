@@ -3,10 +3,10 @@ import { parseAsInteger, useQueryState } from "nuqs"
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useDebouncedQueryState } from "@/hooks/use-debounced-query-state"
-import { cn } from "@/lib/utils"
+import { useDebouncedQueryState } from "@/packages/hooks-core"
+import { Button } from "@/packages/ui/button"
+import { Input } from "@/packages/ui/input"
+import { cn } from "@/packages/ui-utils"
 
 interface DataTableSearchProps {
   value?: string
