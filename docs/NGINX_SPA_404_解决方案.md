@@ -21,7 +21,7 @@ server {
   listen 80;
   server_name your-domain.com;
 
-  root /var/www/idealtemplate;
+  root /var/www/ideal-frontbase;
   index index.html;
 
   location / {
@@ -30,7 +30,7 @@ server {
 }
 ```
 
-### 方案 B：部署在子路径 `/idealtemplate/`
+### 方案 B：部署在子路径 `/ideal-frontbase/`
 ```nginx
 server {
   listen 80;
@@ -39,15 +39,15 @@ server {
   root /var/www;
   index index.html;
 
-  location /idealtemplate/ {
-    try_files $uri $uri/ /idealtemplate/index.html;
+  location /ideal-frontbase/ {
+    try_files $uri $uri/ /ideal-frontbase/index.html;
   }
 }
 ```
 
 ## 前端侧注意事项
-- 构建 `base` 必须与部署路径一致（例如子路径部署需使用 `/idealtemplate/`）。
-- 例如 Vite 中通过 `VITE_BASE_URL=/idealtemplate/` 设置。
+- 构建 `base` 必须与部署路径一致（例如子路径部署需使用 `/ideal-frontbase/`）。
+- 例如 Vite 中通过 `VITE_BASE_URL=/ideal-frontbase/` 设置。
 
 ## 结论
 - **彻底解决 SPA 刷新 404 的唯一方式是服务器层回退配置**。

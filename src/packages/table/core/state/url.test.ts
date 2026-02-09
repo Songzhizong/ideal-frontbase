@@ -307,7 +307,7 @@ describe("stateUrl", () => {
   })
 
   it("在 basepath 场景下 push 的 URL 会保留 basepath", async () => {
-    basePathMocks.setBasePath("/idealtemplate")
+    basePathMocks.setBasePath("/ideal-frontbase")
     urlMocks.setLocation({
       pathname: "/list",
       hash: "",
@@ -332,7 +332,7 @@ describe("stateUrl", () => {
     expect(urlMocks.push).toHaveBeenCalledTimes(1)
     const href = urlMocks.push.mock.calls[0]?.[0] as string
     const url = parseHref(href)
-    expect(url.pathname).toBe("/idealtemplate/list")
+    expect(url.pathname).toBe("/ideal-frontbase/list")
   })
 
   it("会向 adapter 暴露 searchKey，供 UI 搜索组件自动对齐", async () => {

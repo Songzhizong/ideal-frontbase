@@ -1,8 +1,8 @@
-# Ideal Template
+# Ideal Frontbase
 
-**专为 AI 辅助开发优化的 React 19 + TypeScript 高性能全栈开发模板。**
+**面向团队统一前端工程基座的 React 19 + TypeScript 高性能项目底座。**
 
-本模板旨在提供一个现代化、类型安全、架构清晰的前端工程基础。采用特性驱动架构（Feature-Based），深度集成 Zod 类型系统，并针对 AI Agent（如 Cline、Windsurf 等）的代码理解与生成进行了特别优化。
+本工程旨在提供一个现代化、类型安全、架构清晰的前端工程基础。采用特性驱动架构（Feature-Based），深度集成 Zod 类型系统，并针对 AI Agent（如 Cline、Windsurf 等）的代码理解与生成进行了特别优化。
 
 项目预置了完整的工程化配置，features 目录下的功能仅作为架构模式的演示示例，可随时替换为你自己的业务逻辑。
 
@@ -56,7 +56,7 @@
 
     ```bash
     git clone <your-repo-url>
-    cd idealtemplate
+    cd ideal-frontbase
     ```
 
 2.  **启用 Corepack (可选但推荐)**
