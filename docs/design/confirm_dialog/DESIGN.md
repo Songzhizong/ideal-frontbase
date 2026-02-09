@@ -108,7 +108,7 @@ const handleDelete = async (id: string) => {
 
 ## 5. 详细代码实现 (Draft)
 
-### 5.1 Store 定义 (src/lib/confirm-store.ts)
+### 5.1 Store 定义 (packages/confirm/confirm-store.ts)
 利用 Zustand 存储弹窗状态和 Promise 的 resolver。
 
 ```typescript
@@ -180,7 +180,7 @@ export const useConfirmStore = create<ConfirmStore>((set, get) => ({
 export const confirm = (options: ConfirmOptions) => useConfirmStore.getState().confirm(options)
 ```
 
-### 5.2 全局组件封装 (src/components/common/global-confirm-dialog.tsx)
+### 5.2 全局组件封装 (packages/confirm/global-confirm-dialog.tsx)
 这个组件需要放置在应用根节点附近，确保不会被路由切换卸载。
 
 ```tsx
@@ -233,7 +233,7 @@ export function GlobalConfirmDialog() {
 }
 ```
 
-### 5.3 导出 Hook (src/hooks/use-confirm.ts)
+### 5.3 导出 Hook (packages/confirm/use-confirm.ts)
 为了让业务代码调用更符合语义，封装一个简单的 Hook。
 
 ```typescript
@@ -252,7 +252,7 @@ export function useConfirm() {
 ### 6.1 注册组件
 在应用“根组件/全局 Provider”处引入组件，确保整个应用生命周期内只挂载一次，并且不会被路由切换卸载。
 
-本项目推荐直接挂载在 `src/app/provider.tsx` 的 `ThemeProvider` 内部（保证主题令牌可用），并放在 `RouterProvider` 之后：
+本项目推荐直接挂载在 `apps/<app-name>/src/app/provider.tsx` 的 `ThemeProvider` 内部（保证主题令牌可用），并放在 `RouterProvider` 之后：
 
 ```tsx
 import { GlobalConfirmDialog } from "@/packages/confirm"
@@ -275,7 +275,7 @@ export function AppProvider() {
 
 ### 6.2 调用方式建议
 1.  **组件内调用（推荐）**：通过 `useConfirm()` 获取 `confirm`，在事件处理函数中 `await`。
-2.  **非组件环境调用**：通过 `src/lib/confirm-store.ts` 导出的 `confirm(options)` 调用（基于 `useConfirmStore.getState()`）。
+2.  **非组件环境调用**：通过 `packages/confirm/confirm-store.ts` 导出的 `confirm(options)` 调用（基于 `useConfirmStore.getState()`）。
 
 ### 6.3 扩展功能建议 (Advanced)
 

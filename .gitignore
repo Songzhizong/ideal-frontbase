@@ -2,9 +2,11 @@ node_modules
 pnpm-debug.log*
 .DS_Store
 dist
+apps/admin/dist
 .idea
 .vite
 coverage
+apps/admin/coverage
 .env.local
 .env.*.local
 __pycache__/

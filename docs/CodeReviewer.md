@@ -33,6 +33,7 @@
 *   **HTTP Client**：严禁使用 `axios` 或原生 `fetch`。必须使用项目中封装好的 `ky` 实例 (`@/packages/api-core`)。
 *   **路由鉴权**：检查是否在 `useEffect` 中处理重定向。建议迁移至 TanStack Router 的 `beforeLoad` 生命周期。
 *   **日期处理**：检查是否使用 `momentjs`。建议替换为 `date-fns`。
+*   **Monorepo 边界**：检查是否出现 `apps/*` 之间直接源码依赖；跨应用复用能力必须沉淀到 `packages/*`。
 
 ---
 
@@ -66,5 +67,4 @@
     // After (符合规范的代码)
     ...
     ```
-
 

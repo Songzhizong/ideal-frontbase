@@ -1,11 +1,10 @@
 # 表格组件 V2 示例代码
 
 本文件提供 6 类可直接复用的示例代码骨架。完整可运行页面可参考：
-- `src/features/example/table/stages/stage-1-basic.tsx`
-- `src/features/example/table/stages/stage-2-filters.tsx`
-- `src/features/example/table/stages/stage-3-features.tsx`
-- `src/features/example/table/stages/stage-4-tree-drag.tsx`
-- `src/features/example/table/stages/stage-4-remote-drag.tsx`
+- `apps/<app-name>/src/features/example/users/components/user-management-page.tsx`（当前示例位于 `apps/admin/...`）
+- `apps/<app-name>/src/features/example/users/components/use-user-management-table-state.ts`（当前示例位于 `apps/admin/...`）
+- `apps/<app-name>/src/features/example/users/components/user-table-columns.tsx`（当前示例位于 `apps/admin/...`）
+- `apps/<app-name>/src/features/example/users/components/user-management-filters.ts`（当前示例位于 `apps/admin/...`）
 
 ---
 
@@ -318,4 +317,3 @@ export function DragSortExample(props: {
   return <div>{dt.dragSort.enabled ? "drag-on" : "drag-off"}</div>
 }
 ```
-

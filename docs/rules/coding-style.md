@@ -12,7 +12,9 @@
 - **TypeScript 接口/类型**：使用 `PascalCase`。
 
 ## 2. 导入导出规范
-- **绝对路径**：必须使用 `@/` 别名（例如：`@/packages/ui`）。
+- **应用内导入**：应用代码使用 `@/*`（映射当前应用 `apps/<app-name>/src/*`）。
+- **共享能力导入**：跨应用复用能力使用 `@/packages/*`（映射仓库根 `packages/*`）。
+- **包内实现导入**：`packages/*` 内部优先使用相对路径，禁止导入 `apps/*` 源码。
 - **组件导出**：统一使用有名导出 `export function ComponentName() {}`。
 
 ## 3. 格式化工具

@@ -9,8 +9,8 @@
 
 ## 2. 必用 API
 - **权限判断**：仅使用 `hasPermission(permission: Permission | Permission[], mode?: "AND" | "OR")`。
-- **权限类型**：`Permission` 来自 `src/types/auth.ts`。
-- **权限常量**：使用 `PERMISSIONS`。
+- **权限类型**：`Permission` 来自 `@/packages/auth-core`。
+- **权限常量**：使用当前应用的 `@/config/permissions` 导出的 `PERMISSIONS`。
 
 ## 3. 路由级控制
 - 使用 TanStack Router 的 `beforeLoad` 进行权限校验。
@@ -34,3 +34,4 @@
 ## 7. 不允许的做法
 - 直接硬编码权限字符串。
 - 使用非 `PERMISSIONS` 常量或非 `Permission` 类型进行校验。
+- 跨应用引用权限配置（例如 `apps/a` 直接导入 `apps/b` 的权限常量）。

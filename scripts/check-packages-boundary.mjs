@@ -1,8 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs"
+import { readdirSync, readFileSync, existsSync } from "node:fs"
 import path from "node:path"
 
 const projectRoot = process.cwd()
-const packagesRoot = path.join(projectRoot, "src/packages")
+const packagesRoot = path.join(projectRoot, "packages")
 const sourceFilePattern = /\.(?:[cm]?[jt]sx?)$/
 
 const importPatterns = [
@@ -69,6 +69,11 @@ function isRelativeCrossPackageImport(filePath, packageRoot, specifier) {
 }
 
 const violations = []
+
+if (!existsSync(packagesRoot)) {
+	console.error("packages 目录不存在，无法执行边界检查。")
+	process.exit(1)
+}
 
 const allPackageFiles = walkFiles(packagesRoot)
 for (const filePath of allPackageFiles) {

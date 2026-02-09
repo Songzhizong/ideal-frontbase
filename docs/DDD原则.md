@@ -10,7 +10,11 @@ Auth 模块遵循 **领域驱动设计 (DDD)** 和 **Colocation** 原则，将�
 
 ### 心态转变
 
-不要把 `features/auth` 看作是"私有闭包"，而要把它看作是一个 **内部 NPM 包**：
+不要把 `apps/<app-name>/src/features/auth` 看作是"私有闭包"，而要把它看作是一个 **内部 NPM 包**：
+
+Monorepo 约定：
+- 应用内业务代码位于 `apps/<app-name>/src/features/*`。
+- 跨应用复用能力沉淀到 `packages/*`，禁止应用之间直接互相导入源码。
 
 ```typescript
 // 就像使用 NPM 包一样
@@ -26,7 +30,7 @@ import { useAuth, User, Permission } from "@/features/auth"
 ## 🗂️ 完整的文件结构
 
 ```
-src/features/auth/
+apps/<app-name>/src/features/auth/
 ├── types/
 │   └── index.ts                    # ✅ User, Permission, AuthResponse (Schema + Types)
 │
@@ -49,7 +53,7 @@ src/features/auth/
 
 ## 🔑 关键设计：index.ts 作为 Public API
 
-### src/features/auth/index.ts
+### apps/<app-name>/src/features/auth/index.ts
 
 ```typescript
 /**
@@ -92,7 +96,7 @@ export { PermissionGuard, LoginForm } from "./components/..."
 // ✅ 正确：从 auth 模块的公共入口导入
 import { useAuth, User, Permission } from "@/features/auth"
 
-// src/features/dashboard/components/header.tsx
+// apps/<app-name>/src/features/dashboard/components/header.tsx
 export function Header() {
   const { user, logout } = useAuth()
 
@@ -108,7 +112,7 @@ export function Header() {
 ### 在路由守卫中使用
 
 ```typescript
-// src/routes/_authenticated.tsx
+// apps/<app-name>/src/routes/_authenticated.tsx
 import { authStore } from "@/packages/auth-core"
 
 export const Route = createFileRoute("/_authenticated")({
@@ -129,7 +133,7 @@ export const Route = createFileRoute("/_authenticated")({
 ### ❌ 反模式 1：按文件类型分类
 
 ```
-src/
+apps/<app-name>/src/
 ├── types/
 │   ├── user.ts          # ❌ User 类型
 │   ├── auth.ts          # ❌ Auth 类型
@@ -157,7 +161,7 @@ import { useAuth } from "@/features/auth/hooks/use-auth"
 ### ❌ 反模式 3：Global 垃圾桶效应
 
 ```
-src/
+apps/<app-name>/src/
 ├── global/
 │   ├── user.ts          # ❌ 因为多个页面用
 │   ├── product.ts       # ❌ 因为购物车和订单都用
@@ -212,9 +216,9 @@ src/
 # 需求：给 User 添加 "avatar" 字段
 
 修改文件：
-✅ src/features/auth/types/index.ts        # 更新 Schema
-✅ src/features/auth/components/header.tsx # 显示头像
-✅ src/features/auth/api/get-current-user.ts # API 返回头像
+✅ apps/<app-name>/src/features/auth/types/index.ts        # 更新 Schema
+✅ apps/<app-name>/src/features/auth/components/header.tsx # 显示头像
+✅ apps/<app-name>/src/features/auth/api/get-current-user.ts # API 返回头像
 
 所有修改都在 features/auth/ 目录内！
 ```
@@ -223,9 +227,9 @@ src/
 
 ```
 # AI 看到路径就知道业务上下文
-src/features/auth/...        → 这是认证相关的代码
-src/features/dashboard/...   → 这是仪表盘相关的代码
-src/features/orders/...      → 这是订单相关的代码
+apps/<app-name>/src/features/auth/...        → 这是认证相关的代码
+apps/<app-name>/src/features/dashboard/...   → 这是仪表盘相关的代码
+apps/<app-name>/src/features/orders/...      → 这是订单相关的代码
 ```
 
 ### 3. 模块可以独立测试和维护
@@ -247,10 +251,10 @@ describe("Auth Feature", () => {
 
 ```
 修改 User 头像字段：
-1. src/types/user.ts           # 更新类型
-2. src/api/user.ts             # 更新 API
-3. src/hooks/use-user.ts       # 更新 Hook
-4. src/components/Header.tsx   # 更新 UI
+1. apps/<app-name>/src/types/user.ts           # 更新类型
+2. apps/<app-name>/src/api/user.ts             # 更新 API
+3. apps/<app-name>/src/hooks/use-user.ts       # 更新 Hook
+4. apps/<app-name>/src/components/Header.tsx   # 更新 UI
 
 需要在 4 个不同目录间跳转！
 ```
@@ -259,9 +263,9 @@ describe("Auth Feature", () => {
 
 ```
 修改 User 头像字段：
-1. src/features/auth/types/index.ts
-2. src/features/auth/api/get-current-user.ts
-3. src/features/auth/components/header.tsx
+1. apps/<app-name>/src/features/auth/types/index.ts
+2. apps/<app-name>/src/features/auth/api/get-current-user.ts
+3. apps/<app-name>/src/features/auth/components/header.tsx
 
 所有修改都在 features/auth/ 内！
 ```
@@ -273,7 +277,7 @@ describe("Auth Feature", () => {
 ### 案例 1：Dashboard 使用 Auth
 
 ```typescript
-// src/features/dashboard/components/stats-card.tsx
+// apps/<app-name>/src/features/dashboard/components/stats-card.tsx
 import { useAuth } from "@/features/auth"
 
 export function StatsCard() {
@@ -291,7 +295,7 @@ export function StatsCard() {
 ### 案例 2：Orders 使用 Auth
 
 ```typescript
-// src/features/orders/api/create-order.ts
+// apps/<app-name>/src/features/orders/api/create-order.ts
 import type { User } from "@/features/auth"
 
 export const createOrder = async (userId: User["id"]) => {
@@ -302,7 +306,7 @@ export const createOrder = async (userId: User["id"]) => {
 ### 案例 3：Profile 使用 Auth
 
 ```typescript
-// src/features/profile/components/profile-form.tsx
+// apps/<app-name>/src/features/profile/components/profile-form.tsx
 import { useAuth, type User } from "@/features/auth"
 
 export function ProfileForm() {
@@ -321,37 +325,33 @@ export function ProfileForm() {
 3. **心态转变**：把 `features/auth` 看作一个内部 NPM 包
 4. **依赖方向**：其他 Feature 可以依赖 Auth，但 Auth 不应依赖其他 Feature
 5. **Public API**：通过 `index.ts` 控制哪些内容对外暴露
-6. **避免 Global**：不要因为"多个页面复用"就把代码移到 `src/global`
+6. **避免 Global**：不要因为"多个页面复用"就把代码移到 `apps/<app-name>/src/global`
 
 ---
 
-## 🚀 迁移指南
+## 🚀 新项目落地步骤
 
-如果你的项目还在使用传统架构，可以这样迁移：
+新项目可按以下步骤落地该模式：
 
 ### 步骤 1：创建 Feature 目录
 
 ```bash
-mkdir -p src/features/auth/{types,api,hooks,components}
+mkdir -p apps/<app-name>/src/features/auth/{types,api,hooks,components}
 ```
 
-### 步骤 2：移动文件
+### 步骤 2：按领域组织文件
 
 ```bash
-# 移动类型定义
-mv src/types/user.ts src/features/auth/types/index.ts
-
-# 移动 API
-mv src/api/auth.ts src/features/auth/api/
-
-# 移动 Hooks
-mv src/hooks/use-auth.ts src/features/auth/hooks/
+# 在 feature 目录内创建领域文件
+touch apps/<app-name>/src/features/auth/types/index.ts
+touch apps/<app-name>/src/features/auth/api/get-current-user.ts
+touch apps/<app-name>/src/features/auth/hooks/use-auth.ts
 ```
 
 ### 步骤 3：创建 Public API
 
 ```typescript
-// src/features/auth/index.ts
+// apps/<app-name>/src/features/auth/index.ts
 export * from "./types"
 export * from "./hooks/use-auth"
 export * from "./api/..."
