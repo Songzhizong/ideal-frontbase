@@ -39,6 +39,14 @@ type GetTenantIdFn = () => string | null
 let getToken: GetTokenFn = () => null
 let getTenantId: GetTenantIdFn = () => null
 
+const isLocalDev = () => {
+  if (typeof window === "undefined") {
+    return false
+  }
+  const hostname = window.location.hostname
+  return hostname === "localhost" || hostname === "127.0.0.1"
+}
+
 /**
  * 配置 API Client 的依赖注入
  * 在应用启动时由 auth feature 调用，注入 token 获取和 401 处理逻辑
@@ -54,7 +62,7 @@ export const configureApiClient = (options: {
 const apiInstance = ky.create({
   // 开发环境使用相对路径，通过Vite代理转发
   // 生产环境通过环境变量设置完整URL
-  prefixUrl: import.meta.env.DEV ? "/" : env.VITE_API_BASE_URL,
+  prefixUrl: isLocalDev() ? "/" : env.VITE_API_BASE_URL,
   timeout: 10_000,
   retry: {
     limit: 2,
@@ -74,7 +82,7 @@ const apiInstance = ky.create({
         if ((options as ExtendedOptions).useTenantId) {
           const tenantId = getTenantId()
           if (tenantId) {
-            if (import.meta.env.DEV) {
+            if (isLocalDev()) {
               console.debug("[API] Setting x-tenant-id:", tenantId)
             }
             request.headers.set("x-tenant-id", tenantId)
@@ -91,7 +99,7 @@ const apiInstance = ky.create({
           }
         }
 
-        if (import.meta.env.DEV) {
+        if (isLocalDev()) {
           console.info("Request URL:", request.url)
         }
 

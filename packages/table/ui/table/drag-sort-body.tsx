@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/packages/ui/table"
 import { cn } from "@/packages/ui-utils"
 import type { DataTableInstance } from "../../core"
 import { DataTableDragSortRowProvider } from "../drag-handle"
-import { DataTableDropIndicator } from "../drop-indicator"
+import { DataTableDropIndicator } from "@/packages/table"
 import {
   type DragSortDropPosition,
   getParentRowId,
