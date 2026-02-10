@@ -84,7 +84,11 @@
 
 5.  **启动开发服务器**
     ```bash
-    pnpm dev
+    APP=admin pnpm dev
+    ```
+    或：
+    ```bash
+    APP=infera pnpm dev
     ```
     访问 http://localhost:5173 即可看到应用。
 
@@ -121,14 +125,78 @@ packages/
 
 ## 📜 脚本说明
 
-- `pnpm dev`: 启动开发服务器
-- `pnpm build`: 构建生产环境代码
-- `pnpm build-mock`: 构建带 Mock 数据的预览版本
-- `pnpm lint`: 运行 Biome 代码检查
-- `pnpm format`: 运行 Biome 格式化
-- `pnpm typecheck`: 运行 TypeScript 类型检查
-- `pnpm test`: 运行 Vitest 单元测试
-- `pnpm routes:generate`: 手动生成路由树 (通常会自动监听)
+当前根脚本基于 Turborepo + `scripts/run-turbo-for-apps.mjs`，会自动识别 `apps/*` 下的应用，不再需要每新增应用就改根 `package.json`。
+
+### 自动识别规则
+
+1. 扫描 `apps/*` 目录下所有包含 `package.json` 的子目录作为候选应用。
+2. 当执行 `--all` 时，只会运行“定义了该脚本”的应用。
+3. 当执行单应用命令时，会校验：
+   - 应用是否存在；
+   - 该应用是否定义了目标脚本（例如 `build` / `dev` / `typecheck`）。
+
+### 单应用命令
+
+可以通过环境变量 `APP` 或参数 `--app` 指定应用：
+
+```bash
+APP=admin pnpm dev
+APP=infera pnpm build:app
+APP=admin pnpm typecheck:app
+
+pnpm dev --app=admin
+pnpm build:app --app=infera
+pnpm lint:app --app=admin
+```
+
+### 全应用命令（自动识别 apps）
+
+```bash
+pnpm dev:all
+pnpm build
+pnpm build-mock
+pnpm build-mock:pages
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:watch
+pnpm format
+pnpm routes:generate
+pnpm msw:init
+```
+
+### 参数透传给 turbo
+
+在根命令后追加 `--`，可把参数透传给 `turbo run`：
+
+```bash
+pnpm build -- --dry
+pnpm test -- --concurrency=50%
+```
+
+### 新增应用接入方式
+
+新增 `apps/new-app` 时，只需保证该应用有 `package.json`，并定义你希望参与调度的脚本，例如：
+
+```json
+{
+  "name": "@ideal-frontbase/new-app",
+  "scripts": {
+    "dev": "vite --mode dev",
+    "build": "vite build --mode prod",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check . --no-errors-on-unmatched"
+  }
+}
+```
+
+完成后，`pnpm build`、`pnpm lint`、`pnpm dev:all` 会自动纳入该应用。
+
+### 常见报错说明
+
+- `请设置 APP=<app-name> 或传入 --app=<app-name>`：你执行了单应用命令，但未指定应用。
+- `应用 "<name>" 不存在`：`apps/<name>` 不存在或没有 `package.json`。
+- `应用 "<name>" 未定义 "<task>" 脚本`：该应用的 `package.json` 里缺少对应脚本。
 
 ---
 

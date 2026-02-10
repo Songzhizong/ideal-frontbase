@@ -1,0 +1,56 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"globalDependencies": [
+		"pnpm-lock.yaml",
+		"biome.json",
+		"apps/*/.env*",
+		"packages/**"
+	],
+	"tasks": {
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"preview": {
+			"cache": false,
+			"persistent": true
+		},
+		"test:watch": {
+			"cache": false,
+			"persistent": true
+		},
+		"routes:generate": {
+			"cache": false
+		},
+		"msw:init": {
+			"cache": false
+		},
+		"build": {
+			"dependsOn": ["routes:generate", "^build"],
+			"outputs": ["dist/**", "404.html"]
+		},
+		"build-mock": {
+			"dependsOn": ["^build-mock"],
+			"outputs": ["dist/**", "404.html"]
+		},
+		"build-mock:pages": {
+			"dependsOn": ["build-mock"],
+			"outputs": ["dist/**", "404.html"]
+		},
+		"typecheck": {
+			"dependsOn": ["^typecheck"],
+			"outputs": []
+		},
+		"lint": {
+			"dependsOn": ["^lint"],
+			"outputs": []
+		},
+		"test": {
+			"dependsOn": ["^build"],
+			"outputs": ["coverage/**"]
+		},
+		"format": {
+			"cache": false
+		}
+	}
+}

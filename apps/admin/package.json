@@ -12,8 +12,8 @@
 		"test": "vitest",
 		"test:watch": "vitest --watch",
 		"typecheck": "tsc --noEmit",
-		"lint": "biome check .",
-		"format": "biome format . --write",
+		"lint": "biome check . --no-errors-on-unmatched",
+		"format": "biome format . --write --no-errors-on-unmatched",
 		"msw:init": "msw init public/ --save",
 		"routes:generate": "node scripts/generate-route-tree.mjs"
 	},

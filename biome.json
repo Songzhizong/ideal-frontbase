@@ -21,14 +21,14 @@
       "apps/admin/src/hooks/**",
       "apps/admin/src/lib/**",
       "apps/admin/src/mocks/**",
+      "apps/admin/src/routes/**",
+      "apps/admin/src/test/**",
+      "apps/admin/src/types/**",
       "packages/confirm/**",
       "packages/error-core/**",
       "packages/platform-router/**",
       "packages/theme-system/**",
-      "packages/ui-utils/**",
-      "apps/admin/src/routes/**",
-      "apps/admin/src/test/**",
-      "apps/admin/src/types/**"
+      "packages/ui-utils/**"
     ]
   },
   "formatter": {
