@@ -13,3 +13,8 @@ export interface LayoutNavItem {
   permission?: string
   children?: readonly LayoutNavItem[]
 }
+
+export interface LayoutNavGroup {
+  title?: string
+  items: readonly LayoutNavItem[]
+}

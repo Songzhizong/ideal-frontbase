@@ -1,4 +1,4 @@
-import type { LayoutNavItem, LayoutPermissionChecker } from "./types"
+import type { LayoutNavGroup, LayoutNavItem, LayoutPermissionChecker } from "./types"
 
 export type ParentLayoutNavItem = LayoutNavItem & {
   children: readonly LayoutNavItem[]
@@ -41,6 +41,10 @@ export function flattenNavItems(items: readonly LayoutNavItem[]) {
   return result
 }
 
+export function flattenNavGroups(groups: readonly LayoutNavGroup[]) {
+  return groups.flatMap((group) => group.items)
+}
+
 function hasPermissionAccess(item: LayoutNavItem, checker?: LayoutPermissionChecker) {
   return !checker || !item.permission || checker(item.permission)
 }
@@ -72,6 +76,27 @@ export function filterNavByPermission(
 
     result.push({
       ...item,
+    })
+  }
+
+  return result
+}
+
+export function filterNavGroupsByPermission(
+  groups: readonly LayoutNavGroup[],
+  checker?: LayoutPermissionChecker,
+) {
+  const result: LayoutNavGroup[] = []
+
+  for (const group of groups) {
+    const items = filterNavByPermission(group.items, checker)
+    if (items.length === 0) {
+      continue
+    }
+
+    result.push({
+      ...group,
+      items,
     })
   }
 

@@ -3,16 +3,23 @@ import * as React from "react"
 import { useThemeStore } from "@/packages/theme-system"
 import { SidebarProvider } from "@/packages/ui/sidebar"
 import { cn } from "@/packages/ui-utils"
-import { filterNavByPermission } from "./nav-utils"
+import { filterNavByPermission, flattenNavGroups } from "./nav-utils"
 import { AppSidebar } from "./parts/app-sidebar"
 import { Header } from "./parts/header"
 import { SearchCommand } from "./parts/search-command"
-import type { LayoutIcon, LayoutNavItem, LayoutPermissionChecker } from "./types"
+import type {
+  LayoutIcon,
+  LayoutNavGroup,
+  LayoutNavItem,
+  LayoutPermissionChecker,
+} from "./types"
 
 interface BaseLayoutProps {
   children: React.ReactNode
-  primaryNavItems: readonly LayoutNavItem[]
+  primaryNavItems?: readonly LayoutNavItem[]
+  primaryNavGroups?: readonly LayoutNavGroup[]
   allNavItems?: readonly LayoutNavItem[]
+  allNavGroups?: readonly LayoutNavGroup[]
   permissionChecker?: LayoutPermissionChecker
   sidebarBrand?: React.ReactNode
   headerActions?: React.ReactNode
@@ -24,7 +31,9 @@ interface BaseLayoutProps {
 export function BaseLayout({
   children,
   primaryNavItems,
+  primaryNavGroups,
   allNavItems,
+  allNavGroups,
   permissionChecker,
   sidebarBrand,
   headerActions,
@@ -44,9 +53,33 @@ export function BaseLayout({
   const enableRouteRemount = pageAnimation !== "none" && !import.meta.env.DEV
   const [searchOpen, setSearchOpen] = React.useState(false)
 
+  const primarySidebarGroups = React.useMemo(() => {
+    if (primaryNavGroups) {
+      return primaryNavGroups
+    }
+
+    return [
+      {
+        items: primaryNavItems ?? [],
+      },
+    ]
+  }, [primaryNavGroups, primaryNavItems])
+
+  const searchableNavSourceItems = React.useMemo(() => {
+    if (allNavGroups) {
+      return flattenNavGroups(allNavGroups)
+    }
+
+    if (allNavItems) {
+      return allNavItems
+    }
+
+    return flattenNavGroups(primarySidebarGroups)
+  }, [allNavGroups, allNavItems, primarySidebarGroups])
+
   const searchableNavItems = React.useMemo(() => {
-    return filterNavByPermission(allNavItems ?? primaryNavItems, permissionChecker)
-  }, [allNavItems, permissionChecker, primaryNavItems])
+    return filterNavByPermission(searchableNavSourceItems, permissionChecker)
+  }, [permissionChecker, searchableNavSourceItems])
 
   const contentClassName = cn(
     "h-full w-full",
@@ -58,7 +91,7 @@ export function BaseLayout({
   const sidebarCollapsible: "none" | "icon" = menuLayout === "dual" ? "none" : "icon"
 
   const sidebarProps = {
-    items: primaryNavItems,
+    groups: primarySidebarGroups,
     ...(permissionChecker ? { permissionChecker } : {}),
     collapsible: sidebarCollapsible,
     showLabel: menuLayout === "single",

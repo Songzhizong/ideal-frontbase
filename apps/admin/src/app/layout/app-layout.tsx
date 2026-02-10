@@ -5,7 +5,7 @@ import { NotificationsButton } from "@/features/core/notifications"
 import { useAuthStore } from "@/packages/auth-core"
 import { BaseLayout, findFirstAccessibleNav, type LayoutIcon } from "@/packages/layout-core"
 import { ThemeSettingsDrawer } from "@/packages/theme-system"
-import { ALL_NAV, PRIMARY_NAV } from "./nav-config"
+import { ALL_NAV_GROUPS, PRIMARY_NAV, PRIMARY_NAV_GROUPS } from "./nav-config"
 import { SidebarBrand } from "./parts/sidebar-brand"
 
 const BREADCRUMB_ICON_BY_PATH: Readonly<Record<string, LayoutIcon>> = {
@@ -29,8 +29,8 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <BaseLayout
-      primaryNavItems={PRIMARY_NAV}
-      allNavItems={ALL_NAV}
+      primaryNavGroups={PRIMARY_NAV_GROUPS}
+      allNavGroups={ALL_NAV_GROUPS}
       permissionChecker={hasPermission}
       sidebarBrand={<SidebarBrand />}
       headerActions={

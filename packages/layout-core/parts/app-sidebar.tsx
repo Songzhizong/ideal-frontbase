@@ -9,6 +9,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -20,16 +21,17 @@ import {
 } from "@/packages/ui/sidebar"
 import { cn } from "@/packages/ui-utils"
 import {
-  filterNavByPermission,
+  filterNavGroupsByPermission,
+  flattenNavGroups,
   hasChildren,
   isLeafActive,
   isParentActive,
   type ParentLayoutNavItem,
 } from "../nav-utils"
-import type { LayoutNavItem, LayoutPermissionChecker } from "../types"
+import type { LayoutNavGroup, LayoutNavItem, LayoutPermissionChecker } from "../types"
 
 interface AppSidebarProps {
-  items: readonly LayoutNavItem[]
+  groups: readonly LayoutNavGroup[]
   permissionChecker?: LayoutPermissionChecker
   collapsible: "offcanvas" | "icon" | "none"
   showLabel?: boolean
@@ -50,7 +52,7 @@ function NavIcon({ item }: { item: LayoutNavItem }) {
 }
 
 export function AppSidebar({
-  items,
+  groups,
   permissionChecker,
   collapsible,
   showLabel = true,
@@ -66,9 +68,13 @@ export function AppSidebar({
   const isDualMode = collapsible === "none" && iconOnly
   const isCollapsed = collapsible === "icon" && state === "collapsed" && !isMobile
   const isIconMode = iconOnly || isCollapsed
+  const visibleGroups = React.useMemo(() => {
+    return filterNavGroupsByPermission(groups, permissionChecker)
+  }, [groups, permissionChecker])
   const visibleItems = React.useMemo(() => {
-    return filterNavByPermission(items, permissionChecker)
-  }, [items, permissionChecker])
+    return flattenNavGroups(visibleGroups)
+  }, [visibleGroups])
+  const showGroupSection = visibleGroups.length > 1
 
   const sidebarBrand =
     brand ??
@@ -163,69 +169,81 @@ export function AppSidebar({
         <div className="flex h-full min-h-0">
           <div className="flex w-(--sidebar-width-icon) shrink-0 flex-col">
             <SidebarHeader className="p-0">{sidebarBrand}</SidebarHeader>
-            <SidebarContent className="scrollbar-thin px-3 py-2">
-              <SidebarGroup className="p-0">
-                <SidebarGroupContent>
-                  <SidebarMenu className="gap-0.5">
-                    {visibleItems.map((item) => {
-                      if (hasChildren(item)) {
-                        const itemSelected = dualPanelOpen && dualParentTo === item.to
-                        const itemActive =
-                          itemSelected ||
-                          (activeChildParent?.to === item.to &&
-                            (!dualPanelOpen || dualParentTo === activeChildParent.to))
+            <SidebarContent className="scrollbar-thin gap-0.5 px-3 py-2">
+              {visibleGroups.map((group, groupIndex) => (
+                <SidebarGroup
+                  key={`${group.title ?? "group"}-${groupIndex}`}
+                  className={cn(
+                    "p-0",
+                    showGroupSection && groupIndex > 0
+                      ? group.title
+                        ? "mt-1.5 pt-1.5"
+                        : "mt-0.5 pt-0.5"
+                      : null,
+                  )}
+                >
+                  <SidebarGroupContent>
+                    <SidebarMenu className="gap-0.5">
+                      {group.items.map((item) => {
+                        if (hasChildren(item)) {
+                          const itemSelected = dualPanelOpen && dualParentTo === item.to
+                          const itemActive =
+                            itemSelected ||
+                            (activeChildParent?.to === item.to &&
+                              (!dualPanelOpen || dualParentTo === activeChildParent.to))
+
+                          return (
+                            <SidebarMenuItem key={item.title}>
+                              <SidebarMenuButton
+                                type="button"
+                                aria-label={item.title}
+                                tooltip={item.title}
+                                isActive={itemActive}
+                                onClick={() => openDualPanel(item)}
+                                onMouseEnter={() => {
+                                  if (!dualPinned) {
+                                    openDualPanel(item)
+                                  }
+                                }}
+                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              >
+                                <NavIcon item={item} />
+                                <span className="sr-only">{item.title}</span>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          )
+                        }
 
                         return (
                           <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
-                              type="button"
-                              aria-label={item.title}
+                              asChild
+                              isActive={activeLeafItem?.to === item.to}
                               tooltip={item.title}
-                              isActive={itemActive}
-                              onClick={() => openDualPanel(item)}
                               onMouseEnter={() => {
                                 if (!dualPinned) {
-                                  openDualPanel(item)
+                                  setDualPanelOpen(false)
+                                  setDualParentTo(null)
                                 }
                               }}
-                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              onClick={() => {
+                                setDualPanelOpen(false)
+                                setDualParentTo(null)
+                              }}
+                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
-                              <NavIcon item={item} />
-                              <span className="sr-only">{item.title}</span>
+                              <Link to={item.to}>
+                                <NavIcon item={item} />
+                                <span className="sr-only">{item.title}</span>
+                              </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         )
-                      }
-
-                      return (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={activeLeafItem?.to === item.to}
-                            tooltip={item.title}
-                            onMouseEnter={() => {
-                              if (!dualPinned) {
-                                setDualPanelOpen(false)
-                                setDualParentTo(null)
-                              }
-                            }}
-                            onClick={() => {
-                              setDualPanelOpen(false)
-                              setDualParentTo(null)
-                            }}
-                            className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
-                          >
-                            <Link to={item.to}>
-                              <NavIcon item={item} />
-                              <span className="sr-only">{item.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      )
-                    })}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ))}
             </SidebarContent>
           </div>
 
@@ -290,127 +308,150 @@ export function AppSidebar({
       className="sticky top-0 h-screen overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
     >
       <SidebarHeader className="p-0">{sidebarBrand}</SidebarHeader>
-      <SidebarContent className="scrollbar-thin px-3 py-2">
-        <SidebarGroup className="p-0">
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              {visibleItems.map((item) => {
-                if (hasChildren(item)) {
-                  const isActive = isParentActive(item, pathname)
+      <SidebarContent className="scrollbar-thin gap-0.5 px-3 py-2">
+        {visibleGroups.map((group, groupIndex) => (
+          <SidebarGroup
+            key={`${group.title ?? "group"}-${groupIndex}`}
+            className={cn(
+              "p-0",
+              showGroupSection && groupIndex > 0
+                ? group.title
+                  ? "mt-1.5"
+                  : "mt-0.5"
+                : null,
+            )}
+          >
+            {showGroupSection && !isIconMode && group.title ? (
+              <SidebarGroupLabel
+                className={cn(
+                  "h-auto px-3 pb-1 pt-0.5 text-xs font-medium tracking-wide text-sidebar-foreground/40 uppercase",
+                  groupIndex > 0 ? "mt-0.5" : null,
+                )}
+              >
+                {group.title}
+              </SidebarGroupLabel>
+            ) : null}
 
-                  if (isIconMode) {
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-0.5">
+                {group.items.map((item) => {
+                  if (hasChildren(item)) {
+                    const isActive = isParentActive(item, pathname)
+
+                    if (isIconMode) {
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <HoverCard openDelay={0} closeDelay={100}>
+                            <HoverCardTrigger asChild>
+                              <SidebarMenuButton
+                                type="button"
+                                aria-label={item.title}
+                                isActive={isActive}
+                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              >
+                                <NavIcon item={item} />
+                                <span className="sr-only">{item.title}</span>
+                              </SidebarMenuButton>
+                            </HoverCardTrigger>
+                            <HoverCardContent
+                              side="right"
+                              align="start"
+                              sideOffset={10}
+                              className="w-56 border-sidebar-border bg-popover p-2"
+                            >
+                              <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
+                                {item.title}
+                              </p>
+                              <ul className="space-y-1">
+                                {item.children.map((subItem) => (
+                                  <li key={subItem.title}>
+                                    <Link
+                                      to={subItem.to}
+                                      className={cn(
+                                        "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
+                                        pathname === subItem.to
+                                          ? "bg-sidebar-accent font-medium text-primary!"
+                                          : "text-sidebar-foreground/75!",
+                                      )}
+                                    >
+                                      {subItem.title}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </HoverCardContent>
+                          </HoverCard>
+                        </SidebarMenuItem>
+                      )
+                    }
+
                     return (
-                      <SidebarMenuItem key={item.title}>
-                        <HoverCard openDelay={0} closeDelay={100}>
-                          <HoverCardTrigger asChild>
+                      <Collapsible
+                        key={item.title}
+                        asChild
+                        defaultOpen={isActive}
+                        className="group/collapsible"
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
                             <SidebarMenuButton
                               type="button"
-                              aria-label={item.title}
+                              tooltip={item.title}
                               isActive={isActive}
-                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              className="mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
                               <NavIcon item={item} />
-                              <span className="sr-only">{item.title}</span>
+                              <span>{item.title}</span>
+                              <ChevronRight className="ml-auto size-4 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                             </SidebarMenuButton>
-                          </HoverCardTrigger>
-                          <HoverCardContent
-                            side="right"
-                            align="start"
-                            sideOffset={10}
-                            className="w-56 border-sidebar-border bg-popover p-2"
-                          >
-                            <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
-                              {item.title}
-                            </p>
-                            <ul className="space-y-1">
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub className="ml-8 mr-0 space-y-0.5 border-none px-0 py-0.5">
                               {item.children.map((subItem) => (
-                                <li key={subItem.title}>
-                                  <Link
-                                    to={subItem.to}
-                                    className={cn(
-                                      "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
-                                      pathname === subItem.to
-                                        ? "bg-sidebar-accent font-medium text-primary!"
-                                        : "text-sidebar-foreground/75!",
-                                    )}
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={pathname === subItem.to}
+                                    className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
                                   >
-                                    {subItem.title}
-                                  </Link>
-                                </li>
+                                    <Link to={subItem.to}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
                               ))}
-                            </ul>
-                          </HoverCardContent>
-                        </HoverCard>
-                      </SidebarMenuItem>
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
                     )
                   }
 
                   return (
-                    <Collapsible
-                      key={item.title}
-                      asChild
-                      defaultOpen={isActive}
-                      className="group/collapsible"
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton
-                            type="button"
-                            tooltip={item.title}
-                            isActive={isActive}
-                            className="mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
-                          >
-                            <NavIcon item={item} />
-                            <span>{item.title}</span>
-                            <ChevronRight className="ml-auto size-4 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub className="ml-8 mr-0 space-y-0.5 border-none px-0 py-0.5">
-                            {item.children.map((subItem) => (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={pathname === subItem.to}
-                                  className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
-                                >
-                                  <Link to={subItem.to}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.to}
+                        tooltip={item.title}
+                        className={cn(
+                          "mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!",
+                          isIconMode ? "mx-auto size-9 justify-center p-0" : null,
+                        )}
+                      >
+                        <Link to={item.to}>
+                          <NavIcon item={item} />
+                          {showLabel ? (
+                            <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
+                          ) : null}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                   )
-                }
-
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.to}
-                      tooltip={item.title}
-                      className={cn(
-                        "mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!",
-                        isIconMode ? "mx-auto size-9 justify-center p-0" : null,
-                      )}
-                    >
-                      <Link to={item.to}>
-                        <NavIcon item={item} />
-                        {showLabel ? (
-                          <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
-                        ) : null}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   )
