@@ -23,6 +23,21 @@ Monorepo 目录约定如下：
   - 可复用能力放到 `packages/*`。
   - 业务耦合能力放到 `apps/<app-name>/src/features/*`、`apps/<app-name>/src/routes/*` 等应用目录。
 - 应用隔离：禁止应用之间直接依赖彼此源码（例如 `apps/a` 直接导入 `apps/b`）；跨应用复用必须下沉到 `packages/*`。
+- **共享包定义 (`packages/*`)**：
+  - `@/packages/ui`: 核心 UI 组件库（基于 Shadcn UI）。
+  - `@/packages/api-core`: 基于 `ky` 的 API 客户端驱动及基础异常定义。
+  - `@/packages/auth-core`: 权限判定 (`PermissionGate`)、鉴权 Store 及 WebAuthn 支持。
+  - `@/packages/hooks-core`: 常用逻辑封装（如 `useBoolean`, `useLoading` 等）。
+  - `@/packages/table`: 高级数据表格组件体系。
+  - `@/packages/layout-core`: 基础布局 (`BaseLayout`) 及页面容器 (`PageContainer`)。
+  - `@/packages/theme-system`: 主题色预设、字体配置及主题切换逻辑。
+  - `@/packages/platform-router`: 跨平台的路由组件（`BaseLink`, `useBaseNavigate`）。
+  - `@/packages/confirm`: 基于 Promise 的全局二次确认对话框。
+  - `@/packages/error-core`: 问题详情显示组件 (`ProblemDetail`) 及 404/错误页。
+  - `@/packages/app-config`: 环境变量定义与全局应用配置。
+  - `@/packages/shared-types`: 跨模块共享的 TypeScript 类型（如分页结果、基础 DTO）。
+  - `@/packages/mock-core`: MSW 浏览器/服务器 Mock 注册机制。
+  - `@/packages/ui-utils`: Tailwind 样式合并 (`cn`) 等视觉辅助工具。
 - 结构约束：禁止恢复仓库根 `src/*` 旧结构，禁止新增兼容层。
 - 导入策略：
   - 应用内代码统一使用 `@/*`（映射当前应用的 `apps/<app-name>/src/*`）。
