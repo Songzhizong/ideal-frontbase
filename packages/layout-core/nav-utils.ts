@@ -9,7 +9,15 @@ export function hasChildren(item: LayoutNavItem): item is ParentLayoutNavItem {
 }
 
 export function isParentActive(item: ParentLayoutNavItem, pathname: string) {
-  return item.children.some((child) => child.to === pathname) || pathname.startsWith(`${item.to}/`)
+  const hasActiveChild = item.children.some((child) => {
+    if (child.to === "/") {
+      return pathname === "/"
+    }
+
+    return pathname === child.to || pathname.startsWith(`${child.to}/`)
+  })
+
+  return hasActiveChild || pathname.startsWith(`${item.to}/`)
 }
 
 export function isLeafActive(item: LayoutNavItem, pathname: string) {
