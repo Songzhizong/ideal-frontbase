@@ -48,6 +48,7 @@ Monorepo 目录约定如下：
 - **表格与查询状态**：详细规则请阅读 [data-table.md](data-table.md)。
 - **权限与鉴权控制**：详细规则请阅读 [permissions.md](permissions.md)。
 - **代码风格与命名**：详细规则请阅读 [coding-style.md](coding-style.md)。
+- **系统设计语言**：详细规则请阅读 [ui-design.md](ui-design.md)。
 
 ---
 

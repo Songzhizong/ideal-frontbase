@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { AppProvider } from "@/app/provider"
+import { AppProvider } from "@/app/providers"
 import { initializeApp } from "@/app/initialize"
 import "@/app/globals.css"
 import { handlers } from "@/mocks/handlers"

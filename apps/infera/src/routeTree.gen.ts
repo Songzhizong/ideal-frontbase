@@ -18,11 +18,29 @@ import { Route as AuthenticatedCoreRouteRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/_dashboard/index'
 import { Route as BlankAuthLoginRouteImport } from './routes/_blank/_auth/login'
 import { Route as AuthenticatedCoreProfileRouteImport } from './routes/_authenticated/_core/profile'
-import { Route as AuthenticatedCoreFileManagementRouteImport } from './routes/_authenticated/_core/file-management'
-import { Route as AuthenticatedExampleUsersIndexRouteImport } from './routes/_authenticated/example/users/index'
-import { Route as AuthenticatedExampleUsersNewRouteImport } from './routes/_authenticated/example/users/new'
-import { Route as AuthenticatedExampleUsersUserIdResetPasswordRouteImport } from './routes/_authenticated/example/users/$userId/reset-password'
-import { Route as AuthenticatedExampleUsersUserIdEditRouteImport } from './routes/_authenticated/example/users/$userId/edit'
+import { Route as AuthenticatedTTenantIdUsersRouteImport } from './routes/_authenticated/t/$tenantId/users'
+import { Route as AuthenticatedTTenantIdQuotasBudgetsRouteImport } from './routes/_authenticated/t/$tenantId/quotas-budgets'
+import { Route as AuthenticatedTTenantIdProjectsRouteImport } from './routes/_authenticated/t/$tenantId/projects'
+import { Route as AuthenticatedTTenantIdOverviewRouteImport } from './routes/_authenticated/t/$tenantId/overview'
+import { Route as AuthenticatedTTenantIdBillingRouteImport } from './routes/_authenticated/t/$tenantId/billing'
+import { Route as AuthenticatedTTenantIdAuditRouteImport } from './routes/_authenticated/t/$tenantId/audit'
+import { Route as AuthenticatedTTenantIdAlertsRouteImport } from './routes/_authenticated/t/$tenantId/alerts'
+import { Route as AuthenticatedTTenantIdPProjectIdUsageRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/usage'
+import { Route as AuthenticatedTTenantIdPProjectIdSettingsRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/settings'
+import { Route as AuthenticatedTTenantIdPProjectIdDashboardRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/dashboard'
+import { Route as AuthenticatedTTenantIdPProjectIdAuditRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/audit'
+import { Route as AuthenticatedTTenantIdPProjectIdServicesIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/services/index'
+import { Route as AuthenticatedTTenantIdPProjectIdModelsIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/models/index'
+import { Route as AuthenticatedTTenantIdPProjectIdFineTuningIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/fine-tuning/index'
+import { Route as AuthenticatedTTenantIdPProjectIdEvaluationIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/evaluation/index'
+import { Route as AuthenticatedTTenantIdPProjectIdDatasetsIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/datasets/index'
+import { Route as AuthenticatedTTenantIdPProjectIdApiKeysIndexRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/api-keys/index'
+import { Route as AuthenticatedTTenantIdPProjectIdServicesServiceIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/services/$serviceId'
+import { Route as AuthenticatedTTenantIdPProjectIdModelsModelIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/models/$modelId'
+import { Route as AuthenticatedTTenantIdPProjectIdFineTuningJobIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+import { Route as AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+import { Route as AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/datasets/$datasetId'
+import { Route as AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
 
 const BlankRouteRoute = BlankRouteRouteImport.update({
   id: '/_blank',
@@ -68,34 +86,142 @@ const AuthenticatedCoreProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedCoreRouteRoute,
   } as any)
-const AuthenticatedCoreFileManagementRoute =
-  AuthenticatedCoreFileManagementRouteImport.update({
-    id: '/file-management',
-    path: '/file-management',
-    getParentRoute: () => AuthenticatedCoreRouteRoute,
-  } as any)
-const AuthenticatedExampleUsersIndexRoute =
-  AuthenticatedExampleUsersIndexRouteImport.update({
-    id: '/example/users/',
-    path: '/example/users/',
+const AuthenticatedTTenantIdUsersRoute =
+  AuthenticatedTTenantIdUsersRouteImport.update({
+    id: '/t/$tenantId/users',
+    path: '/t/$tenantId/users',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedExampleUsersNewRoute =
-  AuthenticatedExampleUsersNewRouteImport.update({
-    id: '/example/users/new',
-    path: '/example/users/new',
+const AuthenticatedTTenantIdQuotasBudgetsRoute =
+  AuthenticatedTTenantIdQuotasBudgetsRouteImport.update({
+    id: '/t/$tenantId/quotas-budgets',
+    path: '/t/$tenantId/quotas-budgets',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedExampleUsersUserIdResetPasswordRoute =
-  AuthenticatedExampleUsersUserIdResetPasswordRouteImport.update({
-    id: '/example/users/$userId/reset-password',
-    path: '/example/users/$userId/reset-password',
+const AuthenticatedTTenantIdProjectsRoute =
+  AuthenticatedTTenantIdProjectsRouteImport.update({
+    id: '/t/$tenantId/projects',
+    path: '/t/$tenantId/projects',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedExampleUsersUserIdEditRoute =
-  AuthenticatedExampleUsersUserIdEditRouteImport.update({
-    id: '/example/users/$userId/edit',
-    path: '/example/users/$userId/edit',
+const AuthenticatedTTenantIdOverviewRoute =
+  AuthenticatedTTenantIdOverviewRouteImport.update({
+    id: '/t/$tenantId/overview',
+    path: '/t/$tenantId/overview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdBillingRoute =
+  AuthenticatedTTenantIdBillingRouteImport.update({
+    id: '/t/$tenantId/billing',
+    path: '/t/$tenantId/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdAuditRoute =
+  AuthenticatedTTenantIdAuditRouteImport.update({
+    id: '/t/$tenantId/audit',
+    path: '/t/$tenantId/audit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdAlertsRoute =
+  AuthenticatedTTenantIdAlertsRouteImport.update({
+    id: '/t/$tenantId/alerts',
+    path: '/t/$tenantId/alerts',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdUsageRoute =
+  AuthenticatedTTenantIdPProjectIdUsageRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/usage',
+    path: '/t/$tenantId/p/$projectId/usage',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdSettingsRoute =
+  AuthenticatedTTenantIdPProjectIdSettingsRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/settings',
+    path: '/t/$tenantId/p/$projectId/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdDashboardRoute =
+  AuthenticatedTTenantIdPProjectIdDashboardRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/dashboard',
+    path: '/t/$tenantId/p/$projectId/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdAuditRoute =
+  AuthenticatedTTenantIdPProjectIdAuditRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/audit',
+    path: '/t/$tenantId/p/$projectId/audit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdServicesIndexRoute =
+  AuthenticatedTTenantIdPProjectIdServicesIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/services/',
+    path: '/t/$tenantId/p/$projectId/services/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdModelsIndexRoute =
+  AuthenticatedTTenantIdPProjectIdModelsIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/models/',
+    path: '/t/$tenantId/p/$projectId/models/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute =
+  AuthenticatedTTenantIdPProjectIdFineTuningIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/fine-tuning/',
+    path: '/t/$tenantId/p/$projectId/fine-tuning/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute =
+  AuthenticatedTTenantIdPProjectIdEvaluationIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/evaluation/',
+    path: '/t/$tenantId/p/$projectId/evaluation/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute =
+  AuthenticatedTTenantIdPProjectIdDatasetsIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/datasets/',
+    path: '/t/$tenantId/p/$projectId/datasets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute =
+  AuthenticatedTTenantIdPProjectIdApiKeysIndexRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/api-keys/',
+    path: '/t/$tenantId/p/$projectId/api-keys/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute =
+  AuthenticatedTTenantIdPProjectIdServicesServiceIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/services/$serviceId',
+    path: '/t/$tenantId/p/$projectId/services/$serviceId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdModelsModelIdRoute =
+  AuthenticatedTTenantIdPProjectIdModelsModelIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/models/$modelId',
+    path: '/t/$tenantId/p/$projectId/models/$modelId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute =
+  AuthenticatedTTenantIdPProjectIdFineTuningJobIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/fine-tuning/$jobId',
+    path: '/t/$tenantId/p/$projectId/fine-tuning/$jobId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute =
+  AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/evaluation/$evalRunId',
+    path: '/t/$tenantId/p/$projectId/evaluation/$evalRunId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute =
+  AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/datasets/$datasetId',
+    path: '/t/$tenantId/p/$projectId/datasets/$datasetId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute =
+  AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRouteImport.update({
+    id: '/t/$tenantId/p/$projectId/api-keys/$apiKeyId',
+    path: '/t/$tenantId/p/$projectId/api-keys/$apiKeyId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -104,26 +230,62 @@ export interface FileRoutesByFullPath {
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
-  '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
   '/login': typeof BlankAuthLoginRoute
-  '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
-  '/example/users/': typeof AuthenticatedExampleUsersIndexRoute
-  '/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
-  '/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
+  '/t/$tenantId/alerts': typeof AuthenticatedTTenantIdAlertsRoute
+  '/t/$tenantId/audit': typeof AuthenticatedTTenantIdAuditRoute
+  '/t/$tenantId/billing': typeof AuthenticatedTTenantIdBillingRoute
+  '/t/$tenantId/overview': typeof AuthenticatedTTenantIdOverviewRoute
+  '/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
+  '/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
+  '/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
+  '/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
+  '/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
+  '/t/$tenantId/p/$projectId/usage': typeof AuthenticatedTTenantIdPProjectIdUsageRoute
+  '/t/$tenantId/p/$projectId/api-keys/$apiKeyId': typeof AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute
+  '/t/$tenantId/p/$projectId/datasets/$datasetId': typeof AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute
+  '/t/$tenantId/p/$projectId/evaluation/$evalRunId': typeof AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute
+  '/t/$tenantId/p/$projectId/fine-tuning/$jobId': typeof AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute
+  '/t/$tenantId/p/$projectId/models/$modelId': typeof AuthenticatedTTenantIdPProjectIdModelsModelIdRoute
+  '/t/$tenantId/p/$projectId/services/$serviceId': typeof AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute
+  '/t/$tenantId/p/$projectId/api-keys/': typeof AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute
+  '/t/$tenantId/p/$projectId/datasets/': typeof AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute
+  '/t/$tenantId/p/$projectId/evaluation/': typeof AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute
+  '/t/$tenantId/p/$projectId/fine-tuning/': typeof AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute
+  '/t/$tenantId/p/$projectId/models/': typeof AuthenticatedTTenantIdPProjectIdModelsIndexRoute
+  '/t/$tenantId/p/$projectId/services/': typeof AuthenticatedTTenantIdPProjectIdServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedDashboardIndexRoute
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
-  '/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/profile': typeof AuthenticatedCoreProfileRoute
   '/login': typeof BlankAuthLoginRoute
-  '/example/users/new': typeof AuthenticatedExampleUsersNewRoute
-  '/example/users': typeof AuthenticatedExampleUsersIndexRoute
-  '/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
-  '/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
+  '/t/$tenantId/alerts': typeof AuthenticatedTTenantIdAlertsRoute
+  '/t/$tenantId/audit': typeof AuthenticatedTTenantIdAuditRoute
+  '/t/$tenantId/billing': typeof AuthenticatedTTenantIdBillingRoute
+  '/t/$tenantId/overview': typeof AuthenticatedTTenantIdOverviewRoute
+  '/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
+  '/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
+  '/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
+  '/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
+  '/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
+  '/t/$tenantId/p/$projectId/usage': typeof AuthenticatedTTenantIdPProjectIdUsageRoute
+  '/t/$tenantId/p/$projectId/api-keys/$apiKeyId': typeof AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute
+  '/t/$tenantId/p/$projectId/datasets/$datasetId': typeof AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute
+  '/t/$tenantId/p/$projectId/evaluation/$evalRunId': typeof AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute
+  '/t/$tenantId/p/$projectId/fine-tuning/$jobId': typeof AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute
+  '/t/$tenantId/p/$projectId/models/$modelId': typeof AuthenticatedTTenantIdPProjectIdModelsModelIdRoute
+  '/t/$tenantId/p/$projectId/services/$serviceId': typeof AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute
+  '/t/$tenantId/p/$projectId/api-keys': typeof AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute
+  '/t/$tenantId/p/$projectId/datasets': typeof AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute
+  '/t/$tenantId/p/$projectId/evaluation': typeof AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute
+  '/t/$tenantId/p/$projectId/fine-tuning': typeof AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute
+  '/t/$tenantId/p/$projectId/models': typeof AuthenticatedTTenantIdPProjectIdModelsIndexRoute
+  '/t/$tenantId/p/$projectId/services': typeof AuthenticatedTTenantIdPProjectIdServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,14 +295,32 @@ export interface FileRoutesById {
   '/errors/403': typeof Errors403Route
   '/errors/404': typeof Errors404Route
   '/errors/500': typeof Errors500Route
-  '/_authenticated/_core/file-management': typeof AuthenticatedCoreFileManagementRoute
   '/_authenticated/_core/profile': typeof AuthenticatedCoreProfileRoute
   '/_blank/_auth/login': typeof BlankAuthLoginRoute
   '/_authenticated/_dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/_authenticated/example/users/new': typeof AuthenticatedExampleUsersNewRoute
-  '/_authenticated/example/users/': typeof AuthenticatedExampleUsersIndexRoute
-  '/_authenticated/example/users/$userId/edit': typeof AuthenticatedExampleUsersUserIdEditRoute
-  '/_authenticated/example/users/$userId/reset-password': typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
+  '/_authenticated/t/$tenantId/alerts': typeof AuthenticatedTTenantIdAlertsRoute
+  '/_authenticated/t/$tenantId/audit': typeof AuthenticatedTTenantIdAuditRoute
+  '/_authenticated/t/$tenantId/billing': typeof AuthenticatedTTenantIdBillingRoute
+  '/_authenticated/t/$tenantId/overview': typeof AuthenticatedTTenantIdOverviewRoute
+  '/_authenticated/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
+  '/_authenticated/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
+  '/_authenticated/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/_authenticated/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
+  '/_authenticated/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
+  '/_authenticated/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
+  '/_authenticated/t/$tenantId/p/$projectId/usage': typeof AuthenticatedTTenantIdPProjectIdUsageRoute
+  '/_authenticated/t/$tenantId/p/$projectId/api-keys/$apiKeyId': typeof AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/datasets/$datasetId': typeof AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/evaluation/$evalRunId': typeof AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/$jobId': typeof AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/models/$modelId': typeof AuthenticatedTTenantIdPProjectIdModelsModelIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/services/$serviceId': typeof AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute
+  '/_authenticated/t/$tenantId/p/$projectId/api-keys/': typeof AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute
+  '/_authenticated/t/$tenantId/p/$projectId/datasets/': typeof AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute
+  '/_authenticated/t/$tenantId/p/$projectId/evaluation/': typeof AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute
+  '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/': typeof AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute
+  '/_authenticated/t/$tenantId/p/$projectId/models/': typeof AuthenticatedTTenantIdPProjectIdModelsIndexRoute
+  '/_authenticated/t/$tenantId/p/$projectId/services/': typeof AuthenticatedTTenantIdPProjectIdServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,26 +329,62 @@ export interface FileRouteTypes {
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
-    | '/file-management'
     | '/profile'
     | '/login'
-    | '/example/users/new'
-    | '/example/users/'
-    | '/example/users/$userId/edit'
-    | '/example/users/$userId/reset-password'
+    | '/t/$tenantId/alerts'
+    | '/t/$tenantId/audit'
+    | '/t/$tenantId/billing'
+    | '/t/$tenantId/overview'
+    | '/t/$tenantId/projects'
+    | '/t/$tenantId/quotas-budgets'
+    | '/t/$tenantId/users'
+    | '/t/$tenantId/p/$projectId/audit'
+    | '/t/$tenantId/p/$projectId/dashboard'
+    | '/t/$tenantId/p/$projectId/settings'
+    | '/t/$tenantId/p/$projectId/usage'
+    | '/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+    | '/t/$tenantId/p/$projectId/datasets/$datasetId'
+    | '/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+    | '/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+    | '/t/$tenantId/p/$projectId/models/$modelId'
+    | '/t/$tenantId/p/$projectId/services/$serviceId'
+    | '/t/$tenantId/p/$projectId/api-keys/'
+    | '/t/$tenantId/p/$projectId/datasets/'
+    | '/t/$tenantId/p/$projectId/evaluation/'
+    | '/t/$tenantId/p/$projectId/fine-tuning/'
+    | '/t/$tenantId/p/$projectId/models/'
+    | '/t/$tenantId/p/$projectId/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
-    | '/file-management'
     | '/profile'
     | '/login'
-    | '/example/users/new'
-    | '/example/users'
-    | '/example/users/$userId/edit'
-    | '/example/users/$userId/reset-password'
+    | '/t/$tenantId/alerts'
+    | '/t/$tenantId/audit'
+    | '/t/$tenantId/billing'
+    | '/t/$tenantId/overview'
+    | '/t/$tenantId/projects'
+    | '/t/$tenantId/quotas-budgets'
+    | '/t/$tenantId/users'
+    | '/t/$tenantId/p/$projectId/audit'
+    | '/t/$tenantId/p/$projectId/dashboard'
+    | '/t/$tenantId/p/$projectId/settings'
+    | '/t/$tenantId/p/$projectId/usage'
+    | '/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+    | '/t/$tenantId/p/$projectId/datasets/$datasetId'
+    | '/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+    | '/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+    | '/t/$tenantId/p/$projectId/models/$modelId'
+    | '/t/$tenantId/p/$projectId/services/$serviceId'
+    | '/t/$tenantId/p/$projectId/api-keys'
+    | '/t/$tenantId/p/$projectId/datasets'
+    | '/t/$tenantId/p/$projectId/evaluation'
+    | '/t/$tenantId/p/$projectId/fine-tuning'
+    | '/t/$tenantId/p/$projectId/models'
+    | '/t/$tenantId/p/$projectId/services'
   id:
     | '__root__'
     | '/_authenticated'
@@ -177,14 +393,32 @@ export interface FileRouteTypes {
     | '/errors/403'
     | '/errors/404'
     | '/errors/500'
-    | '/_authenticated/_core/file-management'
     | '/_authenticated/_core/profile'
     | '/_blank/_auth/login'
     | '/_authenticated/_dashboard/'
-    | '/_authenticated/example/users/new'
-    | '/_authenticated/example/users/'
-    | '/_authenticated/example/users/$userId/edit'
-    | '/_authenticated/example/users/$userId/reset-password'
+    | '/_authenticated/t/$tenantId/alerts'
+    | '/_authenticated/t/$tenantId/audit'
+    | '/_authenticated/t/$tenantId/billing'
+    | '/_authenticated/t/$tenantId/overview'
+    | '/_authenticated/t/$tenantId/projects'
+    | '/_authenticated/t/$tenantId/quotas-budgets'
+    | '/_authenticated/t/$tenantId/users'
+    | '/_authenticated/t/$tenantId/p/$projectId/audit'
+    | '/_authenticated/t/$tenantId/p/$projectId/dashboard'
+    | '/_authenticated/t/$tenantId/p/$projectId/settings'
+    | '/_authenticated/t/$tenantId/p/$projectId/usage'
+    | '/_authenticated/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+    | '/_authenticated/t/$tenantId/p/$projectId/datasets/$datasetId'
+    | '/_authenticated/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+    | '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+    | '/_authenticated/t/$tenantId/p/$projectId/models/$modelId'
+    | '/_authenticated/t/$tenantId/p/$projectId/services/$serviceId'
+    | '/_authenticated/t/$tenantId/p/$projectId/api-keys/'
+    | '/_authenticated/t/$tenantId/p/$projectId/datasets/'
+    | '/_authenticated/t/$tenantId/p/$projectId/evaluation/'
+    | '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/'
+    | '/_authenticated/t/$tenantId/p/$projectId/models/'
+    | '/_authenticated/t/$tenantId/p/$projectId/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -260,52 +494,176 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCoreProfileRouteImport
       parentRoute: typeof AuthenticatedCoreRouteRoute
     }
-    '/_authenticated/_core/file-management': {
-      id: '/_authenticated/_core/file-management'
-      path: '/file-management'
-      fullPath: '/file-management'
-      preLoaderRoute: typeof AuthenticatedCoreFileManagementRouteImport
-      parentRoute: typeof AuthenticatedCoreRouteRoute
-    }
-    '/_authenticated/example/users/': {
-      id: '/_authenticated/example/users/'
-      path: '/example/users'
-      fullPath: '/example/users/'
-      preLoaderRoute: typeof AuthenticatedExampleUsersIndexRouteImport
+    '/_authenticated/t/$tenantId/users': {
+      id: '/_authenticated/t/$tenantId/users'
+      path: '/t/$tenantId/users'
+      fullPath: '/t/$tenantId/users'
+      preLoaderRoute: typeof AuthenticatedTTenantIdUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/example/users/new': {
-      id: '/_authenticated/example/users/new'
-      path: '/example/users/new'
-      fullPath: '/example/users/new'
-      preLoaderRoute: typeof AuthenticatedExampleUsersNewRouteImport
+    '/_authenticated/t/$tenantId/quotas-budgets': {
+      id: '/_authenticated/t/$tenantId/quotas-budgets'
+      path: '/t/$tenantId/quotas-budgets'
+      fullPath: '/t/$tenantId/quotas-budgets'
+      preLoaderRoute: typeof AuthenticatedTTenantIdQuotasBudgetsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/example/users/$userId/reset-password': {
-      id: '/_authenticated/example/users/$userId/reset-password'
-      path: '/example/users/$userId/reset-password'
-      fullPath: '/example/users/$userId/reset-password'
-      preLoaderRoute: typeof AuthenticatedExampleUsersUserIdResetPasswordRouteImport
+    '/_authenticated/t/$tenantId/projects': {
+      id: '/_authenticated/t/$tenantId/projects'
+      path: '/t/$tenantId/projects'
+      fullPath: '/t/$tenantId/projects'
+      preLoaderRoute: typeof AuthenticatedTTenantIdProjectsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/example/users/$userId/edit': {
-      id: '/_authenticated/example/users/$userId/edit'
-      path: '/example/users/$userId/edit'
-      fullPath: '/example/users/$userId/edit'
-      preLoaderRoute: typeof AuthenticatedExampleUsersUserIdEditRouteImport
+    '/_authenticated/t/$tenantId/overview': {
+      id: '/_authenticated/t/$tenantId/overview'
+      path: '/t/$tenantId/overview'
+      fullPath: '/t/$tenantId/overview'
+      preLoaderRoute: typeof AuthenticatedTTenantIdOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/billing': {
+      id: '/_authenticated/t/$tenantId/billing'
+      path: '/t/$tenantId/billing'
+      fullPath: '/t/$tenantId/billing'
+      preLoaderRoute: typeof AuthenticatedTTenantIdBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/audit': {
+      id: '/_authenticated/t/$tenantId/audit'
+      path: '/t/$tenantId/audit'
+      fullPath: '/t/$tenantId/audit'
+      preLoaderRoute: typeof AuthenticatedTTenantIdAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/alerts': {
+      id: '/_authenticated/t/$tenantId/alerts'
+      path: '/t/$tenantId/alerts'
+      fullPath: '/t/$tenantId/alerts'
+      preLoaderRoute: typeof AuthenticatedTTenantIdAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/usage': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/usage'
+      path: '/t/$tenantId/p/$projectId/usage'
+      fullPath: '/t/$tenantId/p/$projectId/usage'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdUsageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/settings': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/settings'
+      path: '/t/$tenantId/p/$projectId/settings'
+      fullPath: '/t/$tenantId/p/$projectId/settings'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/dashboard': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/dashboard'
+      path: '/t/$tenantId/p/$projectId/dashboard'
+      fullPath: '/t/$tenantId/p/$projectId/dashboard'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/audit': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/audit'
+      path: '/t/$tenantId/p/$projectId/audit'
+      fullPath: '/t/$tenantId/p/$projectId/audit'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/services/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/services/'
+      path: '/t/$tenantId/p/$projectId/services'
+      fullPath: '/t/$tenantId/p/$projectId/services/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdServicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/models/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/models/'
+      path: '/t/$tenantId/p/$projectId/models'
+      fullPath: '/t/$tenantId/p/$projectId/models/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/'
+      path: '/t/$tenantId/p/$projectId/fine-tuning'
+      fullPath: '/t/$tenantId/p/$projectId/fine-tuning/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdFineTuningIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/evaluation/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/evaluation/'
+      path: '/t/$tenantId/p/$projectId/evaluation'
+      fullPath: '/t/$tenantId/p/$projectId/evaluation/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdEvaluationIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/datasets/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/datasets/'
+      path: '/t/$tenantId/p/$projectId/datasets'
+      fullPath: '/t/$tenantId/p/$projectId/datasets/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdDatasetsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/api-keys/': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/api-keys/'
+      path: '/t/$tenantId/p/$projectId/api-keys'
+      fullPath: '/t/$tenantId/p/$projectId/api-keys/'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdApiKeysIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/services/$serviceId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/services/$serviceId'
+      path: '/t/$tenantId/p/$projectId/services/$serviceId'
+      fullPath: '/t/$tenantId/p/$projectId/services/$serviceId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdServicesServiceIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/models/$modelId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/models/$modelId'
+      path: '/t/$tenantId/p/$projectId/models/$modelId'
+      fullPath: '/t/$tenantId/p/$projectId/models/$modelId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdModelsModelIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/$jobId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+      path: '/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+      fullPath: '/t/$tenantId/p/$projectId/fine-tuning/$jobId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdFineTuningJobIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/evaluation/$evalRunId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+      path: '/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+      fullPath: '/t/$tenantId/p/$projectId/evaluation/$evalRunId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/datasets/$datasetId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/datasets/$datasetId'
+      path: '/t/$tenantId/p/$projectId/datasets/$datasetId'
+      fullPath: '/t/$tenantId/p/$projectId/datasets/$datasetId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/p/$projectId/api-keys/$apiKeyId': {
+      id: '/_authenticated/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+      path: '/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+      fullPath: '/t/$tenantId/p/$projectId/api-keys/$apiKeyId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedCoreRouteRouteChildren {
-  AuthenticatedCoreFileManagementRoute: typeof AuthenticatedCoreFileManagementRoute
   AuthenticatedCoreProfileRoute: typeof AuthenticatedCoreProfileRoute
 }
 
 const AuthenticatedCoreRouteRouteChildren: AuthenticatedCoreRouteRouteChildren =
   {
-    AuthenticatedCoreFileManagementRoute: AuthenticatedCoreFileManagementRoute,
     AuthenticatedCoreProfileRoute: AuthenticatedCoreProfileRoute,
   }
 
@@ -317,21 +675,74 @@ const AuthenticatedCoreRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoreRouteRoute: typeof AuthenticatedCoreRouteRouteWithChildren
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
-  AuthenticatedExampleUsersNewRoute: typeof AuthenticatedExampleUsersNewRoute
-  AuthenticatedExampleUsersIndexRoute: typeof AuthenticatedExampleUsersIndexRoute
-  AuthenticatedExampleUsersUserIdEditRoute: typeof AuthenticatedExampleUsersUserIdEditRoute
-  AuthenticatedExampleUsersUserIdResetPasswordRoute: typeof AuthenticatedExampleUsersUserIdResetPasswordRoute
+  AuthenticatedTTenantIdAlertsRoute: typeof AuthenticatedTTenantIdAlertsRoute
+  AuthenticatedTTenantIdAuditRoute: typeof AuthenticatedTTenantIdAuditRoute
+  AuthenticatedTTenantIdBillingRoute: typeof AuthenticatedTTenantIdBillingRoute
+  AuthenticatedTTenantIdOverviewRoute: typeof AuthenticatedTTenantIdOverviewRoute
+  AuthenticatedTTenantIdProjectsRoute: typeof AuthenticatedTTenantIdProjectsRoute
+  AuthenticatedTTenantIdQuotasBudgetsRoute: typeof AuthenticatedTTenantIdQuotasBudgetsRoute
+  AuthenticatedTTenantIdUsersRoute: typeof AuthenticatedTTenantIdUsersRoute
+  AuthenticatedTTenantIdPProjectIdAuditRoute: typeof AuthenticatedTTenantIdPProjectIdAuditRoute
+  AuthenticatedTTenantIdPProjectIdDashboardRoute: typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
+  AuthenticatedTTenantIdPProjectIdSettingsRoute: typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
+  AuthenticatedTTenantIdPProjectIdUsageRoute: typeof AuthenticatedTTenantIdPProjectIdUsageRoute
+  AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute: typeof AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute
+  AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute: typeof AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute
+  AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute: typeof AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute
+  AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute: typeof AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute
+  AuthenticatedTTenantIdPProjectIdModelsModelIdRoute: typeof AuthenticatedTTenantIdPProjectIdModelsModelIdRoute
+  AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute: typeof AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute
+  AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute: typeof AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute
+  AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute: typeof AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute
+  AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute: typeof AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute
+  AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute: typeof AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute
+  AuthenticatedTTenantIdPProjectIdModelsIndexRoute: typeof AuthenticatedTTenantIdPProjectIdModelsIndexRoute
+  AuthenticatedTTenantIdPProjectIdServicesIndexRoute: typeof AuthenticatedTTenantIdPProjectIdServicesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoreRouteRoute: AuthenticatedCoreRouteRouteWithChildren,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
-  AuthenticatedExampleUsersNewRoute: AuthenticatedExampleUsersNewRoute,
-  AuthenticatedExampleUsersIndexRoute: AuthenticatedExampleUsersIndexRoute,
-  AuthenticatedExampleUsersUserIdEditRoute:
-    AuthenticatedExampleUsersUserIdEditRoute,
-  AuthenticatedExampleUsersUserIdResetPasswordRoute:
-    AuthenticatedExampleUsersUserIdResetPasswordRoute,
+  AuthenticatedTTenantIdAlertsRoute: AuthenticatedTTenantIdAlertsRoute,
+  AuthenticatedTTenantIdAuditRoute: AuthenticatedTTenantIdAuditRoute,
+  AuthenticatedTTenantIdBillingRoute: AuthenticatedTTenantIdBillingRoute,
+  AuthenticatedTTenantIdOverviewRoute: AuthenticatedTTenantIdOverviewRoute,
+  AuthenticatedTTenantIdProjectsRoute: AuthenticatedTTenantIdProjectsRoute,
+  AuthenticatedTTenantIdQuotasBudgetsRoute:
+    AuthenticatedTTenantIdQuotasBudgetsRoute,
+  AuthenticatedTTenantIdUsersRoute: AuthenticatedTTenantIdUsersRoute,
+  AuthenticatedTTenantIdPProjectIdAuditRoute:
+    AuthenticatedTTenantIdPProjectIdAuditRoute,
+  AuthenticatedTTenantIdPProjectIdDashboardRoute:
+    AuthenticatedTTenantIdPProjectIdDashboardRoute,
+  AuthenticatedTTenantIdPProjectIdSettingsRoute:
+    AuthenticatedTTenantIdPProjectIdSettingsRoute,
+  AuthenticatedTTenantIdPProjectIdUsageRoute:
+    AuthenticatedTTenantIdPProjectIdUsageRoute,
+  AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute:
+    AuthenticatedTTenantIdPProjectIdApiKeysApiKeyIdRoute,
+  AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute:
+    AuthenticatedTTenantIdPProjectIdDatasetsDatasetIdRoute,
+  AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute:
+    AuthenticatedTTenantIdPProjectIdEvaluationEvalRunIdRoute,
+  AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute:
+    AuthenticatedTTenantIdPProjectIdFineTuningJobIdRoute,
+  AuthenticatedTTenantIdPProjectIdModelsModelIdRoute:
+    AuthenticatedTTenantIdPProjectIdModelsModelIdRoute,
+  AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute:
+    AuthenticatedTTenantIdPProjectIdServicesServiceIdRoute,
+  AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute:
+    AuthenticatedTTenantIdPProjectIdApiKeysIndexRoute,
+  AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute:
+    AuthenticatedTTenantIdPProjectIdDatasetsIndexRoute,
+  AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute:
+    AuthenticatedTTenantIdPProjectIdEvaluationIndexRoute,
+  AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute:
+    AuthenticatedTTenantIdPProjectIdFineTuningIndexRoute,
+  AuthenticatedTTenantIdPProjectIdModelsIndexRoute:
+    AuthenticatedTTenantIdPProjectIdModelsIndexRoute,
+  AuthenticatedTTenantIdPProjectIdServicesIndexRoute:
+    AuthenticatedTTenantIdPProjectIdServicesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

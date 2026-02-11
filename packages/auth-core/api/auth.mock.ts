@@ -69,7 +69,7 @@ export const authHandlers = [
   // Get Permissions
   http.get("*/nexus-api/iam/front/apps/:appId/available-permission-idents", async () => {
     await delay(200)
-    return HttpResponse.json(["users:read"])
+    return HttpResponse.json(["dashboard:view", "users:read", "file:manage:view"])
   }),
 
   // Logout

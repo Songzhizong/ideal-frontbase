@@ -6,7 +6,7 @@ export function NotificationsButton() {
     <Button
       variant="ghost"
       size="sm"
-      className="relative h-10 w-10 rounded-full p-0"
+      className="relative h-10 w-10 cursor-pointer rounded-full p-0"
       aria-label="Notifications"
     >
       <Bell className="size-4" />

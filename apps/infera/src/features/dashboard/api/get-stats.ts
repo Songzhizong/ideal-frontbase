@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { api } from "@/packages/api-core"
+import { api } from "@/features/core/api/http-client"
 
 export interface DashboardStats {
   totalUsers: number

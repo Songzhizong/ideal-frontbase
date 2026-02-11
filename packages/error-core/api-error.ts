@@ -7,6 +7,7 @@ export class ApiError extends Error {
   public readonly url: string
   public readonly method: string
   public readonly problem: ProblemDetail | null
+  public readonly retryAfterSeconds: number | null
   public readonly originalError: unknown
 
   public constructor(args: {
@@ -15,6 +16,7 @@ export class ApiError extends Error {
     url: string
     method: string
     problem?: ProblemDetail | null
+    retryAfterSeconds?: number | null
     originalError?: unknown
   }) {
     super(args.message)
@@ -22,6 +24,7 @@ export class ApiError extends Error {
     this.url = args.url
     this.method = args.method
     this.problem = args.problem ?? null
+    this.retryAfterSeconds = args.retryAfterSeconds ?? null
     this.originalError = args.originalError
   }
 }

@@ -10,13 +10,13 @@ import {
   Users,
 } from "lucide-react"
 import { motion } from "motion/react"
+import { ContentLayout } from "@/components/content-layout"
 import { useInfrastructureStats } from "@/features/dashboard/api/get-infrastructure-stats"
 import { useRecentActivities } from "@/features/dashboard/api/get-recent-activities"
 import { useSystemModules } from "@/features/dashboard/api/get-system-modules"
 import { RecentActivityList } from "@/features/dashboard/components/recent-activity-list"
 import { StatsCard } from "@/features/dashboard/components/stats-card"
 import { SystemModuleCard } from "@/features/dashboard/components/system-module-card"
-import { PageContainer } from "@/packages/layout-core"
 import { Badge } from "@/packages/ui/badge"
 import { Button } from "@/packages/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
@@ -87,7 +87,7 @@ export function InfrastructureDashboard() {
   ]
 
   return (
-    <PageContainer>
+    <ContentLayout className="mx-auto w-full max-w-7xl">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -220,6 +220,6 @@ export function InfrastructureDashboard() {
           </div>
         </section>
       </motion.div>
-    </PageContainer>
+    </ContentLayout>
   )
 }

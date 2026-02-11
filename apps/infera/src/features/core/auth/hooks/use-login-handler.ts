@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
-import { PRIMARY_NAV } from "@/app/layout/nav-config"
 import {
   type LoginResponse,
   LoginResponseType,
@@ -8,7 +7,7 @@ import {
   usePermissionIdents,
   useUserProfile,
 } from "@/packages/auth-core"
-import { findFirstAccessibleNav } from "@/packages/layout-core"
+import { resolveDefaultTenantId } from "../utils/resolve-default-tenant-id"
 
 /**
  * Hook to handle successful login flow
@@ -16,9 +15,6 @@ import { findFirstAccessibleNav } from "@/packages/layout-core"
  */
 export function useLoginHandler() {
   const navigate = useNavigate()
-  // 性能优化: 使用 Selector 仅订阅 hasPermission 函数
-  // 避免 token、user、permissions 等状态变化导致组件重新渲染
-  const hasPermission = useAuthStore((state) => state.hasPermission)
   const { refetch: refetchUser } = useUserProfile({ enabled: false })
   const { refetch: refetchPermissionIdents } = usePermissionIdents({ enabled: false })
 
@@ -48,16 +44,15 @@ export function useLoginHandler() {
         if (permissionsResult.data) {
           authStore.setPermissions(permissionsResult.data)
 
+          const defaultTenantId = resolveDefaultTenantId(authStore)
+
           toast.success("登录成功!")
-
-          const firstAccessiblePage = findFirstAccessibleNav(PRIMARY_NAV, hasPermission)
-
-          // Redirect to first accessible page or 403 if no access
-          if (firstAccessiblePage) {
-            void navigate({ to: firstAccessiblePage.to })
-          } else {
-            void navigate({ to: "/" })
-          }
+          void navigate({
+            to: "/t/$tenantId/overview",
+            params: {
+              tenantId: defaultTenantId,
+            },
+          })
         } else {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error("Failed to fetch user data")

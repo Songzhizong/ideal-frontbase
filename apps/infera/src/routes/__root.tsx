@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query"
 import { createRootRouteWithContext, Outlet, useNavigate } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useEffect } from "react"
+import { PermissionContextProvider } from "@/features/core/auth/permission-context"
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -24,9 +25,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
   return (
-    <div className="relative min-h-screen">
-      <Outlet />
-      {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
-    </div>
+    <PermissionContextProvider>
+      <div className="relative min-h-screen">
+        <Outlet />
+        {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
+      </div>
+    </PermissionContextProvider>
   )
 }

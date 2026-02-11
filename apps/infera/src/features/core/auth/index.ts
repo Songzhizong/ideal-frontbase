@@ -25,7 +25,20 @@ export { NoAccess } from "./components/no-access"
 export { PermissionGuard } from "./components/permission-guard"
 export { UserMenu } from "./components/user-menu"
 export { useLoginHandler } from "./hooks/use-login-handler"
+export type {
+  PermissionContextValue,
+  PermissionEnvironmentTag,
+  PermissionSubjectType,
+} from "./permission-context"
+export { PermissionContextProvider, usePermissionContext } from "./permission-context"
+export { enforceRoutePermission } from "./route-permission"
 export type { AuthResponse } from "./types"
+export type {
+  ProdRestrictionOptions,
+  UsePermissionOptions,
+  UsePermissionResult,
+} from "./use-permission"
+export { usePermission } from "./use-permission"
 
 // ============================================
 // Utils (Public API)

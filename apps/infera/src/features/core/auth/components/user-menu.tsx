@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router"
 import { LogOut, User } from "lucide-react"
 import { useState } from "react"
 import { useLogoutHandler } from "@/hooks/use-logout-handler"
 import { useAuthStore } from "@/packages/auth-core"
+import { BaseLink } from "@/packages/platform-router"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +36,7 @@ export function UserMenu() {
         <Button
           variant="ghost"
           size="sm"
-          className="relative h-10 w-10 rounded-full p-0"
+          className="relative h-10 w-10 cursor-pointer rounded-full p-0"
           aria-label="User menu"
         >
           <Avatar className="h-9 w-9">
@@ -48,16 +48,16 @@ export function UserMenu() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>我的账户</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/profile">
+        <DropdownMenuItem asChild className="cursor-pointer transition-colors">
+          <BaseLink to="/profile">
             <User className="mr-2 h-4 w-4" />
             <span>个人中心</span>
-          </Link>
+          </BaseLink>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => setIsLogoutDialogOpen(true)}
-          className="text-destructive focus:text-destructive"
+          className="cursor-pointer text-destructive transition-colors focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>退出登录</span>

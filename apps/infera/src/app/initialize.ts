@@ -5,22 +5,83 @@
  * 这里是配置跨层依赖的正确位置
  */
 
+import { toast } from "sonner"
 import { configureQueryClient } from "@/app/query-client"
+import { router } from "@/app/router"
+import { buildProjectPath, buildTenantPath } from "@/components/workspace/workspace-context"
+import { configureHttpClient, type HttpAuditSuccessEvent } from "@/features/core/api/http-client"
 import { createDebouncedUnauthorizedHandler } from "@/features/core/auth"
-import { configureApiClient } from "@/packages/api-core"
 import { authStore } from "@/packages/auth-core"
+
+function decodePathSegment(value: string) {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+function resolveAuditTargetPath(pathname: string) {
+  const projectMatch = pathname.match(
+    /\/infera-api\/tenants\/(?<tenantId>[^/]+)\/projects\/(?<projectId>[^/]+)/iu,
+  )
+  if (projectMatch?.groups?.tenantId && projectMatch.groups.projectId) {
+    return buildProjectPath(
+      decodePathSegment(projectMatch.groups.tenantId),
+      decodePathSegment(projectMatch.groups.projectId),
+      "/audit",
+    )
+  }
+
+  const tenantMatch = pathname.match(/\/infera-api\/tenants\/(?<tenantId>[^/]+)/iu)
+  if (tenantMatch?.groups?.tenantId) {
+    return buildTenantPath(decodePathSegment(tenantMatch.groups.tenantId), "/audit")
+  }
+
+  return "/profile"
+}
+
+function handleAuditSuccess(event: HttpAuditSuccessEvent) {
+  if (!event.auditId) {
+    return
+  }
+
+  let pathname = ""
+  try {
+    pathname = new URL(event.url, window.location.origin).pathname.toLowerCase()
+  } catch {
+    pathname = ""
+  }
+
+  if (pathname.includes("/auth/login") || pathname.includes("/iam/logout")) {
+    return
+  }
+
+  toast.success("操作成功，已写入审计日志。", {
+    action: {
+      label: "查看审计记录",
+      onClick: () => {
+        const targetPath = resolveAuditTargetPath(pathname)
+        void router.navigate({
+          to: targetPath,
+        })
+      },
+    },
+  })
+}
 
 /**
  * 配置 API Client 的认证行为
  * 注入 Auth 业务逻辑到基础设施层
  */
 export function initializeApiClient() {
-  configureApiClient({
+  configureHttpClient({
     getToken: () => authStore.getState().token,
     getTenantId: () => {
       const state = authStore.getState()
       return state.tenantId ?? state.user?.tenantId ?? null
     },
+    onAuditSuccess: handleAuditSuccess,
   })
 
   configureQueryClient({

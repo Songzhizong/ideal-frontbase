@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { z } from "zod"
-import { api } from "@/packages/api-core"
+import { api } from "@/features/core/api/http-client"
 
 /**
  * 个人密码状态

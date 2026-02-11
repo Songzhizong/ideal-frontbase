@@ -1,30 +1,33 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import { PRIMARY_NAV } from "@/app/layout/nav-config"
 import { PERMISSIONS } from "@/config/permissions"
-import { InfrastructureDashboard } from "@/features/dashboard/routes/infrastructure-dashboard"
+import { enforceRoutePermission } from "@/features/core/auth/route-permission"
+import { resolveDefaultTenantId } from "@/features/core/auth/utils/resolve-default-tenant-id"
 import { authStore } from "@/packages/auth-core"
-import { findFirstAccessibleNav } from "@/packages/layout-core"
+
+function resolveDefaultTenantRouteId() {
+	return resolveDefaultTenantId(authStore.getState())
+}
 
 export const Route = createFileRoute("/_authenticated/_dashboard/")({
-  beforeLoad: () => {
-    const { hasPermission } = authStore.getState()
+	beforeLoad: () => {
+		enforceRoutePermission({
+			permission: PERMISSIONS.DASHBOARD_VIEW,
+		})
 
-    // 检查是否有控制台访问权限
-    if (!hasPermission(PERMISSIONS.DASHBOARD_VIEW)) {
-      const firstAccessiblePage = findFirstAccessibleNav(PRIMARY_NAV, hasPermission)
-
-      // 如果有其他可访问的页面,重定向到该页面
-      if (firstAccessiblePage && firstAccessiblePage.to !== "/") {
-        throw redirect({
-          to: firstAccessiblePage.to,
-        })
-      }
-
-      // 如果没有任何可访问的页面,会由 AppLayout 注入 NoAccess 组件
-    }
-  },
-  component: InfrastructureDashboard,
-  staticData: {
-    title: "控制台",
-  },
+		throw redirect({
+			to: "/t/$tenantId/overview",
+			params: {
+				tenantId: resolveDefaultTenantRouteId(),
+			},
+			replace: true,
+		})
+	},
+	component: DashboardIndexRedirect,
+	staticData: {
+		title: "控制台",
+	},
 })
+
+function DashboardIndexRedirect() {
+	return null
+}

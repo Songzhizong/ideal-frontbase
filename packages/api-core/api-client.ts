@@ -34,10 +34,21 @@ interface ExtendedKyInstance extends KyInstance {
 // Dependency Injection: 定义回调函数类型
 type GetTokenFn = () => string | null
 type GetTenantIdFn = () => string | null
+type OnAuditSuccessFn = (event: AuditSuccessEvent) => void
+
+export interface AuditSuccessEvent {
+  method: string
+  url: string
+  status: number
+  auditId: string | null
+}
 
 // 初始化为空函数（默认行为）
 let getToken: GetTokenFn = () => null
 let getTenantId: GetTenantIdFn = () => null
+let onAuditSuccess: OnAuditSuccessFn = () => {}
+
+const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"])
 
 const isLocalDev = () => {
   if (typeof window === "undefined") {
@@ -47,6 +58,24 @@ const isLocalDev = () => {
   return hostname === "localhost" || hostname === "127.0.0.1"
 }
 
+function parseRetryAfterSeconds(headerValue: string | null): number | null {
+  if (!headerValue) {
+    return null
+  }
+
+  const asNumber = Number(headerValue)
+  if (Number.isFinite(asNumber) && asNumber >= 0) {
+    return Math.ceil(asNumber)
+  }
+
+  const asDate = Date.parse(headerValue)
+  if (!Number.isFinite(asDate)) {
+    return null
+  }
+
+  return Math.max(0, Math.ceil((asDate - Date.now()) / 1000))
+}
+
 /**
  * 配置 API Client 的依赖注入
  * 在应用启动时由 auth feature 调用，注入 token 获取和 401 处理逻辑
@@ -54,9 +83,11 @@ const isLocalDev = () => {
 export const configureApiClient = (options: {
   getToken: GetTokenFn
   getTenantId: GetTenantIdFn
+  onAuditSuccess?: OnAuditSuccessFn
 }) => {
   getToken = options.getToken
   getTenantId = options.getTenantId
+  onAuditSuccess = options.onAuditSuccess ?? (() => {})
 }
 
 const apiInstance = ky.create({
@@ -111,11 +142,38 @@ const apiInstance = ky.create({
         }
       },
     ],
+    afterResponse: [
+      (request, _options, response) => {
+        if (!response.ok) {
+          return
+        }
+
+        const method = request.method.toUpperCase()
+        if (!WRITE_METHODS.has(method)) {
+          return
+        }
+
+        const auditId = response.headers.get("x-audit-id") ?? response.headers.get("x-audit-log-id")
+        try {
+          onAuditSuccess({
+            method,
+            url: request.url,
+            status: response.status,
+            auditId,
+          })
+        } catch (error) {
+          if (isLocalDev()) {
+            console.error("[API] audit success callback failed:", error)
+          }
+        }
+      },
+    ],
     beforeError: [
       async (error) => {
         const { request, response } = error
         let problem = null
         let message = response.status >= 500 ? "Server error. Try again." : "Request failed."
+        const retryAfterSeconds = parseRetryAfterSeconds(response.headers.get("retry-after"))
 
         try {
           const data: unknown = await response.clone().json()
@@ -136,6 +194,7 @@ const apiInstance = ky.create({
           url: request.url,
           method: request.method,
           problem,
+          retryAfterSeconds,
           originalError: error,
         })
       },

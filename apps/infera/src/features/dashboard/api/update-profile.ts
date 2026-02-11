@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 import { z } from "zod"
-import { api } from "@/packages/api-core"
+import { api } from "@/features/core/api/http-client"
 
 export const ProfileSchema = z.object({
   name: z.string().min(2, "Name should be at least 2 characters."),

@@ -1,6 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router"
+import { useRouterState } from "@tanstack/react-router"
 import { ChevronRight, Pin, PinOff } from "lucide-react"
 import * as React from "react"
+import { BaseLink } from "@/packages/platform-router"
 import { Button } from "@/packages/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/packages/ui/collapsible"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/packages/ui/hover-card"
@@ -232,10 +233,10 @@ export function AppSidebar({
                               }}
                               className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
-                              <Link to={item.to}>
+                              <BaseLink to={item.to}>
                                 <NavIcon item={item} />
                                 <span className="sr-only">{item.title}</span>
-                              </Link>
+                              </BaseLink>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         )
@@ -278,7 +279,7 @@ export function AppSidebar({
                   <ul className="space-y-0.5">
                     {dualParent.children.map((subItem) => (
                       <li key={subItem.title}>
-                        <Link
+                        <BaseLink
                           to={subItem.to}
                           className={cn(
                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors [&>svg]:size-4.5!",
@@ -289,7 +290,7 @@ export function AppSidebar({
                         >
                           <NavIcon item={subItem} />
                           <span className="truncate">{subItem.title}</span>
-                        </Link>
+                        </BaseLink>
                       </li>
                     ))}
                   </ul>
@@ -365,7 +366,7 @@ export function AppSidebar({
                               <ul className="space-y-1">
                                 {item.children.map((subItem) => (
                                   <li key={subItem.title}>
-                                    <Link
+                                    <BaseLink
                                       to={subItem.to}
                                       className={cn(
                                         "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
@@ -375,7 +376,7 @@ export function AppSidebar({
                                       )}
                                     >
                                       {subItem.title}
-                                    </Link>
+                                    </BaseLink>
                                   </li>
                                 ))}
                               </ul>
@@ -414,9 +415,9 @@ export function AppSidebar({
                                     isActive={pathname === subItem.to}
                                     className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
                                   >
-                                    <Link to={subItem.to}>
+                                    <BaseLink to={subItem.to}>
                                       <span>{subItem.title}</span>
-                                    </Link>
+                                    </BaseLink>
                                   </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>
                               ))}
@@ -438,12 +439,12 @@ export function AppSidebar({
                           isIconMode ? "mx-auto size-9 justify-center p-0" : null,
                         )}
                       >
-                        <Link to={item.to}>
+                        <BaseLink to={item.to}>
                           <NavIcon item={item} />
                           {showLabel ? (
                             <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                           ) : null}
-                        </Link>
+                        </BaseLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )

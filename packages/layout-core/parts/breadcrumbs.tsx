@@ -1,6 +1,7 @@
-import { Link, useMatches } from "@tanstack/react-router"
+import { useMatches } from "@tanstack/react-router"
 import { ChevronRight, LayoutGrid } from "lucide-react"
 import * as React from "react"
+import { BaseLink } from "@/packages/platform-router"
 import { useThemeStore } from "@/packages/theme-system"
 import { flattenNavItems } from "../nav-utils"
 import type { LayoutIcon, LayoutNavItem } from "../types"
@@ -63,13 +64,13 @@ export function Breadcrumbs({ navItems, iconByPath }: BreadcrumbsProps) {
           <li key={`${crumb.to}-${crumb.label}`} className="flex items-center gap-2">
             {index > 0 ? <ChevronRight className="size-3 text-muted-foreground/50" /> : null}
             {index < breadcrumbs.length - 1 ? (
-              <Link
+              <BaseLink
                 to={crumb.to}
                 className="flex items-center gap-1 transition hover:text-foreground"
               >
                 {showBreadcrumbIcon && index === 0 ? <LayoutGrid className="size-3" /> : null}
                 {crumb.label}
-              </Link>
+              </BaseLink>
             ) : (
               <span className="flex items-center gap-1 font-semibold text-foreground">
                 {showBreadcrumbIcon

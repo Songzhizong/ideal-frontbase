@@ -50,7 +50,7 @@ export function DataTableRoot<TData, TFilterSchema>({
       <div
         data-slot="data-table-root"
         className={cn(
-          "flex min-h-0 flex-col overflow-clip",
+          "flex min-h-0 flex-col overflow-clip bg-card",
           " [&>*:first-child]:rounded-t-[inherit] [&>*:last-child]:rounded-b-[inherit]",
           scrollContainer === "root" && "h-full",
           className,

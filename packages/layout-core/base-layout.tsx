@@ -23,6 +23,7 @@ interface BaseLayoutProps {
   permissionChecker?: LayoutPermissionChecker
   sidebarBrand?: React.ReactNode
   headerActions?: React.ReactNode
+  headerLeading?: React.ReactNode
   appTitle?: string
   breadcrumbIconByPath?: Readonly<Record<string, LayoutIcon>>
   searchPlaceholder?: string
@@ -37,6 +38,7 @@ export function BaseLayout({
   permissionChecker,
   sidebarBrand,
   headerActions,
+  headerLeading,
   appTitle,
   breadcrumbIconByPath,
   searchPlaceholder,
@@ -102,6 +104,7 @@ export function BaseLayout({
   const headerProps = {
     navItems: searchableNavItems,
     ...(onSearchOpen ? { onSearchOpen } : {}),
+    ...(headerLeading ? { leading: headerLeading } : {}),
     ...(headerActions ? { actions: headerActions } : {}),
     ...(breadcrumbIconByPath ? { breadcrumbIconByPath } : {}),
   }

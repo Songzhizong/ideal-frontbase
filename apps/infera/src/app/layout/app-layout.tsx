@@ -1,11 +1,12 @@
 import { AlertTriangle, ShieldAlert } from "lucide-react"
 import * as React from "react"
+import { useInferaSidebarNav } from "@/components/sidebar"
+import { TopbarStart } from "@/components/topbar"
 import { NoAccess, UserMenu } from "@/features/core/auth"
 import { NotificationsButton } from "@/features/core/notifications"
 import { useAuthStore } from "@/packages/auth-core"
 import { BaseLayout, findFirstAccessibleNav, type LayoutIcon } from "@/packages/layout-core"
 import { ThemeSettingsDrawer } from "@/packages/theme-system"
-import { ALL_NAV, PRIMARY_NAV } from "./nav-config"
 import { SidebarBrand } from "./parts/sidebar-brand"
 
 const BREADCRUMB_ICON_BY_PATH: Readonly<Record<string, LayoutIcon>> = {
@@ -20,19 +21,21 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const hasPermission = useAuthStore((state) => state.hasPermission)
+  const { primaryNavGroups, allNavGroups, primaryNavItems } = useInferaSidebarNav()
 
   const hasAccessiblePrimaryNav = React.useMemo(() => {
-    return findFirstAccessibleNav(PRIMARY_NAV, hasPermission) !== null
-  }, [hasPermission])
+    return findFirstAccessibleNav(primaryNavItems, hasPermission) !== null
+  }, [hasPermission, primaryNavItems])
 
   const pageContent = hasAccessiblePrimaryNav ? children : <NoAccess />
 
   return (
     <BaseLayout
-      primaryNavItems={PRIMARY_NAV}
-      allNavItems={ALL_NAV}
+      primaryNavGroups={primaryNavGroups}
+      allNavGroups={allNavGroups}
       permissionChecker={hasPermission}
       sidebarBrand={<SidebarBrand />}
+      headerLeading={<TopbarStart />}
       headerActions={
         <>
           <ThemeSettingsDrawer />

@@ -1,7 +1,7 @@
-import { useNavigate } from "@tanstack/react-router"
 import { Search } from "lucide-react"
 import { pinyin } from "pinyin-pro"
 import * as React from "react"
+import { useBaseNavigate } from "@/packages/platform-router"
 import {
   Dialog,
   DialogContent,
@@ -71,7 +71,7 @@ export function SearchCommand({
   const itemRefs = React.useRef<Array<HTMLButtonElement | null>>([])
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedIndex, setSelectedIndex] = React.useState(0)
-  const navigate = useNavigate()
+  const navigate = useBaseNavigate()
 
   const searchMenuItems = React.useMemo(() => buildSearchMenuItems(items), [items])
 

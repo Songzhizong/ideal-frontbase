@@ -1,4 +1,4 @@
-import { api } from "@/packages/api-core"
+import { api } from "@/features/core/api/http-client"
 import type { PageInfo } from "@/packages/shared-types"
 
 export namespace Api {

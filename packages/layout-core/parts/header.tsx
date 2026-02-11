@@ -12,6 +12,7 @@ interface HeaderProps {
   onSearchOpen?: () => void
   actions?: React.ReactNode
   breadcrumbIconByPath?: Readonly<Record<string, LayoutIcon>>
+  leading?: React.ReactNode
 }
 
 export function Header({
@@ -19,6 +20,7 @@ export function Header({
   onSearchOpen,
   actions,
   breadcrumbIconByPath,
+  leading,
 }: HeaderProps) {
   const headerHeight = useThemeStore((state) => state.layout.headerHeight)
   const menuLayout = useThemeStore((state) => state.layout.menuLayout)
@@ -50,8 +52,9 @@ export function Header({
       )}
       style={{ height: `${headerHeight}px` }}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 items-center gap-3">
         {menuLayout !== "dual" ? <SidebarTrigger /> : null}
+        {leading ? <div className="flex min-w-0 items-center gap-2">{leading}</div> : null}
         <Breadcrumbs {...breadcrumbProps} />
       </div>
 
@@ -61,7 +64,7 @@ export function Header({
             <Button
               variant="outline"
               size="sm"
-              className="hidden items-center gap-2 rounded-full px-4 md:flex"
+              className="hidden cursor-pointer items-center gap-2 rounded-full px-4 md:flex"
               onClick={onSearchOpen}
               aria-keyshortcuts="Meta+K Control+K"
             >
@@ -74,7 +77,7 @@ export function Header({
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 rounded-full p-0 md:hidden"
+              className="h-10 w-10 cursor-pointer rounded-full p-0 md:hidden"
               onClick={onSearchOpen}
               aria-label="Open search"
             >
