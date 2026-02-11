@@ -78,8 +78,13 @@ export function DataTableQueryPanel<TFilterSchema>({
     const dataTableRoot = panelElement.closest<HTMLElement>('[data-slot="data-table-root"]')
     if (!dataTableRoot) return
 
+    if (!isStickyQueryPanel) {
+      dataTableRoot.style.removeProperty("--dt-sticky-query-height")
+      return
+    }
+
     const updateStickyHeight = () => {
-      const height = isStickyQueryPanel ? panelElement.offsetHeight : 0
+      const height = panelElement.offsetHeight
       dataTableRoot.style.setProperty("--dt-sticky-query-height", `${height}px`)
     }
 

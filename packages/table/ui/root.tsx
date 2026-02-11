@@ -115,7 +115,7 @@ export function DataTableRoot<TData, TFilterSchema>({
         data-slot="data-table-root"
         data-dt-variant={variant}
         className={cn(
-          "flex min-h-0 flex-col bg-card",
+          "flex min-h-0 flex-col rounded-[inherit] bg-card",
           hasWindowSticky ? "overflow-visible" : "overflow-clip",
           " [&>*:first-child]:rounded-t-[inherit] [&>*:last-child]:rounded-b-[inherit]",
           scrollContainer === "root" && "h-full",

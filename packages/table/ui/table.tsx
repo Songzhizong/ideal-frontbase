@@ -60,7 +60,7 @@ export function DataTableTable<TData>({
   const stickyHeader = layout?.stickyHeader ?? false;
   const isStickyHeader = stickyHeader === true || typeof stickyHeader === "object";
   const stickyHeaderTop = isStickyQueryPanel
-    ? "calc(var(--dt-sticky-top,0px) + var(--dt-sticky-query-height,0px))"
+    ? "calc(var(--dt-query-top,var(--dt-sticky-top,0px)) + var(--dt-sticky-query-height,0px))"
     : "var(--dt-sticky-top,0px)";
   const i18n = useMemo(() => {
     return mergeDataTableI18n(globalI18n, i18nOverrides);
