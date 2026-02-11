@@ -86,9 +86,9 @@ export function LoginPage() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <h1 className="text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-                推理，
+                让大模型，
                 <span className="bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  唯快不破
+                  真正进入生产
                 </span>
               </h1>
             </div>
@@ -96,9 +96,9 @@ export function LoginPage() {
             {/* Brand Slogan */}
             <div className="space-y-4">
               <p className="text-xl text-muted-foreground leading-relaxed">
-                面向 AI 模型服务的统一裸金属运营平台。
+                Infera 是一站式的大模型推理与微调 SaaS 平台
                 <br />
-                消除虚拟化开销，实现对异构算力资源的绝对掌控。
+                为企业提供 可治理、可审计、可计量、可回滚 的 LLM 基础设施
               </p>
             </div>
 
@@ -106,16 +106,16 @@ export function LoginPage() {
             <div className="space-y-4 pt-8">
               {[
                 {
-                  title: "零损耗性能",
-                  desc: "无延迟的直通硬件执行。彻底释放你每一 TFLOPS 的算力潜能。",
+                  title: "企业级模型治理",
+                  desc: "模型、版本、权限与审计，全量可追溯",
                 },
                 {
-                  title: "异构大一统",
-                  desc: "无缝聚合 Ray、vLLM 节点。一个 Master 接口，纳管任意硬件。",
+                  title: "微调到推理的一体化链路",
+                  desc: "数据集版本化，一键部署为 OpenAI-compatible API",
                 },
                 {
-                  title: "安全模型流",
-                  desc: "签名直连分发系统，确保模型从存储安全直达算力节点，避开流量瓶颈。",
+                  title: "每一次推理，都能算清楚账",
+                  desc: "按项目 / 服务 / API Key 精细计量与预算控制",
                 },
               ].map((feature, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: Static list
