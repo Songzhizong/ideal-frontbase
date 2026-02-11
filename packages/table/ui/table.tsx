@@ -151,7 +151,15 @@ export function DataTableTable<TData>({
             cellMetaClass,
           )}
         >
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          <div
+            className={cn(
+              "min-w-0 w-full",
+              cellAlign === "center" && "flex justify-center",
+              cellAlign === "right" && "flex justify-end",
+            )}
+          >
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </div>
         </TableCell>
       );
     });

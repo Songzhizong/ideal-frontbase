@@ -40,7 +40,7 @@ export function BasicTableExample({ rows }: { rows: UserRow[] }) {
     state,
     getRowId: (row) => row.id,
   })
-  return <DataTablePreset dt={dt} />
+  return <DataTablePreset dt={dt} query={{ search: {} }} />
 }
 ```
 

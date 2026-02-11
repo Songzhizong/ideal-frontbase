@@ -35,7 +35,9 @@ export function stateInternal<TFilterSchema>(
   const listenersRef = useRef(new Set<() => void>())
   const snapshotRef = useRef<TableStateSnapshot<TFilterSchema>>(buildInitialSnapshot(options))
   const behaviorRef = useRef(options.behavior)
+  const searchKeyRef = useRef(options.searchKey)
   behaviorRef.current = options.behavior
+  searchKeyRef.current = options.searchKey
 
   const getSnapshot = useCallback(() => snapshotRef.current, [])
 
@@ -66,7 +68,10 @@ export function stateInternal<TFilterSchema>(
       getSnapshot,
       setSnapshot,
       subscribe,
+      ...(typeof searchKeyRef.current === "string" && searchKeyRef.current.trim() !== ""
+        ? { searchKey: searchKeyRef.current }
+        : {}),
     }),
-    [getSnapshot, setSnapshot, subscribe],
+    [getSnapshot, setSnapshot, subscribe, options.searchKey],
   )
 }

@@ -3,9 +3,9 @@ import { cn } from "@/packages/ui-utils"
 import type { TenantProjectEnvironment } from "../types/tenant-projects"
 
 const ENVIRONMENT_CLASSNAME: Readonly<Record<TenantProjectEnvironment, string>> = {
-  Dev: "border-blue-500/20 bg-blue-500/10 text-blue-500",
-  Test: "border-amber-500/20 bg-amber-500/10 text-amber-500",
-  Prod: "border-red-500/20 bg-red-500/10 text-red-500",
+  Dev: "border-slate-500/30 bg-slate-500/10 text-slate-600",
+  Test: "border-orange-500/30 bg-orange-500/10 text-orange-600",
+  Prod: "border-indigo-500/30 bg-indigo-500/15 text-indigo-700 font-semibold",
 }
 
 export function TenantProjectEnvironmentBadge({

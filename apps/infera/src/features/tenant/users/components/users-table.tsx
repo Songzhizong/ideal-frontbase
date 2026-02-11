@@ -8,7 +8,6 @@ import {
   DataTableRoot,
   DataTableTable,
   remote,
-  type TableStateAdapter,
   useDataTable,
 } from "@/packages/table"
 import { Button } from "@/packages/ui/button"
@@ -131,7 +130,7 @@ export function UsersTable({ tenantId }: { tenantId: string }) {
   const dt = useDataTable<TenantUserItem, TenantUsersTableFilters>({
     columns,
     dataSource,
-    state: state as unknown as TableStateAdapter<TenantUsersTableFilters>,
+    state,
     getRowId: (r) => r.id,
     features: {
       pinning: {

@@ -411,12 +411,16 @@ export function DataTablePreset<TData, TFilterSchema>(props: {
   height?: string
   className?: string
   layout?: DataTableLayoutOptions
-  toolbar?: ReactNode
-  toolbarActions?: ReactNode
-  renderEmpty?: () => ReactNode
-  renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode
-  selectionBarActions?: DataTableSelectionBarProps<TData>["actions"]
+  query: DataTablePresetQueryProps<TFilterSchema>
+  table?: Pick<DataTableTableProps<TData>, "renderSubComponent" | "renderEmpty" | "renderError">
+  selectionBarActions?: DataTableSelectionBarProps<TData, TFilterSchema>["actions"]
+  selectionBarClassName?: string
+  pagination?: DataTablePaginationProps | false
 }): JSX.Element
+
+export function createCrudQueryPreset<TFilterSchema>(
+  options?: CrudQueryPresetOptions<TFilterSchema>,
+): DataTablePresetQueryProps<TFilterSchema>
 ```
 
 ### 5.2 工具栏与搜索筛选

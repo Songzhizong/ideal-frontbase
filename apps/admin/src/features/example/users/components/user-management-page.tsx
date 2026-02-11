@@ -4,7 +4,13 @@ import { StatsCard } from "@/features/dashboard/components/stats-card"
 import { PageContainer } from "@/packages/layout-core"
 import { useBaseNavigate } from "@/packages/platform-router"
 import type { DataTableSelectionExportPayload } from "@/packages/table"
-import { DataTablePreset, DataTableViewOptions, remote, useDataTable } from "@/packages/table"
+import {
+  createCrudQueryPreset,
+  DataTablePreset,
+  DataTableViewOptions,
+  remote,
+  useDataTable,
+} from "@/packages/table"
 import { Button } from "@/packages/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/ui/card"
 import { cn } from "@/packages/ui-utils"
@@ -252,7 +258,7 @@ export function UserManagementPage() {
             dt={dt}
             layout={{ stickyHeader: true, stickyPagination: true }}
             className="rounded-md border border-border/50"
-            query={{
+            query={createCrudQueryPreset<DemoUserFilters>({
               className: "bg-transparent",
               search: {
                 placeholder: "搜索姓名、邮箱、手机号",
@@ -277,7 +283,7 @@ export function UserManagementPage() {
                   <DataTableViewOptions />
                 </div>
               ),
-            }}
+            })}
             table={{
               renderEmpty: () => "暂无匹配用户",
             }}

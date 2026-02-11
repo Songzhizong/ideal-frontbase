@@ -24,9 +24,11 @@ export function stateControlled<TFilterSchema>(
   const listenersRef = useRef(new Set<() => void>())
   const snapshotRef = useRef<TableStateSnapshot<TFilterSchema>>(options.value)
   const behaviorRef = useRef(options.behavior)
+  const searchKeyRef = useRef(options.searchKey)
   const onChangeRef = useRef(options.onChange)
 
   behaviorRef.current = options.behavior
+  searchKeyRef.current = options.searchKey
   onChangeRef.current = options.onChange
 
   useEffect(() => {
@@ -58,7 +60,10 @@ export function stateControlled<TFilterSchema>(
       getSnapshot,
       setSnapshot,
       subscribe,
+      ...(typeof searchKeyRef.current === "string" && searchKeyRef.current.trim() !== ""
+        ? { searchKey: searchKeyRef.current }
+        : {}),
     }),
-    [getSnapshot, setSnapshot, subscribe],
+    [getSnapshot, setSnapshot, subscribe, options.searchKey],
   )
 }

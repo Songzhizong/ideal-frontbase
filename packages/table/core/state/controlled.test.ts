@@ -124,4 +124,25 @@ describe("stateControlled", () => {
 
     expect(listener).toHaveBeenCalledTimes(1)
   })
+
+  it("支持通过 options.searchKey 暴露搜索字段", () => {
+    type Filters = { keyword: string }
+    const onChange = vi.fn()
+    const initial: TableStateSnapshot<Filters> = {
+      page: 1,
+      size: 10,
+      sort: [],
+      filters: { keyword: "" },
+    }
+
+    const { result } = renderHook(() =>
+      stateControlled({
+        value: initial,
+        onChange,
+        searchKey: "keyword",
+      }),
+    )
+
+    expect(result.current.searchKey).toBe("keyword")
+  })
 })

@@ -92,14 +92,14 @@ export function TenantProjectsFilterPanel({
           {emphasizeSearch ? (
             <div className="relative min-w-64 flex-1">
               <Search
-                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
                 aria-hidden
               />
               <Input
                 value={searchInput}
                 onChange={(event) => onSearchInputChange(event.target.value)}
                 placeholder="搜索项目名称或 ID"
-                className="pr-9 pl-9"
+                className="border-none bg-muted/50 pr-9 pl-10 shadow-inner focus-visible:bg-background focus-visible:shadow-none"
               />
               {searchInput.length > 0 ? (
                 <button
@@ -141,7 +141,7 @@ export function TenantProjectsFilterPanel({
                         value={searchInput}
                         onChange={(event) => onSearchInputChange(event.target.value)}
                         placeholder="搜索项目"
-                        className="h-8 pr-8"
+                        className="h-8 border-none bg-muted/50 pr-8 shadow-inner focus-visible:bg-background focus-visible:shadow-none"
                       />
                       {searchInput.length > 0 ? (
                         <button
@@ -159,8 +159,121 @@ export function TenantProjectsFilterPanel({
               </AnimatePresence>
             </div>
           )}
+        </div>
 
-          <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <Tabs
+            value={activeScope}
+            onValueChange={(value) => {
+              if (isFilterScope(value)) {
+                setActiveScope(value)
+              }
+            }}
+            className="min-w-0 flex-1 gap-2"
+          >
+            <TabsList className="h-8 bg-muted/60 p-1">
+              <TabsTrigger value="environment" className="px-3 text-xs">
+                Environment
+              </TabsTrigger>
+              <TabsTrigger value="owner" className="px-3 text-xs">
+                Owner
+              </TabsTrigger>
+              <TabsTrigger value="cost" className="px-3 text-xs">
+                Cost
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="environment" className="mt-2 text-foreground">
+              <div className="overflow-x-auto pb-1">
+                <ToggleGroup
+                  type="single"
+                  value={environment ?? ALL_FILTER_VALUE}
+                  onValueChange={(value) =>
+                    onEnvironmentChange(
+                      value === ALL_FILTER_VALUE || value.length === 0 ? null : value,
+                    )
+                  }
+                  variant="outline"
+                  spacing={8}
+                  className="w-max min-w-full"
+                >
+                  <ToggleGroupItem
+                    value={ALL_FILTER_VALUE}
+                    className="h-8 rounded-full px-3 text-xs"
+                  >
+                    全部环境
+                  </ToggleGroupItem>
+                  {TENANT_PROJECT_ENVIRONMENTS.map((item) => (
+                    <ToggleGroupItem
+                      key={item}
+                      value={item}
+                      className="h-8 rounded-full px-3 text-xs"
+                    >
+                      {item}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="owner" className="mt-2 text-foreground">
+              <div className="overflow-x-auto pb-1">
+                <ToggleGroup
+                  type="single"
+                  value={ownerId ?? ALL_FILTER_VALUE}
+                  onValueChange={(value) =>
+                    onOwnerChange(value === ALL_FILTER_VALUE || value.length === 0 ? null : value)
+                  }
+                  variant="outline"
+                  spacing={8}
+                  className="w-max min-w-full"
+                >
+                  <ToggleGroupItem
+                    value={ALL_FILTER_VALUE}
+                    className="h-8 rounded-full px-3 text-xs"
+                  >
+                    全部 Owner
+                  </ToggleGroupItem>
+                  {ownerSegmentItems}
+                </ToggleGroup>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="cost" className="mt-2 text-foreground">
+              <div className="overflow-x-auto pb-1">
+                <ToggleGroup
+                  type="single"
+                  value={costRange ?? ALL_FILTER_VALUE}
+                  onValueChange={(value) =>
+                    onCostRangeChange(
+                      value === ALL_FILTER_VALUE || value.length === 0 ? null : value,
+                    )
+                  }
+                  variant="outline"
+                  spacing={8}
+                  className="w-max min-w-full"
+                >
+                  <ToggleGroupItem
+                    value={ALL_FILTER_VALUE}
+                    className="h-8 rounded-full px-3 text-xs"
+                  >
+                    全部成本
+                  </ToggleGroupItem>
+                  {TENANT_PROJECT_COST_RANGE_OPTIONS.map((option) => (
+                    <ToggleGroupItem
+                      key={option.value}
+                      value={option.value}
+                      className="h-8 rounded-full px-3 text-xs"
+                    >
+                      {option.label}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
@@ -178,112 +291,12 @@ export function TenantProjectsFilterPanel({
               size="sm"
               onClick={onReset}
               disabled={!hasActiveFilters}
-              className="cursor-pointer"
+              className="cursor-pointer font-normal text-muted-foreground hover:text-foreground"
             >
               重置
             </Button>
           </div>
         </div>
-
-        <Tabs
-          value={activeScope}
-          onValueChange={(value) => {
-            if (isFilterScope(value)) {
-              setActiveScope(value)
-            }
-          }}
-          className="gap-2"
-        >
-          <TabsList className="h-8 bg-muted/60 p-1">
-            <TabsTrigger value="environment" className="px-3 text-xs">
-              Environment
-            </TabsTrigger>
-            <TabsTrigger value="owner" className="px-3 text-xs">
-              Owner
-            </TabsTrigger>
-            <TabsTrigger value="cost" className="px-3 text-xs">
-              Cost
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="environment" className="mt-0">
-            <div className="overflow-x-auto pb-1">
-              <ToggleGroup
-                type="single"
-                value={environment ?? ALL_FILTER_VALUE}
-                onValueChange={(value) =>
-                  onEnvironmentChange(
-                    value === ALL_FILTER_VALUE || value.length === 0 ? null : value,
-                  )
-                }
-                variant="outline"
-                spacing={8}
-                className="w-max min-w-full"
-              >
-                <ToggleGroupItem value={ALL_FILTER_VALUE} className="h-8 rounded-full px-3 text-xs">
-                  全部环境
-                </ToggleGroupItem>
-                {TENANT_PROJECT_ENVIRONMENTS.map((item) => (
-                  <ToggleGroupItem
-                    key={item}
-                    value={item}
-                    className="h-8 rounded-full px-3 text-xs"
-                  >
-                    {item}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="owner" className="mt-0">
-            <div className="overflow-x-auto pb-1">
-              <ToggleGroup
-                type="single"
-                value={ownerId ?? ALL_FILTER_VALUE}
-                onValueChange={(value) =>
-                  onOwnerChange(value === ALL_FILTER_VALUE || value.length === 0 ? null : value)
-                }
-                variant="outline"
-                spacing={8}
-                className="w-max min-w-full"
-              >
-                <ToggleGroupItem value={ALL_FILTER_VALUE} className="h-8 rounded-full px-3 text-xs">
-                  全部 Owner
-                </ToggleGroupItem>
-                {ownerSegmentItems}
-              </ToggleGroup>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="cost" className="mt-0">
-            <div className="overflow-x-auto pb-1">
-              <ToggleGroup
-                type="single"
-                value={costRange ?? ALL_FILTER_VALUE}
-                onValueChange={(value) =>
-                  onCostRangeChange(value === ALL_FILTER_VALUE || value.length === 0 ? null : value)
-                }
-                variant="outline"
-                spacing={8}
-                className="w-max min-w-full"
-              >
-                <ToggleGroupItem value={ALL_FILTER_VALUE} className="h-8 rounded-full px-3 text-xs">
-                  全部成本
-                </ToggleGroupItem>
-                {TENANT_PROJECT_COST_RANGE_OPTIONS.map((option) => (
-                  <ToggleGroupItem
-                    key={option.value}
-                    value={option.value}
-                    className="h-8 rounded-full px-3 text-xs"
-                  >
-                    {option.label}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
-          </TabsContent>
-        </Tabs>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 px-4 py-3">

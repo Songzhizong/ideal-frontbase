@@ -1,5 +1,5 @@
 import { Search, X } from "lucide-react"
-import { type KeyboardEvent, useEffect, useMemo, useState } from "react"
+import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { Button } from "@/packages/ui/button"
 import { Input } from "@/packages/ui/input"
@@ -15,6 +15,10 @@ function toTextValue(value: unknown): string {
   if (typeof value === "number" || typeof value === "boolean") return String(value)
   if (value instanceof Date) return value.toISOString()
   return String(value)
+}
+
+function isImeComposing(event: KeyboardEvent<HTMLInputElement>): boolean {
+  return event.nativeEvent.isComposing || event.keyCode === 229
 }
 
 export interface DataTableSearchProps<TFilterSchema> {
@@ -43,6 +47,8 @@ export function DataTableSearch<TFilterSchema>({
   const dt = useDataTableInstance<unknown, TFilterSchema>()
   const { i18n: globalI18n } = useDataTableConfig()
   const inferredSearchKey = dt.meta.state?.searchKey as keyof TFilterSchema | undefined
+  const shouldUseFallbackSearchKey = filterKey == null && inferredSearchKey == null
+  const fallbackWarningShownRef = useRef(false)
   const key = (filterKey ?? inferredSearchKey ?? "q") as keyof TFilterSchema
   const rawValue = dt.filters.state[key]
   const normalizedValue = useMemo(() => toTextValue(rawValue), [rawValue])
@@ -52,6 +58,16 @@ export function DataTableSearch<TFilterSchema>({
   const i18n = useMemo(() => {
     return mergeDataTableI18n(globalI18n, i18nOverrides)
   }, [globalI18n, i18nOverrides])
+
+  useEffect(() => {
+    if (!shouldUseFallbackSearchKey) return
+    if (fallbackWarningShownRef.current) return
+    if (!import.meta.env.DEV) return
+    fallbackWarningShownRef.current = true
+    console.warn(
+      "[DataTableSearch] Missing `filterKey` and `state.searchKey`; fallback to `q` is used. Configure one explicitly for stable behavior.",
+    )
+  }, [shouldUseFallbackSearchKey])
 
   const debouncedSetValue = useDebouncedCallback((nextValue: string) => {
     dt.filters.set(key, nextValue as TFilterSchema[keyof TFilterSchema])
@@ -77,6 +93,7 @@ export function DataTableSearch<TFilterSchema>({
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (isImeComposing(event)) return
     if (event.key !== "Enter" || debounceMs <= 0) return
     debouncedSetValue.flush()
   }

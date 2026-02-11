@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { motion, useReducedMotion } from "motion/react"
 import { useEffect, useMemo, useState } from "react"
+import { cn } from "@/packages/ui-utils"
 import type { TenantProjectItem } from "../types/tenant-projects"
 import { formatCurrency, formatTokenCount } from "../utils/tenant-projects-formatters"
 
@@ -128,7 +129,7 @@ function AnimatedMetricValue({
   }, [durationMs, prefersReducedMotion, value])
 
   const rendered = toDisplayNumber(displayValue, roundMode)
-  return <span>{formatValue(rendered)}</span>
+  return <span className="font-mono">{formatValue(rendered)}</span>
 }
 
 function MetricSparkline({ points }: { points: readonly number[] }) {
@@ -188,7 +189,7 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
         trendPoints: monthlyTrend,
         delta: monthlyDelta,
         icon: Activity,
-        toneClassName: "text-primary bg-primary/10",
+        toneClassName: "text-primary bg-primary/10 backdrop-blur-sm",
       },
       {
         id: "tokens",
@@ -199,7 +200,7 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
         caption: `覆盖 ${projects.length} 个项目`,
         trendPoints: tokenTrend,
         icon: Coins,
-        toneClassName: "text-amber-500 bg-amber-500/10",
+        toneClassName: "text-amber-500 bg-amber-500/10 backdrop-blur-sm",
       },
       {
         id: "alerts",
@@ -212,8 +213,8 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
         icon: AlertTriangle,
         toneClassName:
           unhealthyProjects === 0
-            ? "text-emerald-500 bg-emerald-500/10"
-            : "text-amber-500 bg-amber-500/10",
+            ? "text-emerald-500 bg-emerald-500/10 backdrop-blur-sm"
+            : "text-amber-600 bg-amber-500/10 backdrop-blur-sm animate-pulse-subtle",
       },
     ]
 
@@ -252,7 +253,7 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
               show: { opacity: 1, y: 0, scale: 1 },
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="rounded-2xl bg-background/20 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/55"
+            className="rounded-2xl border border-border/40 bg-background/40 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -266,7 +267,13 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
                 </p>
               </div>
               <span
-                className={`inline-flex size-9 items-center justify-center rounded-full ${card.toneClassName}`}
+                className={cn(
+                  "inline-flex size-9 items-center justify-center rounded-full transition-all",
+                  card.toneClassName,
+                  card.id === "alerts" &&
+                    card.value > 0 &&
+                    "animate-pulse shadow-[0_0_12px_-4px_rgba(245,158,11,0.5)]",
+                )}
               >
                 <Icon className="size-4" aria-hidden />
               </span>
@@ -280,9 +287,23 @@ export function TenantProjectsGlobalMetrics({ projects }: TenantProjectsGlobalMe
             {typeof card.delta === "number" ? (
               <p className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
                 {card.delta >= 0 ? (
-                  <ArrowUpRight className="size-3.5 text-emerald-500" aria-hidden />
+                  <ArrowUpRight
+                    className={cn(
+                      "size-3.5",
+                      card.id === "alerts" ? "text-amber-500" : "text-amber-500", // Cost/Token UP = Bad/Warn
+                    )}
+                    aria-hidden
+                  />
                 ) : (
-                  <ArrowDownRight className="size-3.5 text-amber-500" aria-hidden />
+                  <ArrowDownRight
+                    className={cn(
+                      "size-3.5",
+                      card.id === "alerts"
+                        ? "text-emerald-500" // Alerts DOWN = Good
+                        : "text-emerald-500", // Cost/Token DOWN = Good
+                    )}
+                    aria-hidden
+                  />
                 )}
                 {Math.abs(card.delta).toFixed(1)}%
               </p>

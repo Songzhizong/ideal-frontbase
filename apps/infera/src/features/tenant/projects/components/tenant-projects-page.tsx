@@ -166,9 +166,9 @@ export function TenantProjectsPage({ tenantId }: TenantProjectsPageProps) {
         description="以驾驶舱视图管理租户项目、成本与服务健康。适配小规模项目集（常驻 10 个以内）的高频巡检场景。"
         actions={headerActions}
         className="flex h-full flex-col"
-        contentClassName="flex min-h-0 flex-1 flex-col rounded-2xl bg-paper-100/70 p-4 md:p-5"
+        contentClassName="flex min-h-0 flex-1 flex-col overflow-auto p-4 scrollbar-thin md:p-5"
       >
-        {!tableMeta.canCreateProject ? (
+        {!dt.activity.isInitialLoading && !tableMeta.canCreateProject ? (
           <Alert className="border-amber-500/20 bg-amber-500/10 text-amber-500 [&>svg]:text-amber-500">
             <AlertTriangle className="size-4" aria-hidden />
             <AlertDescription className="text-amber-500/90">

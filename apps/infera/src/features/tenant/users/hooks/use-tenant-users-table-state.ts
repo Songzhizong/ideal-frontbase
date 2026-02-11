@@ -1,13 +1,14 @@
-import { parseAsString } from "nuqs"
+import { parseAsString, parseAsStringLiteral } from "nuqs"
 import { stateUrl } from "@/packages/table"
+import { TENANT_USER_ROLES, TENANT_USER_STATUSES } from "../types/tenant-users"
 
 export function useTenantUsersTableState(tenantId: string) {
   return stateUrl({
     key: `infera_tenant_users_${tenantId}`,
     parsers: {
       q: parseAsString.withDefault(""),
-      role: parseAsString,
-      status: parseAsString,
+      role: parseAsStringLiteral(TENANT_USER_ROLES),
+      status: parseAsStringLiteral(TENANT_USER_STATUSES),
     },
     pagination: {
       defaultPage: 1,

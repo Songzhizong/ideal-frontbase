@@ -68,7 +68,7 @@ export function UserTableDemo({ rows }: { rows: UserRow[] }) {
     getRowId: (row) => row.id,
   })
 
-  return <DataTablePreset dt={dt} />
+  return <DataTablePreset dt={dt} query={{ search: {} }} />
 }
 ```
 
@@ -412,7 +412,7 @@ const columns = [
 ### 7.1 快速模式
 
 ```tsx
-<DataTablePreset dt={dt} />
+<DataTablePreset dt={dt} query={{ search: {} }} />
 ```
 
 ### 7.2 组合模式
@@ -466,7 +466,7 @@ const columns = [
     },
   }}
 >
-  <DataTablePreset dt={dt} />
+  <DataTablePreset dt={dt} query={{ search: {} }} />
 </DataTableConfigProvider>
 ```
 

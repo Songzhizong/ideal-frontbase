@@ -109,7 +109,8 @@ V2 的分层设计适合“复杂场景按需组合”，但企业后台里大�
 设计原则：
 
 - `DataTablePreset` **只做 UI 拼装**，内部仍通过 `useDataTable()` 产出 `dt`
-- 允许少量插槽满足差异（toolbarActions、selectionBarActions、empty/error 渲染）
+- `DataTablePreset` 查询区统一走 `query` 单入口（必填），避免配置分叉
+- 允许少量插槽满足差异（`query.actions`、`selectionBarActions`、`table.renderEmpty/renderError`）
 - Preset 不新增状态来源与数据源的能力入口，只是把“常见组合方式”标准化
 
 组件 API 形态见 9.1，推荐用法见 9.2。

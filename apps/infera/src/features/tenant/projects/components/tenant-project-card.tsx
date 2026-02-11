@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { buildProjectPath } from "@/components/workspace/workspace-context"
 import { TenantProjectEnvironmentBadge } from "@/features/tenant/projects"
@@ -44,7 +44,6 @@ import {
   formatDateTime,
   formatTokenCount,
 } from "../utils/tenant-projects-formatters"
-import { buildTokenTrendSeries, TokenSparkline } from "./tenant-project-card-trend"
 
 function toOwnerInitial(name: string) {
   const normalized = name.trim()
@@ -90,11 +89,6 @@ export function TenantProjectCard({
   const summaryToneClassName =
     ready === total ? "text-emerald-500" : ready > 0 ? "text-amber-500" : "text-destructive"
 
-  const tokenTrendSeries = useMemo(
-    () => buildTokenTrendSeries(project.tokensToday, project.projectId),
-    [project.projectId, project.tokensToday],
-  )
-
   useEffect(() => {
     if (!copied) {
       return
@@ -128,7 +122,7 @@ export function TenantProjectCard({
       onHoverEnd={() => setIsHovered(false)}
       className="group relative"
     >
-      <Card className="relative gap-2 overflow-hidden border-border/50 bg-gradient-to-br from-background via-background to-primary/5 pt-4 pb-3 shadow-md backdrop-blur supports-[backdrop-filter]:bg-background/75 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-border hover:shadow-xl">
+      <Card className="relative gap-0 overflow-hidden border-border/40 bg-gradient-to-br from-background via-background to-primary/5 pt-4 shadow-sm backdrop-blur transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-border/60 hover:shadow-lg supports-[backdrop-filter]:bg-background/80">
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-amber-500/10 opacity-0"
@@ -152,32 +146,36 @@ export function TenantProjectCard({
 
             <div className="relative min-h-5 text-[11px]">
               <AnimatePresence mode="wait" initial={false}>
-                {isHovered || copied ? (
-                  <motion.button
-                    key="project-id-real"
-                    type="button"
-                    onClick={handleCopyProjectId}
-                    className="inline-flex cursor-pointer items-center gap-1.5 font-mono text-muted-foreground transition-colors duration-200 hover:text-foreground"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
+                <motion.div
+                  className="flex items-center gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span
+                    className={cn(
+                      "font-mono text-muted-foreground/50 transition-colors",
+                      isHovered ? "opacity-100" : "opacity-100",
+                    )}
                   >
-                    <Copy className="size-3" aria-hidden />
-                    {copied ? "已复制" : `ID ${project.projectId}`}
-                  </motion.button>
-                ) : (
-                  <motion.p
-                    key="project-id-masked"
-                    className="font-mono text-muted-foreground/60"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                  >
-                    ID 已弱化展示
-                  </motion.p>
-                )}
+                    ID {project.projectId}
+                  </span>
+                  {isHovered && (
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      onClick={handleCopyProjectId}
+                      className="inline-flex cursor-pointer items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                    >
+                      {copied ? (
+                        <span className="text-[10px] text-emerald-500">已复制</span>
+                      ) : (
+                        <Copy className="size-3" aria-hidden />
+                      )}
+                    </motion.button>
+                  )}
+                </motion.div>
               </AnimatePresence>
             </div>
           </div>
@@ -226,27 +224,24 @@ export function TenantProjectCard({
 
         <CardContent className="relative z-10 space-y-2.5 px-4 py-2">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2">
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
                 <Coins className="size-3.5" aria-hidden />
                 本月预估
               </p>
-              <p className="mt-1 text-sm font-semibold text-foreground">
+              <p className="mt-1.5 text-base font-bold text-foreground tracking-tight">
                 {formatCurrency(project.monthlyEstimatedCostCny)}
               </p>
             </div>
 
-            <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2">
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
                 <Activity className="size-3.5" aria-hidden />
                 今日 Tokens
               </p>
-              <div className="mt-1 flex items-end justify-between gap-2">
-                <p className="text-sm font-semibold text-foreground">
-                  {formatTokenCount(project.tokensToday)}
-                </p>
-                <TokenSparkline points={tokenTrendSeries} />
-              </div>
+              <p className="mt-1.5 text-base font-bold text-foreground tracking-tight">
+                {formatTokenCount(project.tokensToday)}
+              </p>
             </div>
           </div>
 
@@ -275,7 +270,11 @@ export function TenantProjectCard({
             <div className="relative">
               <Progress
                 value={progress}
-                className={cn("h-2.5 bg-muted/60", progressToneClassName)}
+                className={cn(
+                  "h-2.5 rounded-full bg-muted shadow-inner [&_[data-slot=progress-indicator]]:rounded-full",
+                  progressToneClassName,
+                  ready > 0 && ready < total && "[&_[data-slot=progress-indicator]]:animate-pulse",
+                )}
               />
               {progress > 0 ? (
                 <motion.span
@@ -293,7 +292,7 @@ export function TenantProjectCard({
           </div>
         </CardContent>
 
-        <CardFooter className="relative z-10 mt-auto items-center justify-between border-t border-border/50 px-4 py-2.5">
+        <CardFooter className="relative z-10 mt-auto items-center justify-between border-t border-border/50 bg-muted/30 px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             <Avatar size="sm">
               <AvatarFallback>{toOwnerInitial(project.ownerName)}</AvatarFallback>

@@ -1,4 +1,6 @@
 import { motion } from "motion/react"
+import { useId } from "react"
+import { cn } from "@/packages/ui-utils"
 
 function toSeed(value: string) {
   let seed = 0
@@ -44,6 +46,7 @@ function buildSparklinePoints(values: readonly number[]) {
 
 interface TokenSparklineProps {
   points: readonly number[]
+  className?: string
 }
 
 function resolveTrendTone(points: readonly number[]) {
@@ -93,13 +96,36 @@ function resolveTrendTone(points: readonly number[]) {
   }
 }
 
-export function TokenSparkline({ points }: TokenSparklineProps) {
+export function TokenSparkline({ points, className }: TokenSparklineProps) {
   const polylinePoints = buildSparklinePoints(points)
   const tone = resolveTrendTone(points)
+  const id = useId()
+
+  const areaPoints = `0,40 ${polylinePoints} 100,40`
+  const lastPoint = polylinePoints.split(" ").pop()
+  const [lastX, lastY] = lastPoint ? lastPoint.split(",") : ["100", "40"]
 
   return (
-    <svg viewBox="0 0 100 40" className={`h-8 w-24 ${tone.className}`} aria-hidden>
+    <svg
+      viewBox="0 0 100 40"
+      className={cn("overflow-visible", tone.className, className)}
+      aria-hidden
+    >
       <title>最近六小时 Token 波动</title>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <motion.polygon
+        points={areaPoints}
+        fill={`url(#${id})`}
+        stroke="none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      />
       <motion.polyline
         points={polylinePoints}
         fill="none"
@@ -110,6 +136,15 @@ export function TokenSparkline({ points }: TokenSparklineProps) {
         initial={{ pathLength: 0, opacity: 0.6 }}
         animate={{ pathLength: 1, opacity: 1 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
+      />
+      <motion.circle
+        cx={lastX}
+        cy={lastY}
+        r="2"
+        fill="currentColor"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.5, type: "spring" }}
       />
     </svg>
   )

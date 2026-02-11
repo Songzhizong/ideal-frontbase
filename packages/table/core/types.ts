@@ -474,6 +474,7 @@ export interface ControlledStateOptions<TFilterSchema> {
     filters: TFilterSchema
   }
   onChange: (next: ControlledStateOptions<TFilterSchema>["value"]) => void
+  searchKey?: Extract<keyof TFilterSchema, string>
   behavior?: {
     resetPageOnFilterChange?: boolean
   }
@@ -486,6 +487,7 @@ export interface InternalStateOptions<TFilterSchema> {
     sort?: TableSort[]
     filters?: TFilterSchema
   }
+  searchKey?: Extract<keyof TFilterSchema, string>
   behavior?: {
     resetPageOnFilterChange?: boolean
   }

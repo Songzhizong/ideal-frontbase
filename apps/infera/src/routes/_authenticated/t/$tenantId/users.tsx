@@ -16,6 +16,6 @@ export const Route = createFileRoute("/_authenticated/t/$tenantId/users")({
 	},
 	component: TenantUsersRoute,
 	staticData: {
-		title: "用户与邀请",
+		title: "用户管理",
 	},
 })

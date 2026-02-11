@@ -22,16 +22,12 @@ export function actions<TData>(
   const minSize = options?.minSize ?? size
   const maxSize = options?.maxSize ?? size
   const align = options?.align ?? "right"
-  const justifyClassName =
-    align === "center" ? "justify-center" : align === "left" ? "justify-start" : "justify-end"
   const headerClassName = cn(options?.headerClassName)
 
   return {
     id: "__actions__",
     header: options?.header ?? (() => null),
-    cell: (ctx) => (
-      <div className={cn("flex w-full gap-2", justifyClassName)}>{render(ctx.row)}</div>
-    ),
+    cell: (ctx) => <div className="inline-flex items-center gap-2">{render(ctx.row)}</div>,
     enableSorting: false,
     enableHiding: false,
     enableResizing: false,

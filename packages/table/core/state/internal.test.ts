@@ -104,4 +104,18 @@ describe("stateInternal", () => {
 
     expect(result.current.getSnapshot().page).toBe(9)
   })
+
+  it("支持通过 options.searchKey 暴露搜索字段", () => {
+    type Filters = { keyword: string }
+    const { result } = renderHook(() =>
+      stateInternal<Filters>({
+        initial: {
+          filters: { keyword: "" },
+        },
+        searchKey: "keyword",
+      }),
+    )
+
+    expect(result.current.searchKey).toBe("keyword")
+  })
 })

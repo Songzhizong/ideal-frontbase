@@ -26,17 +26,17 @@ export const volcanoOrange: ThemePreset = {
           contrastText: "#871400",
         },
         secondary: {
-          default: "#fff7e6",
-          hover: "#ffe7ba",
-          active: "#ffd591",
-          pressed: "#ffc069",
-          fg: "#431418",
+          default: "#f1f5f9",
+          hover: "#e2e8f0",
+          active: "#cbd5e1",
+          pressed: "#94a3b8",
+          fg: "#0f172a",
 
-          subtle: "#fff1b8",
-          onSubtle: "#612500",
+          subtle: "#f8fafc",
+          onSubtle: "#334155",
 
-          border: "#ffe7ba",
-          subtleBorder: "#fff7e6",
+          border: "#e2e8f0",
+          subtleBorder: "#f1f5f9",
         },
       },
 
@@ -59,56 +59,56 @@ export const volcanoOrange: ThemePreset = {
        * ---------------------------------- */
       status: {
         success: {
-          default: "#389e0d",
-          hover: "#237804",
-          active: "#135200",
-          pressed: "#092b00",
+          default: "#16a34a",
+          hover: "#15803d",
+          active: "#166534",
+          pressed: "#14532d",
           fg: "#ffffff",
 
-          subtle: "rgba(56,158,13,0.12)",
-          onSubtle: "#135200",
+          subtle: "rgba(34,197,94,0.12)",
+          onSubtle: "#166534",
 
-          border: "rgba(56,158,13,0.4)",
-          subtleBorder: "rgba(56,158,13,0.25)",
+          border: "rgba(22,163,74,0.4)",
+          subtleBorder: "rgba(22,163,74,0.25)",
         },
         warning: {
-          default: "#faad14",
-          hover: "#d48806",
-          active: "#ad6800",
-          pressed: "#874d00",
+          default: "#f59e0b",
+          hover: "#d97706",
+          active: "#b45309",
+          pressed: "#92400e",
           fg: "#ffffff",
 
-          subtle: "rgba(250,173,20,0.15)",
-          onSubtle: "#874d00",
+          subtle: "rgba(245,158,11,0.15)",
+          onSubtle: "#92400e",
 
-          border: "rgba(250,173,20,0.4)",
-          subtleBorder: "rgba(250,173,20,0.25)",
+          border: "rgba(245,158,11,0.4)",
+          subtleBorder: "rgba(245,158,11,0.25)",
         },
         error: {
-          default: "#f5222d",
-          hover: "#cf1322",
-          active: "#a8071a",
-          pressed: "#820014",
+          default: "#dc2626",
+          hover: "#b91c1c",
+          active: "#991b1b",
+          pressed: "#7f1d1d",
           fg: "#ffffff",
 
-          subtle: "rgba(245,34,45,0.12)",
-          onSubtle: "#a8071a",
+          subtle: "rgba(220,38,38,0.12)",
+          onSubtle: "#991b1b",
 
-          border: "rgba(245,34,45,0.4)",
-          subtleBorder: "rgba(245,34,45,0.25)",
+          border: "rgba(220,38,38,0.4)",
+          subtleBorder: "rgba(220,38,38,0.25)",
         },
         info: {
-          default: "#fa541c",
-          hover: "#d4380d",
-          active: "#ad2102",
-          pressed: "#871400",
+          default: "#1677ff",
+          hover: "#4096ff",
+          active: "#0958d9",
+          pressed: "#003eb3",
           fg: "#ffffff",
 
-          subtle: "rgba(250,84,28,0.12)",
-          onSubtle: "#ad2102",
+          subtle: "rgba(22,119,255,0.12)",
+          onSubtle: "#0958d9",
 
-          border: "rgba(250,84,28,0.4)",
-          subtleBorder: "rgba(250,84,28,0.25)",
+          border: "rgba(22,119,255,0.4)",
+          subtleBorder: "rgba(22,119,255,0.25)",
         },
       },
 
@@ -116,11 +116,11 @@ export const volcanoOrange: ThemePreset = {
        * 3. 文字系统
        * ---------------------------------- */
       text: {
-        primary: "#262626",
-        secondary: "#595959",
-        tertiary: "#8c8c8c",
-        placeholder: "#bfbfbf",
-        disabled: "#d9d9d9",
+        primary: "#020617",
+        secondary: "#334155",
+        tertiary: "#64748b",
+        placeholder: "#94a3b8",
+        disabled: "#cbd5e1",
         inverse: "#ffffff",
         link: {
           default: "#fa541c",
@@ -133,15 +133,15 @@ export const volcanoOrange: ThemePreset = {
        * 4. 背景 / 海拔
        * ---------------------------------- */
       background: {
-        canvas: "#fefefe",
-        layout: "#f5f5f5",
+        canvas: "#f8fafc",
+        layout: "#f1f5f9",
         container: "#ffffff",
-        surface: "#fafafa",
+        surface: "#f8fafc",
         elevated: "#ffffff",
 
         muted: {
-          default: "#f5f5f5",
-          fg: "#595959",
+          default: "#f1f5f9",
+          fg: "#475569",
         },
         accent: {
           default: "rgba(250,84,28,0.1)",
@@ -149,12 +149,12 @@ export const volcanoOrange: ThemePreset = {
         },
 
         glass: {
-          bg: "rgba(255,255,255,0.8)",
-          border: "rgba(0,0,0,0.06)",
+          bg: "rgba(255,255,255,0.75)",
+          border: "rgba(15,23,42,0.08)",
         },
 
-        mask: "rgba(0,0,0,0.45)",
-        tooltip: "#262626",
+        mask: "rgba(15,23,42,0.45)",
+        tooltip: "#020617",
       },
 
       /* ----------------------------------
@@ -162,23 +162,23 @@ export const volcanoOrange: ThemePreset = {
        * ---------------------------------- */
       form: {
         input: "#ffffff",
-        border: "#d9d9d9",
-        borderHover: "#fa541c",
+        border: "#e2e8f0",
+        borderHover: "#cbd5e1",
         ring: "#fa541c",
-        label: "#262626",
-        description: "#8c8c8c",
-        required: "#f5222d",
-        addon: "#fafafa",
-        readonly: "#f5f5f5",
+        label: "#020617",
+        description: "#64748b",
+        required: "#dc2626",
+        addon: "#f1f5f9",
+        readonly: "#f8fafc",
       },
 
       /* ----------------------------------
        * 6. 边框
        * ---------------------------------- */
       border: {
-        base: "#d9d9d9",
-        strong: "#bfbfbf",
-        subtle: "#f0f0f0",
+        base: "#e2e8f0",
+        strong: "#cbd5e1",
+        subtle: "#f1f5f9",
         focus: "#fa541c",
       },
 
@@ -186,19 +186,19 @@ export const volcanoOrange: ThemePreset = {
        * 7. 交互与反馈
        * ---------------------------------- */
       action: {
-        selection: "rgba(250,84,28,0.2)",
+        selection: "rgba(250,84,28,0.25)",
         disabled: {
-          bg: "#f5f5f5",
-          text: "#bfbfbf",
-          border: "#d9d9d9",
+          bg: "#f1f5f9",
+          text: "#94a3b8",
+          border: "#e2e8f0",
         },
         skeleton: {
-          base: "#f0f0f0",
-          shimmer: "#ffffff",
+          base: "#e5e7eb",
+          shimmer: "#f1f5f9",
         },
         scrollbar: {
-          thumb: "#bfbfbf",
-          hover: "#8c8c8c",
+          thumb: "#cbd5e1",
+          hover: "#94a3b8",
         },
       },
 
@@ -207,20 +207,20 @@ export const volcanoOrange: ThemePreset = {
        * ---------------------------------- */
       component: {
         table: {
-          headerBg: "#fafafa",
-          rowHover: "rgba(250,84,28,0.04)",
+          headerBg: "#f8fafc",
+          rowHover: "rgba(250,84,28,0.05)",
           rowStriped: "#ffffff",
-          border: "#f0f0f0",
+          border: "#e2e8f0",
         },
         tabs: {
-          listBg: "#f5f5f5",
+          listBg: "#f1f5f9",
           triggerBg: "#ffffff",
           indicator: "#fa541c",
         },
         sidebar: {
           bg: "#ffffff",
-          fg: "#262626",
-          border: "#f0f0f0",
+          fg: "#020617",
+          border: "#e2e8f0",
           ring: "#fa541c",
           accent: "#fff2e8",
           onAccent: "#d4380d",
@@ -232,9 +232,9 @@ export const volcanoOrange: ThemePreset = {
        * ---------------------------------- */
       effects: {
         shadow: {
-          sm: "0 1px 2px rgba(0,0,0,0.04)",
-          md: "0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08), 0 9px 28px 8px rgba(0,0,0,0.05)",
-          lg: "0 6px 16px -8px rgba(0,0,0,0.08), 0 9px 28px 0 rgba(0,0,0,0.05), 0 12px 48px 16px rgba(0,0,0,0.03)",
+          sm: "0 1px 2px rgba(2,6,23,0.06)",
+          md: "0 4px 12px rgba(2,6,23,0.08)",
+          lg: "0 12px 32px rgba(2,6,23,0.12)",
         },
         glow: "0 0 0 1px rgba(250,84,28,0.25)",
       },
@@ -245,13 +245,13 @@ export const volcanoOrange: ThemePreset = {
       charts: {
         categorical: [
           "#fa541c", // Volcano
-          "#faad14", // Gold
+          "#fa8c16", // Sunset
           "#13c2c2", // Cyan
           "#52c41a", // Green
           "#2f54eb", // Geekblue
           "#722ed1", // Purple
           "#eb2f96", // Magenta
-          "#fadb14", // Yellow
+          "#faad14", // Gold
         ],
         semantic: {
           positive: "#52c41a",
@@ -278,17 +278,17 @@ export const volcanoOrange: ThemePreset = {
           contrastText: "#ffd8bf",
         },
         secondary: {
-          default: "#26120c",
-          hover: "#43140a",
-          active: "#541d11",
-          pressed: "#873800",
-          fg: "#ffd8bf",
+          default: "#1f2937",
+          hover: "#27303b",
+          active: "#2f3945",
+          pressed: "#374151",
+          fg: "#e5e7eb",
 
-          subtle: "#1f120d",
-          onSubtle: "#ffbb96",
+          subtle: "#1b2430",
+          onSubtle: "#cbd5e1",
 
-          border: "#43140a",
-          subtleBorder: "#2b1d11",
+          border: "#334155",
+          subtleBorder: "#293241",
         },
       },
 
@@ -308,66 +308,66 @@ export const volcanoOrange: ThemePreset = {
 
       status: {
         success: {
-          default: "#49aa19",
-          hover: "#389e0d",
-          active: "#237804",
-          pressed: "#135200",
-          fg: "#f6ffed",
+          default: "#22c55e",
+          hover: "#4ade80",
+          active: "#16a34a",
+          pressed: "#15803d",
+          fg: "#ecfdf5",
 
-          subtle: "rgba(73,170,25,0.16)",
-          onSubtle: "#b7eb8f",
+          subtle: "rgba(34,197,94,0.14)",
+          onSubtle: "#86efac",
 
-          border: "rgba(73,170,25,0.4)",
-          subtleBorder: "rgba(73,170,25,0.2)",
+          border: "rgba(34,197,94,0.4)",
+          subtleBorder: "rgba(34,197,94,0.2)",
         },
         warning: {
-          default: "#d89614",
-          hover: "#faad14",
-          active: "#aa7714",
-          pressed: "#874d00",
-          fg: "#fffbe6",
+          default: "#fbbf24",
+          hover: "#facc15",
+          active: "#f59e0b",
+          pressed: "#d97706",
+          fg: "#fffbeb",
 
-          subtle: "rgba(216,150,20,0.16)",
-          onSubtle: "#ffe58f",
+          subtle: "rgba(251,191,36,0.16)",
+          onSubtle: "#fde68a",
 
-          border: "rgba(216,150,20,0.45)",
-          subtleBorder: "rgba(216,150,20,0.25)",
+          border: "rgba(251,191,36,0.45)",
+          subtleBorder: "rgba(251,191,36,0.25)",
         },
         error: {
-          default: "#d9363e",
-          hover: "#ff4d4f",
-          active: "#a8071a",
-          pressed: "#820014",
-          fg: "#fff1f0",
+          default: "#ef4444",
+          hover: "#f87171",
+          active: "#dc2626",
+          pressed: "#b91c1c",
+          fg: "#fee2e2",
 
-          subtle: "rgba(217,54,62,0.18)",
-          onSubtle: "#ffa39e",
+          subtle: "rgba(239,68,68,0.18)",
+          onSubtle: "#fecaca",
 
-          border: "rgba(217,54,62,0.45)",
-          subtleBorder: "rgba(217,54,62,0.25)",
+          border: "rgba(239,68,68,0.45)",
+          subtleBorder: "rgba(239,68,68,0.25)",
         },
         info: {
-          default: "#fa541c",
-          hover: "#ff7a45",
-          active: "#d4380d",
-          pressed: "#ad2102",
-          fg: "#fff2e8",
+          default: "#1677ff",
+          hover: "#4096ff",
+          active: "#0958d9",
+          pressed: "#003eb3",
+          fg: "#ffffff",
 
-          subtle: "rgba(250,84,28,0.16)",
-          onSubtle: "#ffbb96",
+          subtle: "rgba(22,119,255,0.18)",
+          onSubtle: "#69b1ff",
 
-          border: "rgba(250,84,28,0.45)",
-          subtleBorder: "rgba(250,84,28,0.25)",
+          border: "rgba(22,119,255,0.45)",
+          subtleBorder: "rgba(22,119,255,0.25)",
         },
       },
 
       text: {
-        primary: "rgba(255,255,255,0.85)",
-        secondary: "rgba(255,255,255,0.65)",
-        tertiary: "rgba(255,255,255,0.45)",
-        placeholder: "rgba(255,255,255,0.30)",
-        disabled: "rgba(255,255,255,0.20)",
-        inverse: "#000000",
+        primary: "#e5e7eb",
+        secondary: "#9ca3af",
+        tertiary: "#6b7280",
+        placeholder: "#4b5563",
+        disabled: "#374151",
+        inverse: "#020617",
         link: {
           default: "#fa541c",
           hover: "#ff7a45",
@@ -376,15 +376,15 @@ export const volcanoOrange: ThemePreset = {
       },
 
       background: {
-        canvas: "#141414",
-        layout: "#000000",
-        container: "#1f1f1f",
-        surface: "#1f1f1f",
-        elevated: "#2a2a2a",
+        canvas: "#0b1220",
+        layout: "#0f172a",
+        container: "#111827",
+        surface: "#1e293b",
+        elevated: "#2d3748",
 
         muted: {
-          default: "#1f1f1f",
-          fg: "rgba(255,255,255,0.65)",
+          default: "#1f2937",
+          fg: "#9ca3af",
         },
         accent: {
           default: "rgba(250,84,28,0.15)",
@@ -392,66 +392,66 @@ export const volcanoOrange: ThemePreset = {
         },
 
         glass: {
-          bg: "rgba(20,20,20,0.6)",
-          border: "rgba(255,255,255,0.08)",
+          bg: "rgba(15,23,42,0.6)",
+          border: "rgba(255,255,255,0.06)",
         },
 
-        mask: "rgba(0,0,0,0.45)",
-        tooltip: "#434343",
+        mask: "rgba(2,6,23,0.72)",
+        tooltip: "#020617",
       },
 
       form: {
-        input: "#141414",
-        border: "#434343",
-        borderHover: "#595959",
+        input: "#0f172a",
+        border: "#243041",
+        borderHover: "#334155",
         ring: "#fa541c",
-        label: "rgba(255,255,255,0.85)",
-        description: "rgba(255,255,255,0.45)",
-        required: "#d9363e",
-        addon: "#1f1f1f",
-        readonly: "#141414",
+        label: "#d1d5db",
+        description: "#9ca3af",
+        required: "#ef4444",
+        addon: "#1f2937",
+        readonly: "#020617",
       },
 
       border: {
-        base: "#434343",
-        strong: "#666666",
-        subtle: "#303030",
+        base: "#1f2937",
+        strong: "#334155",
+        subtle: "#162032",
         focus: "#fa541c",
       },
 
       action: {
-        selection: "rgba(250,84,28,0.3)",
+        selection: "rgba(250,84,28,0.35)",
         disabled: {
-          bg: "rgba(255,255,255,0.08)",
-          text: "rgba(255,255,255,0.30)",
-          border: "#434343",
+          bg: "#020617",
+          text: "#475569",
+          border: "#1e293b",
         },
         skeleton: {
-          base: "rgba(255,255,255,0.12)",
-          shimmer: "rgba(255,255,255,0.08)",
+          base: "#111827",
+          shimmer: "#1f2937",
         },
         scrollbar: {
-          thumb: "rgba(255,255,255,0.20)",
-          hover: "rgba(255,255,255,0.45)",
+          thumb: "#334155",
+          hover: "#475569",
         },
       },
 
       component: {
         table: {
-          headerBg: "#1f1f1f",
+          headerBg: "#0f172a",
           rowHover: "rgba(250,84,28,0.08)",
-          rowStriped: "#141414",
-          border: "#303030",
+          rowStriped: "#0b1220",
+          border: "#1f2937",
         },
         tabs: {
-          listBg: "#141414",
-          triggerBg: "#1f1f1f",
+          listBg: "#0f172a",
+          triggerBg: "#020617",
           indicator: "#fa541c",
         },
         sidebar: {
-          bg: "#000000",
-          fg: "rgba(255,255,255,0.85)",
-          border: "#303030",
+          bg: "#020617",
+          fg: "#e5e7eb",
+          border: "#1f2937",
           ring: "#fa541c",
           accent: "rgba(250,84,28,0.15)",
           onAccent: "#ffbb96",
@@ -460,17 +460,20 @@ export const volcanoOrange: ThemePreset = {
 
       effects: {
         shadow: {
-          sm: "0 1px 2px rgba(0,0,0,0.5)",
-          md: "0 4px 12px rgba(0,0,0,0.55)",
-          lg: "0 8px 24px rgba(0,0,0,0.65)",
+          sm: "0 1px 2px rgba(0,0,0,0.45)",
+          md: "0 8px 24px rgba(0,0,0,0.55)",
+          lg: "0 16px 48px rgba(0,0,0,0.65)",
         },
-        glow: "0 0 0 1px rgba(250,84,28,0.3), 0 0 28px rgba(250,84,28,0.15)",
+        glow: "0 0 0 1px rgba(250,84,28,0.28), 0 0 28px rgba(250,84,28,0.35)",
       },
 
+      /* ----------------------------------
+       * 10. 数据可视化
+       * ---------------------------------- */
       charts: {
         categorical: [
           "#fa541c",
-          "#fadb14",
+          "#fa8c16",
           "#13c2c2",
           "#52c41a",
           "#2f54eb",

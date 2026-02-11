@@ -27,6 +27,10 @@ function getClearedSearchValue(value: unknown): unknown {
   return null
 }
 
+function isImeComposing(event: KeyboardEvent<HTMLInputElement>): boolean {
+  return event.nativeEvent.isComposing || event.keyCode === 229
+}
+
 export function useAdvancedSearchState<TFilterSchema>({
   filterKey,
   placeholder,
@@ -105,8 +109,8 @@ export function useAdvancedSearchState<TFilterSchema>({
     return optionEntries.filter((entry) => normalizeKeyword(entry.option.label).includes(keyword))
   }, [optionEntries, optionKeyword])
 
-  const resetAdvancedDraft = () => {
-    setDraftValue(searchFilterTextValue)
+  const resetAdvancedDraft = (nextDraftValue = searchFilterTextValue) => {
+    setDraftValue(nextDraftValue)
     setOptionKeyword("")
     setPendingMultiValues([])
     setPendingNumberRange({ min: "", max: "" })
@@ -189,7 +193,14 @@ export function useAdvancedSearchState<TFilterSchema>({
 
   const commitFreeText = () => {
     const nextValue = draftValue.trim()
-    if (nextValue === "") return
+    if (nextValue === "") {
+      setFilter(
+        filterKey,
+        getClearedSearchValue(searchFilterValue) as TFilterSchema[typeof filterKey],
+      )
+      resetAdvancedDraft("")
+      return
+    }
     setFilter(filterKey, nextValue as TFilterSchema[typeof filterKey])
     resetAdvancedDraft()
   }
@@ -197,7 +208,14 @@ export function useAdvancedSearchState<TFilterSchema>({
   const commitTextField = () => {
     if (!activeField || activeField.type !== "text") return
     const nextValue = draftValue.trim()
-    if (nextValue === "") return
+    if (nextValue === "") {
+      setFilter(
+        activeField.key,
+        getClearedSearchValue(filtersState[activeField.key]) as TFilterSchema[typeof activeField.key],
+      )
+      resetAdvancedDraft("")
+      return
+    }
     setFilter(activeField.key, nextValue as TFilterSchema[typeof activeField.key])
     resetAdvancedDraft()
   }
@@ -312,6 +330,7 @@ export function useAdvancedSearchState<TFilterSchema>({
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (isImeComposing(event)) return
     const hasOptions = filteredOptionEntries.length > 0
 
     if (activeField && activeField.type !== "text") {

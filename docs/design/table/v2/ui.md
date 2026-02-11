@@ -41,16 +41,16 @@ export function DataTablePreset<TData, TFilterSchema>(props: {
   height?: string
   className?: string
   layout?: DataTableLayoutOptions
-  toolbar?: ReactNode
-  toolbarActions?: ReactNode
-  renderEmpty?: () => ReactNode
-  renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode
-  selectionBarActions?: (args: {
-    selectedRowIds: string[]
-    selectedRowsCurrentPage: TData[]
-    mode: "page" | "cross-page"
-  }) => ReactNode
+  query: DataTablePresetQueryProps<TFilterSchema>
+  table?: Pick<DataTableTableProps<TData>, "renderSubComponent" | "renderEmpty" | "renderError">
+  selectionBarActions?: DataTableSelectionBarProps<TData, TFilterSchema>["actions"]
+  selectionBarClassName?: string
+  pagination?: DataTablePaginationProps | false
 }): JSX.Element
+
+export function createCrudQueryPreset<TFilterSchema>(
+  options?: CrudQueryPresetOptions<TFilterSchema>,
+): DataTablePresetQueryProps<TFilterSchema>
 
 export function DataTableToolbar(props: { children?: ReactNode; actions?: ReactNode }): JSX.Element
 export function DataTableSearch<TFilterSchema>(props: {
@@ -73,19 +73,24 @@ export function DataTableTable(props?: {
   renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode
 }): JSX.Element
 export function DataTablePagination(): JSX.Element
-export function DataTableSelectionBar<TData>(props: {
+export function DataTableSelectionBar<TData, TFilterSchema = unknown>(props: {
+  className?: string
   actions?: (args: {
     selectedRowIds: string[]
     selectedRowsCurrentPage: TData[]
     mode: "page" | "cross-page"
     selection: DataTableSelection<TData>
+    selectionScope: DataTableSelection<TData>["selectionScope"]
+    exportPayload: DataTableSelectionExportPayload<TFilterSchema>
   }) => ReactNode
+  i18n?: DataTableI18nOverrides
 }): JSX.Element
 ```
 
 说明：
 
-- 需要“一把梭”的标准 CRUD 列表，优先使用 `DataTablePreset`；需要深度定制时再回退到组合式（见 9.2）。
+- 需要“一把梭”的标准 CRUD 列表，优先使用 `DataTablePreset`（`query` 必填）；需要深度定制时再回退到组合式（见 9.2）。
+- `createCrudQueryPreset()` 提供标准查询区默认值与定义合并策略，建议优先用于生成 `query`。
 - `DataTableSearch` 只更新 `dt.filters.set(filterKey, value)`，`filterKey` 解析优先级为：`props.filterKey > dt.meta.state.searchKey > "q"`。
 - `DataTableSearch` 内置输入尾部清空按钮；清空后立即写回空值，并取消 pending 的 debounce。
 - `DataTableSearch.debounceMs` 默认 300ms；URL 模式下由 state adapter 负责将“输入态”和“已提交态”统一为一个规范（UI 不直接操作 URL）。
@@ -112,7 +117,14 @@ const dt = useDataTable({
   },
 })
 
-return <DataTablePreset dt={dt} height="calc(100vh - 240px)" layout={{ scrollContainer: "root", stickyHeader: true }} />
+return (
+  <DataTablePreset
+    dt={dt}
+    height="calc(100vh - 240px)"
+    layout={{ scrollContainer: "root", stickyHeader: true }}
+    query={createCrudQueryPreset({ search: {} })}
+  />
+)
 ```
 
 如需定制 toolbar、selectionBar、pagination 的布局或插槽，可使用组合式 API：

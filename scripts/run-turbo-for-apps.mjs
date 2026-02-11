@@ -16,6 +16,7 @@ const isAll = optionArgs.includes("--all")
 const isParallel = optionArgs.includes("--parallel")
 const appFromArg = optionArgs.find((arg) => arg.startsWith("--app="))
 const appName = appFromArg ? appFromArg.replace("--app=", "") : process.env.APP
+const persistentTasks = new Set(["dev", "preview", "test:watch"])
 
 function readApps() {
 	const appsDir = path.resolve(process.cwd(), "apps")
@@ -88,8 +89,25 @@ if (extraArgs.length > 0) {
 	args.push(...extraArgs)
 }
 
-const result = spawnSync("pnpm", args, {
-	stdio: "inherit",
-})
+const shouldRunDirectForPersistentTask =
+	!isAll && !isParallel && appName && persistentTasks.has(task)
+
+const result = shouldRunDirectForPersistentTask
+	? spawnSync(
+			"pnpm",
+			[
+				"--filter",
+				`./apps/${appName}`,
+				"run",
+				task,
+				...(extraArgs.length > 0 ? ["--", ...extraArgs] : []),
+			],
+			{
+				stdio: "inherit",
+			},
+	  )
+	: spawnSync("pnpm", args, {
+			stdio: "inherit",
+	  })
 
 process.exit(result.status ?? 1)
