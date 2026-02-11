@@ -70,7 +70,7 @@ export function Header({
             >
               <Search className="size-4" />
               搜索
-              <span className="rounded-full border border-border bg-muted px-2 py-1 text-[10px] font-semibold text-muted-foreground">
+              <span className="text-2xs inline-flex h-5 items-center rounded-full border border-border bg-muted px-2 leading-none font-semibold text-muted-foreground">
                 {isMac ? "cmd k" : "ctrl k"}
               </span>
             </Button>

@@ -124,7 +124,9 @@ export function DataTableSearch<TFilterSchema>({
   return (
     <div
       className={cn(
-        fullWidth ? "relative w-full max-w-sm" : "relative w-auto min-w-0 max-w-sm",
+        fullWidth
+          ? "relative w-full max-w-sm rounded-md focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]"
+          : "relative w-auto min-w-0 max-w-sm rounded-md focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
         className,
       )}
     >
@@ -134,7 +136,11 @@ export function DataTableSearch<TFilterSchema>({
         onChange={(event) => handleChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={resolvedSimplePlaceholder}
-        className={cn("h-9 pl-9", canClearSimple ? "pr-9" : undefined, inputClassName)}
+        className={cn(
+          "h-9 border-border/50 bg-muted/20 pl-9 shadow-none focus-visible:ring-0 hover:bg-muted/30",
+          canClearSimple ? "pr-9" : undefined,
+          inputClassName,
+        )}
       />
       {canClearSimple ? (
         <Button

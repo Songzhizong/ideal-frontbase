@@ -1,8 +1,16 @@
-import { BadgeCheck, ShieldAlert, ShieldCheck } from "lucide-react"
+import { AlertCircle, BadgeCheck, MoreHorizontal, ShieldAlert, ShieldCheck } from "lucide-react"
 import { useMemo } from "react"
-import { createColumnHelper, type DataTableColumnDef } from "@/packages/table"
-import { Avatar, AvatarFallback } from "@/packages/ui/avatar"
-import { Badge } from "@/packages/ui/badge"
+import {
+  createColumnHelper,
+  type DataTableColumnDef,
+  DataTableIndicatorList,
+  DataTableStatusPill,
+  DataTableTagListCell,
+  type DataTableTagTone,
+  DataTableTextPairCell,
+  DataTableTimeMetaCell,
+  DataTableUserIdentityCell,
+} from "@/packages/table"
 import { Button } from "@/packages/ui/button"
 import {
   DropdownMenu,
@@ -11,12 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/packages/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/ui/tooltip"
-import { cn } from "@/packages/ui-utils"
-import {
-  formatTimestampToDateTime,
-  formatTimestampToRelativeTime,
-} from "@/packages/ui-utils/time-utils"
+import { formatTimestampToDate, formatTimestampToDateTime } from "@/packages/ui-utils/time-utils"
 import type { Api } from "../api/user-management"
 
 const helper = createColumnHelper<Api.User.ListUser>()
@@ -25,40 +28,19 @@ function getDisplayAccount(user: Api.User.ListUser) {
   return user.account || user.email || user.fullAccount || "-"
 }
 
-function DotStatus({ blocked }: { blocked: boolean }) {
-  if (blocked) {
-    return (
-      <Badge
-        variant="outline"
-        className="border-error/20 bg-error/5 font-medium text-error hover:bg-error/10"
-      >
-        <span className="mr-1.5 size-1.5 rounded-full bg-error animate-pulse" />
-        已锁定
-      </Badge>
-    )
-  }
-  return (
-    <Badge
-      variant="outline"
-      className="border-success/20 bg-success/5 font-medium text-success hover:bg-success/10"
-    >
-      <span className="mr-1.5 size-1.5 rounded-full bg-success" />
-      正常
-    </Badge>
-  )
+function maskEmail(email?: string) {
+  if (!email) return "未绑定邮箱"
+  const [local, domain] = email.split("@")
+  if (!local || !domain || local.length <= 2) return email
+  const visible = local.slice(0, Math.min(3, local.length))
+  return `${visible}***@${domain}`
 }
 
-const AVATAR_GRADIENTS = [
-  "bg-gradient-to-br from-orange-400 to-rose-500",
-  "bg-gradient-to-br from-blue-400 to-indigo-500",
-  "bg-gradient-to-br from-emerald-400 to-teal-500",
-  "bg-gradient-to-br from-violet-400 to-purple-500",
-  "bg-gradient-to-br from-amber-400 to-orange-500",
-]
-
-function getAvatarGradient(name: string) {
-  const index = name.length % AVATAR_GRADIENTS.length
-  return AVATAR_GRADIENTS[index]
+function maskPhone(phone?: string) {
+  if (!phone) return "未绑定手机"
+  const digits = phone.replace(/\s+/g, "")
+  if (digits.length < 7) return phone
+  return `${digits.slice(0, 3)}****${digits.slice(-4)}`
 }
 
 interface UserManagementColumnActions {
@@ -70,13 +52,20 @@ interface UserManagementColumnActions {
   onDelete: (user: Api.User.ListUser) => void
 }
 
+// noinspection NonAsciiCharacters
+const USER_GROUP_TONE_BY_LABEL: Readonly<Record<string, DataTableTagTone>> = {
+  管理员: "error",
+  Admin: "error",
+  admin: "error",
+}
+
 export function useUserManagementColumns(actions: UserManagementColumnActions) {
   return useMemo<DataTableColumnDef<Api.User.ListUser>[]>(
     () => [
       helper.accessor("name", {
         id: "userInfo",
         header: "用户信息",
-        size: 280,
+        size: 190,
         meta: {
           align: "left",
           headerClassName: "pl-4",
@@ -84,125 +73,126 @@ export function useUserManagementColumns(actions: UserManagementColumnActions) {
         },
         cell: (info) => {
           const user = info.row.original
-          const accountText = getDisplayAccount(user)
-          const firstChar = user.name.trim().charAt(0).toUpperCase() || "U"
-          const gradientClass = getAvatarGradient(user.name)
-
           return (
-            <div className="flex items-center gap-3.5 py-1.5">
-              <Avatar size="sm" className="rounded-lg shadow-sm">
-                <AvatarFallback className={cn("text-white font-medium", gradientClass)}>
-                  {firstChar}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex flex-col justify-center">
-                <div className="flex items-center gap-1.5">
-                  <span className="truncate text-[15px] font-bold text-foreground/90 leading-tight">
-                    {user.name}
-                  </span>
-                  {user.realNameVerified ? (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <BadgeCheck className="size-3.5 shrink-0 text-blue-500" />
-                      </TooltipTrigger>
-                      <TooltipContent>已实名认证</TooltipContent>
-                    </Tooltip>
-                  ) : null}
-                </div>
-                <div className="truncate text-xs font-mono text-muted-foreground/70 mt-0.5">
-                  {accountText}
-                </div>
-              </div>
-            </div>
+            <DataTableUserIdentityCell
+              name={user.name}
+              subtext={getDisplayAccount(user)}
+              verified={user.realNameVerified}
+              subtextClassName="font-mono"
+            />
+          )
+        },
+      }),
+      helper.display({
+        id: "contact",
+        header: "联系方式",
+        size: 170,
+        meta: {
+          align: "left",
+        },
+        cell: (info) => {
+          const user = info.row.original
+          return (
+            <DataTableTextPairCell
+              primary={maskEmail(user.email)}
+              secondary={maskPhone(user.phone)}
+              secondaryClassName="font-mono"
+            />
           )
         },
       }),
       helper.display({
         id: "userGroups",
         header: "所属用户组",
-        size: 230,
+        size: 160,
+        meta: {
+          align: "left",
+        },
+        cell: (info) => (
+          <DataTableTagListCell
+            tags={info.row.original.userGroups.map((group) => group.name)}
+            toneByLabel={USER_GROUP_TONE_BY_LABEL}
+            randomTone
+            randomToneSeed="tenant-user-groups"
+          />
+        ),
+      }),
+      helper.display({
+        id: "securityAuth",
+        header: "安全与认证",
+        size: 170,
         meta: {
           align: "left",
         },
         cell: (info) => {
-          const groups = info.row.original.userGroups
-          if (!groups.length) {
-            return <span className="text-xs text-muted-foreground">未分配</span>
-          }
-          const visible = groups.slice(0, 2)
-          const overflow = groups.length - visible.length
+          const user = info.row.original
           return (
-            <div className="flex flex-wrap items-center gap-1.5 py-1">
-              {visible.map((group) => (
-                <Badge key={group.id} variant="secondary" className="font-normal">
-                  {group.name}
-                </Badge>
-              ))}
-              {overflow > 0 ? <Badge variant="outline">+{overflow}</Badge> : null}
-            </div>
+            <DataTableIndicatorList
+              items={[
+                {
+                  key: "real-name",
+                  icon: user.realNameVerified ? (
+                    <BadgeCheck className="size-4" />
+                  ) : (
+                    <AlertCircle className="size-4" />
+                  ),
+                  label: user.realNameVerified ? "实名已认证" : "未实名",
+                  tone: user.realNameVerified ? "success" : "muted",
+                },
+                {
+                  key: "mfa",
+                  icon: user.mfaEnabled ? (
+                    <ShieldCheck className="size-4" />
+                  ) : (
+                    <ShieldAlert className="size-4" />
+                  ),
+                  label: user.mfaEnabled ? "MFA 已开启" : "MFA 未开启",
+                  tone: user.mfaEnabled ? "primary" : "muted",
+                },
+              ]}
+            />
           )
         },
       }),
-      helper.display({
-        id: "security",
-        header: "安全状态",
-        size: 180,
+      helper.accessor("blocked", {
+        id: "status",
+        header: "状态",
+        size: 100,
         meta: {
-          align: "center",
+          align: "left",
         },
         cell: (info) => {
-          const user = info.row.original
+          const blocked = info.getValue()
           return (
-            <div className="flex flex-col gap-2 py-1 items-center lg:items-start">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "w-fit gap-1.5 px-2 py-0.5 font-medium border-transparent",
-                  user.mfaEnabled
-                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {user.mfaEnabled ? (
-                  <ShieldCheck className="size-3.5" />
-                ) : (
-                  <ShieldAlert className="size-3.5" />
-                )}
-                {user.mfaEnabled ? "MFA 保护中" : "MFA 未开启"}
-              </Badge>
-              <DotStatus blocked={user.blocked} />
-            </div>
+            <DataTableStatusPill
+              tone={blocked ? "error" : "success"}
+              label={blocked ? "已锁定" : "正常"}
+            />
           )
         },
       }),
       helper.accessor("lastActiveTime", {
         id: "activity",
         header: "最后活动",
-        size: 170,
+        size: 160,
         meta: {
-          align: "center",
+          align: "left",
         },
         cell: (info) => {
-          const value = info.getValue()
-          if (!value) {
-            return <span className="text-xs text-muted-foreground">-</span>
-          }
+          const user = info.row.original
+          const lastActiveTime = info.getValue()
           return (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-default text-xs text-muted-foreground">
-                  {formatTimestampToRelativeTime(value)}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{formatTimestampToDateTime(value)}</TooltipContent>
-            </Tooltip>
+            <DataTableTimeMetaCell
+              primary={lastActiveTime ? formatTimestampToDateTime(lastActiveTime) : "-"}
+              secondary={`创建于 ${formatTimestampToDate(user.createdTime)}`}
+            />
           )
         },
       }),
       helper.display({
         id: "__actions__",
         header: "操作",
-        size: 120,
+        size: 64,
         enableResizing: false,
         meta: {
           align: "center",
@@ -210,22 +200,16 @@ export function useUserManagementColumns(actions: UserManagementColumnActions) {
         cell: (info) => {
           const user = info.row.original
           return (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-3 text-xs font-medium hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-colors"
-                onClick={() => actions.onEdit(user)}
-              >
-                编辑
-              </Button>
+            <div className="flex justify-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="link" size="sm" className="h-auto p-0">
-                    更多
+                  <Button variant="ghost" size="icon-sm" className="h-8 w-8">
+                    <MoreHorizontal className="size-4" />
+                    <span className="sr-only">操作菜单</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-40">
+                  <DropdownMenuItem onClick={() => actions.onEdit(user)}>编辑</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => actions.onShowUnmask(user)}>
                     查看明文
                   </DropdownMenuItem>

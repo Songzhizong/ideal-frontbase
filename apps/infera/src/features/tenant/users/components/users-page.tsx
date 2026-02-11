@@ -1,6 +1,7 @@
 import { RefreshCw } from "lucide-react"
 import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
+import { ContentLayout } from "@/components/content-layout"
 import type { UserManagementTableFilters } from "@/features/tenant/users"
 import { useConfirm } from "@/hooks"
 import {
@@ -11,13 +12,6 @@ import {
   remote,
   useDataTable,
 } from "@/packages/table"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/packages/ui/breadcrumb"
 import { Button } from "@/packages/ui/button"
 import { cn } from "@/packages/ui-utils"
 import { type Api, fetchGetUserList, fetchGetUserUnmask } from "../api/user-management"
@@ -29,6 +23,7 @@ import {
 import { UserCreateEditSheet } from "./user-create-edit-sheet"
 import { UserGroupsDialog } from "./user-groups-dialog"
 import { useUserManagementColumns } from "./user-management-columns"
+import { UserManagementStatsCards } from "./user-management-stats-cards"
 import { UserPasswordDialog } from "./user-password-dialog"
 import { UserTableEmpty } from "./user-table-empty"
 import { UserUnmaskDialog } from "./user-unmask-dialog"
@@ -211,7 +206,7 @@ export function UsersPage({ tenantId }: UsersPageProps) {
     features: {
       density: {
         enabled: true,
-        default: "comfortable",
+        default: "compact",
         storageKey: `infera_user_mgmt_density_${tenantId}`,
       },
       pinning: {
@@ -223,32 +218,41 @@ export function UsersPage({ tenantId }: UsersPageProps) {
   })
 
   const isRefreshing = dt.activity.isInitialLoading || dt.activity.isFetching
+  const currentRows = dt.table.getRowModel().rows.map((row) => row.original)
+  const userStats = useMemo(() => {
+    const totalUsers = dt.pagination.total ?? currentRows.length
+    const activeUsers = currentRows.filter((user) => !user.blocked).length
+    const mfaEnabledUsers = currentRows.filter((user) => user.mfaEnabled).length
+    const mfaBaseUsers = currentRows.length
+    const mfaRatio = mfaBaseUsers === 0 ? 0 : Math.round((mfaEnabledUsers / mfaBaseUsers) * 100)
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000
+    const newUsers = currentRows.filter((user) => user.createdTime >= thirtyDaysAgo).length
+
+    return {
+      totalUsers,
+      activeUsers,
+      mfaEnabledUsers,
+      mfaBaseUsers,
+      mfaRatio,
+      newUsers,
+    }
+  }, [currentRows, dt.pagination.total])
 
   return (
     <>
-      <div className="min-h-full space-y-6 bg-muted/30 px-6 py-8">
-        <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-1.5">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-muted-foreground/80">租户控制台</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>用户管理</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">用户管理</h1>
-          </div>
-          <Button
-            onClick={handleOpenCreate}
-            className="bg-primary hover:bg-primary/90 shadow-md transition-all duration-300 hover:shadow-lg active:scale-95"
-          >
-            <span className="mr-1 text-lg font-light">+</span> 新增用户
-          </Button>
-        </header>
+      <ContentLayout
+        title="用户管理"
+        description="管理系统内的所有用户账户、权限组及安全状态。"
+        className="min-h-full"
+      >
+        <UserManagementStatsCards
+          totalUsers={userStats.totalUsers}
+          activeUsers={userStats.activeUsers}
+          mfaEnabledUsers={userStats.mfaEnabledUsers}
+          mfaBaseUsers={userStats.mfaBaseUsers}
+          mfaRatio={userStats.mfaRatio}
+          newUsers={userStats.newUsers}
+        />
 
         <section className="overflow-hidden rounded-2xl border border-border/40 bg-card shadow-sm transition-shadow duration-300 hover:shadow-md">
           <DataTablePreset<Api.User.ListUser, UserManagementTableFilters>
@@ -265,11 +269,14 @@ export function UsersPage({ tenantId }: UsersPageProps) {
               activeFilters: ACTIVE_FILTER_FIELDS,
               actions: (
                 <div className="flex flex-wrap gap-2">
+                  <Button onClick={handleOpenCreate} className="h-9 px-3 text-sm font-medium">
+                    <span className="mr-1 text-base font-light">+</span> 新增用户
+                  </Button>
                   <Button
                     type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    className="h-8 w-8"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 border border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground"
                     onClick={() => dt.actions.refetch()}
                     aria-label="刷新"
                     disabled={isRefreshing}
@@ -288,7 +295,7 @@ export function UsersPage({ tenantId }: UsersPageProps) {
             }}
           />
         </section>
-      </div>
+      </ContentLayout>
 
       <UserCreateEditSheet
         open={editorState.open}

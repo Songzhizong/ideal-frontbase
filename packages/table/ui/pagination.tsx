@@ -157,18 +157,18 @@ export function DataTablePagination({
     <div
       ref={rootRef}
       className={cn(
-        "flex w-full flex-col gap-3 border-t border-border/50 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
+        "flex w-full flex-col gap-2 border-t border-border/40 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
         isStickyPagination && "sticky bottom-(--dt-sticky-bottom,0px) z-10",
         className,
       )}
     >
-      <div className="text-sm text-muted-foreground">
+      <div className="text-xs text-muted-foreground/90">
         {showTotal && <span>{i18n.pagination.total(total)}</span>}
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground/90">
           <Select value={`${size}`} onValueChange={handlePageSizeChange}>
-            <SelectTrigger className="h-8 w-20">
+            <SelectTrigger className="h-9 w-20 border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30">
               <SelectValue />
             </SelectTrigger>
             <SelectContent side="top">
@@ -183,17 +183,21 @@ export function DataTablePagination({
         </div>
 
         <Pagination className="mx-0 w-auto justify-start">
-          <PaginationContent>
+          <PaginationContent className="gap-1.5">
             <PaginationItem>
               <PaginationLink
                 href="#"
                 size="default"
                 onClick={handlePageClick(page - 1)}
                 aria-disabled={page <= 1}
-                className={cn(page <= 1 && "pointer-events-none opacity-50")}
+                aria-label={i18n.pagination.previous}
+                className={cn(
+                  "h-9 w-9 rounded-md border border-border/50 bg-muted/20 px-0 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground",
+                  page <= 1 && "pointer-events-none opacity-50",
+                )}
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span className="hidden sm:inline">{i18n.pagination.previous}</span>
+                <span className="sr-only">{i18n.pagination.previous}</span>
               </PaginationLink>
             </PaginationItem>
 
@@ -201,7 +205,11 @@ export function DataTablePagination({
               if (item === "ellipsis-left" || item === "ellipsis-right") {
                 return (
                   <PaginationItem key={item}>
-                    <PaginationLink href="#" aria-disabled className="pointer-events-none">
+                    <PaginationLink
+                      href="#"
+                      aria-disabled
+                      className="h-9 rounded-md border border-border/40 bg-muted/10 text-muted-foreground/80 shadow-none pointer-events-none"
+                    >
                       ...
                     </PaginationLink>
                   </PaginationItem>
@@ -211,7 +219,16 @@ export function DataTablePagination({
               const isActive = item === page
               return (
                 <PaginationItem key={item}>
-                  <PaginationLink href="#" isActive={isActive} onClick={handlePageClick(item)}>
+                  <PaginationLink
+                    href="#"
+                    isActive={isActive}
+                    onClick={handlePageClick(item)}
+                    className={cn(
+                      "h-9 min-w-9 rounded-md border border-border/50 bg-muted/20 px-0 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground",
+                      isActive &&
+                        "border-primary/25 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary",
+                    )}
+                  >
                     {item}
                   </PaginationLink>
                 </PaginationItem>
@@ -224,10 +241,14 @@ export function DataTablePagination({
                 size="default"
                 onClick={handlePageClick(page + 1)}
                 aria-disabled={page >= pageCount}
-                className={cn(page >= pageCount && "pointer-events-none opacity-50")}
+                aria-label={i18n.pagination.next}
+                className={cn(
+                  "h-9 w-9 rounded-md border border-border/50 bg-muted/20 px-0 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground",
+                  page >= pageCount && "pointer-events-none opacity-50",
+                )}
               >
-                <span className="hidden sm:inline">{i18n.pagination.next}</span>
                 <ChevronRight className="h-4 w-4" />
+                <span className="sr-only">{i18n.pagination.next}</span>
               </PaginationLink>
             </PaginationItem>
           </PaginationContent>

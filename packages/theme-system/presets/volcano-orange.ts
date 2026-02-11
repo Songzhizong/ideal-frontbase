@@ -207,7 +207,7 @@ export const volcanoOrange: ThemePreset = {
        * ---------------------------------- */
       component: {
         table: {
-          headerBg: "#f8fafc",
+          headerBg: "#ffffff",
           rowHover: "rgba(250,84,28,0.05)",
           rowStriped: "#ffffff",
           border: "#e2e8f0",

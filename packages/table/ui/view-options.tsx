@@ -102,9 +102,12 @@ export function DataTableViewOptions({
   const defaultTrigger = (
     <Button
       type="button"
-      variant="outline"
-      size="icon-sm"
-      className={cn("h-8 w-8", className)}
+      variant="ghost"
+      size="icon"
+      className={cn(
+        "h-9 w-9 border border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground",
+        className,
+      )}
       aria-label={i18n.viewOptions.triggerAriaLabel}
     >
       <MoreHorizontal className="h-4 w-4" />

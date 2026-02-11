@@ -80,7 +80,7 @@ export function DataTableQueryPanel<TFilterSchema>({
   ) : null
 
   return (
-    <div className={cn("border-b border-border/50 bg-card px-3 py-2", className)}>
+    <div className={cn("border-b border-border/50 bg-card px-3 pt-3 pb-2", className)}>
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           {normalizedSearchProps ? (

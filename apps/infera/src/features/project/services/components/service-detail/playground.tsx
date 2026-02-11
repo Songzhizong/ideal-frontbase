@@ -183,8 +183,8 @@ export function PlaygroundTab({ tenantId, projectId, service }: PlaygroundTabPro
                 key={message.id}
                 className={
                   message.role === "user"
-                    ? "rounded-lg bg-primary/10 p-3 text-sm"
-                    : "rounded-lg bg-muted p-3 text-sm"
+                    ? "typography-chat-message rounded-lg bg-primary/10 p-3"
+                    : "typography-chat-message rounded-lg bg-muted p-3"
                 }
               >
                 <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">

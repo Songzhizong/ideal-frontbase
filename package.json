@@ -28,7 +28,8 @@
     "msw:init": "node scripts/run-turbo-for-apps.mjs msw:init --all",
     "msw:init:app": "node scripts/run-turbo-for-apps.mjs msw:init",
     "routes:generate": "node scripts/run-turbo-for-apps.mjs routes:generate --all",
-    "routes:generate:app": "node scripts/run-turbo-for-apps.mjs routes:generate"
+    "routes:generate:app": "node scripts/run-turbo-for-apps.mjs routes:generate",
+    "push:github": "node scripts/sync-github.mjs"
   },
   "engines": {
     "node": ">=20.0.0",

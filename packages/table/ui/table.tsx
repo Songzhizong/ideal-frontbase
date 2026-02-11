@@ -16,7 +16,7 @@ import {
 } from "@/packages/ui/table";
 import { cn } from "@/packages/ui-utils";
 import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config";
-import { useDataTableInstance, useDataTableLayout } from "./context";
+import { useDataTableInstance, useDataTableLayout, useDataTableVariant } from "./context";
 import { DataTableDragSortBody } from "./table/drag-sort-body";
 import {
   getAnalyticsMeta,
@@ -51,6 +51,7 @@ export function DataTableTable<TData>({
 }: DataTableTableProps<TData>) {
   const dt = useDataTableInstance<TData, unknown>();
   const layout = useDataTableLayout();
+  const variant = useDataTableVariant();
   const { i18n: globalI18n } = useDataTableConfig();
   const scrollContainer = layout?.scrollContainer ?? "window";
   const stickyHeader = layout?.stickyHeader ?? false;
@@ -61,7 +62,10 @@ export function DataTableTable<TData>({
 
   const tableMeta = dt.table.options.meta;
   const density = getDensity(tableMeta);
-  const cellDensityClass = density === "comfortable" ? "py-4" : "py-2";
+  const cellDensityClass =
+    density === "comfortable"
+      ? "py-[var(--dt-cell-py-comfortable,0.75rem)]"
+      : "py-[var(--dt-cell-py-compact,0.375rem)]";
   const treeIndentSize = getTreeIndentSize(tableMeta);
   const treeAllowNesting = getTreeAllowNesting(tableMeta);
   const useRootSplitHeaderBody = scrollContainer === "root" && isStickyHeader;
@@ -177,13 +181,20 @@ export function DataTableTable<TData>({
   };
 
   const renderDataRow = (row: Row<TData>) => {
+    const rowInteractiveClass =
+      variant === "subtle"
+        ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.12))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.22))]"
+        : variant === "dense"
+          ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.25))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.4))]"
+          : "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]";
+
     const baseRow = (
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
         className={cn(
           rowClassName,
-          "group/row hover:bg-muted/30 data-[state=selected]:bg-muted/50",
+          rowInteractiveClass,
         )}
       >
         {renderCells(row)}
@@ -420,7 +431,7 @@ export function DataTableTable<TData>({
       ) : useWindowSplitHeaderBody ? (
         <>
           <div
-            className="sticky z-15 w-full shrink-0 overflow-hidden border-b border-border/50 bg-table-header"
+            className="sticky z-15 w-full shrink-0 overflow-hidden bg-table-header"
             style={{ top: "var(--dt-sticky-top,0px)" }}
           >
             <div

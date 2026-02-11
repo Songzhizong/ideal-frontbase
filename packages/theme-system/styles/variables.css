@@ -68,6 +68,27 @@
   --table-row-hover: 217 91% 96%;
   --table-row-striped: 0 0% 100%;
   --table-border: 240 5.9% 90%;
+  --table-header-fg-default: 240 3.8% 46.1%;
+  --table-header-fg-subtle: 240 3.6% 52%;
+  --table-header-fg-dense: 240 4.2% 40%;
+  --table-row-hover-default: 240 4.8% 95%;
+  --table-row-hover-subtle: 240 4.8% 97%;
+  --table-row-hover-dense: 240 4.8% 93%;
+  --table-row-selected-default: 240 4.8% 92%;
+  --table-row-selected-subtle: 240 4.8% 95%;
+  --table-row-selected-dense: 240 4.8% 90%;
+  --table-head-height-default: 2.25rem;
+  --table-head-height-subtle: 2.25rem;
+  --table-head-height-dense: 2rem;
+  --table-cell-x-default: 0.5rem;
+  --table-cell-x-subtle: 0.5rem;
+  --table-cell-x-dense: 0.375rem;
+  --table-cell-py-compact-default: 0.375rem;
+  --table-cell-py-compact-subtle: 0.375rem;
+  --table-cell-py-compact-dense: 0.25rem;
+  --table-cell-py-comfortable-default: 0.75rem;
+  --table-cell-py-comfortable-subtle: 0.75rem;
+  --table-cell-py-comfortable-dense: 0.625rem;
 
   /* Utility Variables */
   --ink-900: 240 5.9% 10%;
@@ -156,6 +177,15 @@
   --table-row-hover: 217 91% 15%;
   --table-row-striped: 240 7.7% 10.2%;
   --table-border: 240 3.7% 15.9%;
+  --table-header-fg-default: 240 5% 68%;
+  --table-header-fg-subtle: 240 5% 74%;
+  --table-header-fg-dense: 240 5% 64%;
+  --table-row-hover-default: 240 3.7% 18%;
+  --table-row-hover-subtle: 240 3.7% 16%;
+  --table-row-hover-dense: 240 3.7% 20%;
+  --table-row-selected-default: 240 3.7% 24%;
+  --table-row-selected-subtle: 240 3.7% 21%;
+  --table-row-selected-dense: 240 3.7% 26%;
 
   /* Utility Variables - Dark Mode */
   --ink-900: 210 40% 98%;

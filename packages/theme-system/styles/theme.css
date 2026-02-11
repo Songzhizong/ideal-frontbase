@@ -63,6 +63,27 @@
   --color-table-row-hover: hsl(var(--table-row-hover));
   --color-table-row-striped: hsl(var(--table-row-striped));
   --color-table-border: hsl(var(--table-border));
+  --color-table-header-fg-default: hsl(var(--table-header-fg-default));
+  --color-table-header-fg-subtle: hsl(var(--table-header-fg-subtle));
+  --color-table-header-fg-dense: hsl(var(--table-header-fg-dense));
+  --color-table-row-hover-default: hsl(var(--table-row-hover-default));
+  --color-table-row-hover-subtle: hsl(var(--table-row-hover-subtle));
+  --color-table-row-hover-dense: hsl(var(--table-row-hover-dense));
+  --color-table-row-selected-default: hsl(var(--table-row-selected-default));
+  --color-table-row-selected-subtle: hsl(var(--table-row-selected-subtle));
+  --color-table-row-selected-dense: hsl(var(--table-row-selected-dense));
+  --spacing-table-head-height-default: var(--table-head-height-default);
+  --spacing-table-head-height-subtle: var(--table-head-height-subtle);
+  --spacing-table-head-height-dense: var(--table-head-height-dense);
+  --spacing-table-cell-x-default: var(--table-cell-x-default);
+  --spacing-table-cell-x-subtle: var(--table-cell-x-subtle);
+  --spacing-table-cell-x-dense: var(--table-cell-x-dense);
+  --spacing-table-cell-py-compact-default: var(--table-cell-py-compact-default);
+  --spacing-table-cell-py-compact-subtle: var(--table-cell-py-compact-subtle);
+  --spacing-table-cell-py-compact-dense: var(--table-cell-py-compact-dense);
+  --spacing-table-cell-py-comfortable-default: var(--table-cell-py-comfortable-default);
+  --spacing-table-cell-py-comfortable-subtle: var(--table-cell-py-comfortable-subtle);
+  --spacing-table-cell-py-comfortable-dense: var(--table-cell-py-comfortable-dense);
 
   /* Utility colors */
   --color-ink-900: hsl(var(--ink-900));
@@ -84,6 +105,26 @@
   --font-pingfang-sc: "PingFang SC", "Source Han Sans SC", "Microsoft YaHei", var(--font-sans);
   --font-microsoft-yahei: "Microsoft YaHei", "Source Han Sans SC", var(--font-sans);
   --font-system-ui: var(--font-sans);
+
+  /* Typography scale (B2B SaaS: dense + readable) */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2.125rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.5rem;
+  --text-chat-message: 0.9375rem;
+  --text-chat-message--line-height: 1.625rem;
 
   /* Border radius scale */
   --radius-3xl: calc(var(--radius) * 1.5);

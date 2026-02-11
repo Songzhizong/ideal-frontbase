@@ -2,6 +2,7 @@ import { createContext, type ReactNode, useContext } from "react"
 import type { DataTableInstance } from "../core"
 
 export type DataTableScrollContainer = "root" | "window"
+export type DataTableVariant = "default" | "subtle" | "dense"
 
 export interface DataTableLayoutOptions {
   scrollContainer?: DataTableScrollContainer
@@ -11,6 +12,7 @@ export interface DataTableLayoutOptions {
 
 const DataTableInstanceContext = createContext<DataTableInstance<unknown, unknown> | null>(null)
 const DataTableLayoutContext = createContext<DataTableLayoutOptions | null>(null)
+const DataTableVariantContext = createContext<DataTableVariant>("default")
 
 export function useDataTableInstance<TData, TFilterSchema>() {
   const context = useContext(DataTableInstanceContext)
@@ -24,19 +26,27 @@ export function useDataTableLayout() {
   return useContext(DataTableLayoutContext)
 }
 
+export function useDataTableVariant() {
+  return useContext(DataTableVariantContext)
+}
+
 export function DataTableProvider<TData, TFilterSchema>({
   dt,
   layout,
+  variant,
   children,
 }: {
   dt: DataTableInstance<TData, TFilterSchema>
   layout?: DataTableLayoutOptions
+  variant?: DataTableVariant
   children: ReactNode
 }) {
   return (
     <DataTableInstanceContext.Provider value={dt as DataTableInstance<unknown, unknown>}>
       <DataTableLayoutContext.Provider value={layout ?? null}>
-        {children}
+        <DataTableVariantContext.Provider value={variant ?? "default"}>
+          {children}
+        </DataTableVariantContext.Provider>
       </DataTableLayoutContext.Provider>
     </DataTableInstanceContext.Provider>
   )

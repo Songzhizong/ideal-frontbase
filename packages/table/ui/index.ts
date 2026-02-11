@@ -2,9 +2,30 @@ export type { DataTableActiveFiltersProps } from "./active-filters"
 export { DataTableActiveFilters } from "./active-filters"
 export type { DataTableColumnToggleProps } from "./column-toggle"
 export { DataTableColumnToggle } from "./column-toggle"
+export type {
+  DataTableIndicatorItem,
+  DataTableIndicatorListProps,
+  DataTableIndicatorTone,
+  DataTableStatusPillProps,
+  DataTableStatusTone,
+  DataTableTagItem,
+  DataTableTagListCellProps,
+  DataTableTagTone,
+  DataTableTextPairCellProps,
+  DataTableTimeMetaCellProps,
+  DataTableUserIdentityCellProps,
+} from "./cells"
+export {
+  DataTableIndicatorList,
+  DataTableStatusPill,
+  DataTableTagListCell,
+  DataTableTextPairCell,
+  DataTableTimeMetaCell,
+  DataTableUserIdentityCell,
+} from "./cells"
 export type { DataTableI18n, DataTableI18nOverrides } from "./config"
 export { DataTableConfigProvider } from "./config"
-export type { DataTableLayoutOptions } from "./context"
+export type { DataTableLayoutOptions, DataTableVariant } from "./context"
 export type { DataTableDensityToggleProps } from "./density-toggle"
 export { DataTableDensityToggle } from "./density-toggle"
 export type { DataTableDragHandleProps } from "./drag-handle"

@@ -84,7 +84,7 @@ export function DataTableAdvancedSearch<TFilterSchema>({
     <Popover open={state.isValuePickerOpen} onOpenChange={state.onValuePickerOpenChange}>
       <PopoverAnchor asChild>
         <div className={cn(fullWidth ? "w-full max-w-3xl" : "w-auto min-w-0 max-w-3xl", className)}>
-          <div className="flex h-9 w-full items-center rounded-md border border-input bg-background px-2">
+          <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/20 px-2 shadow-none transition-colors focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] hover:bg-muted/30">
             <Search className="ml-1 mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
             <DataTableAdvancedFieldPicker
               fieldPickerOpen={state.fieldPickerOpen}

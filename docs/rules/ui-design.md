@@ -37,6 +37,39 @@
 
 > 硬编码禁令与基础样式约束见 `general_rule.md` §2，此处不重复。
 
+#### 3.1 字号使用指导规范（Typography）
+
+- 设计目标：控制台区域保证信息密度，AI 阅读区域保证长文本可读性。
+- 正文基线：`text-base = 14px/22px`。
+- 字号标尺：
+  - `text-2xs`=`11px/16px`（仅极小英文标签、状态角标数字、时间戳尾注）
+  - `text-xs`=`12px/18px`
+  - `text-sm`=`13px/20px`
+  - `text-base`=`14px/22px`
+  - `text-lg`=`16px/24px`
+  - `text-xl`=`20px/30px`
+  - `text-2xl`=`24px/34px`
+  - `text-3xl`=`30px/40px`
+  - `text-chat-message`=`15px/26px`（桌面端 `16px/24px`）
+- 字重约束：
+  - 正文/说明：`font-normal`（400）
+  - Label/表头/次级标题：`font-medium`（500）
+  - 页面标题/关键指标：`font-semibold`（600）
+- 组件规则（MUST）：
+  - Button 默认 `text-base`（14px）；仅紧凑按钮使用 `text-sm`（13px）。
+  - Input/textarea 的 value 与 placeholder 必须同字号（默认 14px），层级只通过颜色区分。
+  - Table 表头使用 `text-xs`，表体主信息使用 `text-sm`，次级信息使用 `text-xs`。
+  - 监控指标、金额、Token 用量等数字字段必须使用 `tabular-nums`。
+  - 代码块必须使用 `font-mono`，字号使用 `text-code`（若未定义，使用 `text-sm` 兜底）。
+- AI/Markdown 场景规则（MUST）：
+  - 聊天容器正文使用 `typography.chat.message`。
+  - 聊天容器标题局部缩放：`h1 -> text-xl`、`h2 -> text-lg`、`h3 -> text-base`。
+  - 流式输出（Streaming）光标高度需与行高一致，避免抖动与跳行。
+- 禁止项（MUST）：
+  - 禁止业务代码硬编码字号（例如 `text-[11px]`、`text-[13px]`、`text-[14px]`）。
+  - `text-2xs` 禁止用于中文正文、关键元数据和可交互主文案；中文正文最小字号不得低于 `12px`。
+- 完整规范与验收清单见：[typography.md](typography.md)。
+
 ### 4) 页面结构模板（SHOULD）
 
 顶层结构固定：

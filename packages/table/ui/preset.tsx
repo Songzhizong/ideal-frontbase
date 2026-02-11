@@ -3,6 +3,7 @@ import type { DataTableLayoutOptions } from "./context"
 import { DataTablePagination, type DataTablePaginationProps } from "./pagination"
 import { DataTableQueryPanel, type DataTableQueryPanelProps } from "./query-panel"
 import { DataTableRoot } from "./root"
+import type { DataTableVariant } from "./context"
 import type { DataTableSearchProps } from "./search"
 import type { DataTableSelectionBarProps } from "./selection-bar"
 import { DataTableSelectionBar } from "./selection-bar"
@@ -18,6 +19,7 @@ export interface DataTablePresetProps<TData, TFilterSchema> {
   height?: string
   className?: string
   layout?: DataTableLayoutOptions
+  variant?: DataTableVariant
   query: DataTablePresetQueryProps<TFilterSchema>
   table?: Pick<DataTableTableProps<TData>, "renderSubComponent" | "renderEmpty" | "renderError">
   selectionBarActions?: DataTableSelectionBarProps<TData, TFilterSchema>["actions"]
@@ -30,6 +32,7 @@ export function DataTablePreset<TData, TFilterSchema>({
   height,
   className,
   layout,
+  variant,
   query,
   table,
   selectionBarActions,
@@ -48,6 +51,7 @@ export function DataTablePreset<TData, TFilterSchema>({
       {...(typeof height === "string" ? { height } : {})}
       {...(typeof className === "string" ? { className } : {})}
       {...(layout ? { layout } : {})}
+      {...(variant ? { variant } : {})}
     >
       <DataTableQueryPanel<TFilterSchema> {...query} />
       <DataTableTable<TData>

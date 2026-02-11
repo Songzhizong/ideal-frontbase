@@ -34,7 +34,7 @@ function timestampToDate(input: TimestampInput): Date | null {
 export function formatTimestampToDate(input: TimestampInput): string {
   const date = timestampToDate(input)
   if (!date) return "-"
-  return format(date, "yyyy-MM-dd")
+  return format(date, "yyyy/MM/dd")
 }
 
 /**
@@ -44,7 +44,7 @@ export function formatTimestampToDate(input: TimestampInput): string {
 export function formatTimestampToDateTime(input: TimestampInput): string {
   const date = timestampToDate(input)
   if (!date) return "-"
-  return format(date, "yyyy-MM-dd HH:mm:ss")
+  return format(date, "yyyy/MM/dd HH:mm:ss")
 }
 
 /**
