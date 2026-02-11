@@ -75,8 +75,12 @@ export function DataTableRoot<TData, TFilterSchema>({
   children,
 }: DataTableRootProps<TData, TFilterSchema>) {
   const scrollContainer = layout?.scrollContainer ?? "window"
+  const queryTopOffset = resolveOffset(layout?.stickyQueryPanel)
   const topOffset = resolveOffset(layout?.stickyHeader)
   const bottomOffset = resolveOffset(layout?.stickyPagination)
+  const hasWindowSticky =
+    scrollContainer === "window" &&
+    Boolean(layout?.stickyQueryPanel || layout?.stickyHeader || layout?.stickyPagination)
 
   const style = useMemo(() => {
     const next: CSSProperties & Record<string, string> = {}
@@ -87,6 +91,9 @@ export function DataTableRoot<TData, TFilterSchema>({
     }
     if (topOffset != null) {
       next["--dt-sticky-top"] = `${topOffset}px`
+    }
+    if (queryTopOffset != null) {
+      next["--dt-query-top"] = `${queryTopOffset}px`
     }
     if (bottomOffset != null) {
       next["--dt-sticky-bottom"] = `${bottomOffset}px`
@@ -100,7 +107,7 @@ export function DataTableRoot<TData, TFilterSchema>({
     next["--dt-cell-py-compact"] = variantVariables.cellPaddingYCompact
     next["--dt-cell-py-comfortable"] = variantVariables.cellPaddingYComfortable
     return next
-  }, [height, topOffset, bottomOffset, variant])
+  }, [height, queryTopOffset, topOffset, bottomOffset, variant])
 
   return (
     <DataTableProvider dt={dt} {...(layout ? { layout } : {})} variant={variant}>
@@ -108,7 +115,8 @@ export function DataTableRoot<TData, TFilterSchema>({
         data-slot="data-table-root"
         data-dt-variant={variant}
         className={cn(
-          "flex min-h-0 flex-col overflow-clip bg-card",
+          "flex min-h-0 flex-col bg-card",
+          hasWindowSticky ? "overflow-visible" : "overflow-clip",
           " [&>*:first-child]:rounded-t-[inherit] [&>*:last-child]:rounded-b-[inherit]",
           scrollContainer === "root" && "h-full",
           className,

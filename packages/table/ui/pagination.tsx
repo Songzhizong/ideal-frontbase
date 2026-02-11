@@ -158,7 +158,7 @@ export function DataTablePagination({
       ref={rootRef}
       className={cn(
         "flex w-full flex-col gap-2 border-t border-border/40 bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between",
-        isStickyPagination && "sticky bottom-(--dt-sticky-bottom,0px) z-10",
+        isStickyPagination && "sticky bottom-[var(--dt-sticky-bottom,0px)] z-10",
         className,
       )}
     >

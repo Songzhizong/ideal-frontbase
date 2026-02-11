@@ -6,6 +6,7 @@ export type DataTableVariant = "default" | "subtle" | "dense"
 
 export interface DataTableLayoutOptions {
   scrollContainer?: DataTableScrollContainer
+  stickyQueryPanel?: boolean | { topOffset?: number }
   stickyHeader?: boolean | { topOffset?: number }
   stickyPagination?: boolean | { bottomOffset?: number }
 }

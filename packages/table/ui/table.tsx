@@ -54,8 +54,14 @@ export function DataTableTable<TData>({
   const variant = useDataTableVariant();
   const { i18n: globalI18n } = useDataTableConfig();
   const scrollContainer = layout?.scrollContainer ?? "window";
+  const stickyQueryPanel = layout?.stickyQueryPanel ?? false;
+  const isStickyQueryPanel =
+    stickyQueryPanel === true || typeof stickyQueryPanel === "object";
   const stickyHeader = layout?.stickyHeader ?? false;
   const isStickyHeader = stickyHeader === true || typeof stickyHeader === "object";
+  const stickyHeaderTop = isStickyQueryPanel
+    ? "calc(var(--dt-sticky-top,0px) + var(--dt-sticky-query-height,0px))"
+    : "var(--dt-sticky-top,0px)";
   const i18n = useMemo(() => {
     return mergeDataTableI18n(globalI18n, i18nOverrides);
   }, [globalI18n, i18nOverrides]);
@@ -254,7 +260,7 @@ export function DataTableTable<TData>({
                     position: "sticky",
                     ...(isStickyHeaderInTable
                       ? {
-                          top: "var(--dt-sticky-top,0px)",
+                          top: stickyHeaderTop,
                         }
                       : {}),
                     ...(isPinned
@@ -432,7 +438,7 @@ export function DataTableTable<TData>({
         <>
           <div
             className="sticky z-15 w-full shrink-0 overflow-hidden bg-table-header"
-            style={{ top: "var(--dt-sticky-top,0px)" }}
+            style={{ top: stickyHeaderTop }}
           >
             <div
               ref={splitHeaderScrollRef}

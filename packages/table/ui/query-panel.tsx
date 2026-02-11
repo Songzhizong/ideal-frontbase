@@ -1,10 +1,11 @@
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { type ReactNode, useMemo, useState } from "react"
+import { type ReactNode, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/packages/ui/button"
 import { cn } from "@/packages/ui-utils"
 import type { FilterDefinition } from "../core"
 import { DataTableActiveFilters } from "./active-filters"
 import { useDataTableConfig } from "./config"
+import { useDataTableLayout } from "./context"
 import { DataTableFilterBar } from "./filter-bar"
 import { DataTableFilterItem, type DataTableFilterLabelMode } from "./filter-item"
 import { DataTableSearch, type DataTableSearchProps } from "./search"
@@ -43,6 +44,11 @@ export function DataTableQueryPanel<TFilterSchema>({
   advancedFilterBarClassName,
 }: DataTableQueryPanelProps<TFilterSchema>) {
   const { i18n } = useDataTableConfig()
+  const layout = useDataTableLayout()
+  const stickyQueryPanel = layout?.stickyQueryPanel ?? false
+  const isStickyQueryPanel =
+    stickyQueryPanel === true || typeof stickyQueryPanel === "object"
+  const rootRef = useRef<HTMLDivElement>(null)
   const [expandedState, setExpandedState] = useState(defaultExpanded)
   const expanded = expandedProp ?? expandedState
   const hasAdvancedFilters = advancedFilters.length > 0
@@ -65,6 +71,39 @@ export function DataTableQueryPanel<TFilterSchema>({
     } satisfies DataTableSearchProps<TFilterSchema>
   }, [search])
 
+  useLayoutEffect(() => {
+    const panelElement = rootRef.current
+    if (!panelElement) return
+
+    const dataTableRoot = panelElement.closest<HTMLElement>('[data-slot="data-table-root"]')
+    if (!dataTableRoot) return
+
+    const updateStickyHeight = () => {
+      const height = isStickyQueryPanel ? panelElement.offsetHeight : 0
+      dataTableRoot.style.setProperty("--dt-sticky-query-height", `${height}px`)
+    }
+
+    updateStickyHeight()
+
+    if (typeof ResizeObserver === "undefined") {
+      return () => {
+        dataTableRoot.style.removeProperty("--dt-sticky-query-height")
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateStickyHeight()
+    })
+    resizeObserver.observe(panelElement)
+    window.addEventListener("resize", updateStickyHeight)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", updateStickyHeight)
+      dataTableRoot.style.removeProperty("--dt-sticky-query-height")
+    }
+  }, [isStickyQueryPanel])
+
   const toggleButton = hasAdvancedFilters ? (
     <Button
       type="button"
@@ -80,7 +119,14 @@ export function DataTableQueryPanel<TFilterSchema>({
   ) : null
 
   return (
-    <div className={cn("border-b border-border/50 bg-card px-3 pt-3 pb-2", className)}>
+    <div
+      ref={rootRef}
+      className={cn(
+        "border-b border-border/50 bg-card px-3 pt-3 pb-2",
+        isStickyQueryPanel && "sticky top-[var(--dt-query-top,var(--dt-sticky-top,0px))] z-20",
+        className,
+      )}
+    >
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           {normalizedSearchProps ? (

@@ -254,10 +254,10 @@ export function UsersPage({ tenantId }: UsersPageProps) {
           newUsers={userStats.newUsers}
         />
 
-        <section className="overflow-hidden rounded-2xl border border-border/40 bg-card shadow-sm transition-shadow duration-300 hover:shadow-md">
+        <section className="rounded-2xl border border-border/40 bg-card shadow-sm transition-shadow duration-300 hover:shadow-md">
           <DataTablePreset<Api.User.ListUser, UserManagementTableFilters>
             dt={dt}
-            layout={{ stickyHeader: true, stickyPagination: true }}
+            layout={{ stickyQueryPanel: true, stickyHeader: true, stickyPagination: true }}
             query={createCrudQueryPreset<UserManagementTableFilters>({
               search: {
                 filterKey: "keyword",
