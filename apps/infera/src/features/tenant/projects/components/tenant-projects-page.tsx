@@ -1,4 +1,5 @@
 import { AlertTriangle, Plus } from "lucide-react"
+import { motion } from "motion/react"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { ContentLayout } from "@/components/content-layout"
@@ -19,13 +20,11 @@ import {
 import type { TenantProjectEnvironment, TenantProjectItem } from "../types/tenant-projects"
 import { TENANT_PROJECT_COST_RANGE_OPTIONS } from "../utils/tenant-projects-formatters"
 import { CreateProjectDialog } from "./create-project-dialog"
+import { CreateProjectPlaceholderCard } from "./create-project-placeholder-card"
 import { DeleteProjectDialog } from "./delete-project-dialog"
-import {
-  CreateProjectPlaceholderCard,
-  TenantProjectCard,
-  TenantProjectCardSkeleton,
-} from "./tenant-project-card"
+import { TenantProjectCard, TenantProjectCardSkeleton } from "./tenant-project-card"
 import { TenantProjectsFilterPanel } from "./tenant-projects-filter-panel"
+import { TenantProjectsGlobalMetrics } from "./tenant-projects-global-metrics"
 import { TenantProjectsPagination } from "./tenant-projects-pagination"
 
 interface TenantProjectsPageProps {
@@ -163,11 +162,11 @@ export function TenantProjectsPage({ tenantId }: TenantProjectsPageProps) {
   return (
     <>
       <ContentLayout
-        title="项目管理"
-        description="统一管理租户项目、资源状态与成本消耗。默认以卡片视图展示关键指标和删除风险。"
+        title="项目驾驶舱"
+        description="以驾驶舱视图管理租户项目、成本与服务健康。适配小规模项目集（常驻 10 个以内）的高频巡检场景。"
         actions={headerActions}
         className="flex h-full flex-col"
-        contentClassName="flex min-h-0 flex-1 flex-col"
+        contentClassName="flex min-h-0 flex-1 flex-col rounded-2xl bg-paper-100/70 p-4 md:p-5"
       >
         {!tableMeta.canCreateProject ? (
           <Alert className="border-amber-500/20 bg-amber-500/10 text-amber-500 [&>svg]:text-amber-500">
@@ -210,6 +209,10 @@ export function TenantProjectsPage({ tenantId }: TenantProjectsPageProps) {
           activeFilterLabels={activeFilterLabels}
         />
 
+        {!dt.activity.isInitialLoading && dt.status.type !== "error" ? (
+          <TenantProjectsGlobalMetrics projects={projects} />
+        ) : null}
+
         {dt.status.type === "error" ? (
           <ErrorState
             title="项目列表加载失败"
@@ -220,7 +223,7 @@ export function TenantProjectsPage({ tenantId }: TenantProjectsPageProps) {
             }}
           />
         ) : dt.activity.isInitialLoading ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {[0, 1, 2, 3, 4, 5].map((id) => (
               <TenantProjectCardSkeleton key={`skeleton-${id}`} />
             ))}
@@ -239,23 +242,41 @@ export function TenantProjectsPage({ tenantId }: TenantProjectsPageProps) {
               : {})}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.05 },
+              },
+            }}
+            className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+          >
             {projects.map((project) => (
-              <TenantProjectCard
+              <motion.div
                 key={project.projectId}
-                tenantId={tenantId}
-                project={project}
-                canManageProject={tableMeta.canCreateProject}
-                onOpenSettings={(item) => {
-                  toast.info(`项目 ${item.projectName} 的设置页将在 P3.2 阶段实现。`)
-                }}
-                onRequestDelete={setDeletingProject}
-              />
+                variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
+              >
+                <TenantProjectCard
+                  tenantId={tenantId}
+                  project={project}
+                  canManageProject={tableMeta.canCreateProject}
+                  onOpenSettings={(item) => {
+                    toast.info(`项目 ${item.projectName} 的设置页将在 P3.2 阶段实现。`)
+                  }}
+                  onOpenLogs={(item) => {
+                    toast.info(`项目 ${item.projectName} 的控制台日志将在 P3.2 阶段实现。`)
+                  }}
+                  onRequestDelete={setDeletingProject}
+                />
+              </motion.div>
             ))}
             {tableMeta.canCreateProject ? (
               <CreateProjectPlaceholderCard onClick={() => setCreateDialogOpen(true)} />
             ) : null}
-          </div>
+          </motion.div>
         )}
 
         <TenantProjectsPagination

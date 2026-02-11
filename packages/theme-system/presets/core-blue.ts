@@ -2,7 +2,7 @@ import type { ThemePreset } from "../types/theme"
 
 export const coreBlue: ThemePreset = {
   key: "core-blue",
-  name: "基石蓝",
+  name: "科技蓝",
   description:
     "一种冷静、可信赖的系统级蓝色，用于承载默认交互与关键信息，强调稳定性、专业感与长期可用性，适合作为企业级产品与管理后台的基础主色。",
   schemes: {

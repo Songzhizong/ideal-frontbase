@@ -5,13 +5,14 @@
 
 import { coreBlue } from "./presets/core-blue"
 import { emeraldGreen } from "./presets/emerald-green"
+import { volcanoOrange } from "./presets/volcano-orange"
 import type { ThemeConfig, ThemePreset } from "./types/theme"
 
-export const themePresets: ThemePreset[] = [coreBlue, emeraldGreen]
+export const themePresets: ThemePreset[] = [volcanoOrange, coreBlue, emeraldGreen]
 
 export const defaultThemeSettings: ThemeConfig = {
   mode: "system",
-  activePreset: "core-blue",
+  activePreset: "volcano-orange",
   fontFamily: "inter",
   layout: {
     menuLayout: "single",
