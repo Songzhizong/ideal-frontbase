@@ -77,15 +77,13 @@ export function AppSidebar({
   }, [visibleGroups])
   const showGroupSection = visibleGroups.length > 1
 
-  const sidebarBrand =
-    brand ??
-    (
-      <div className="flex h-14 items-center px-5">
-        <span className="min-w-0 truncate text-base font-bold tracking-tight text-foreground">
-          {appTitle}
-        </span>
-      </div>
-    )
+  const sidebarBrand = brand ?? (
+    <div className="flex h-14 items-center px-5">
+      <span className="min-w-0 truncate text-base font-bold tracking-tight text-foreground">
+        {appTitle}
+      </span>
+    </div>
+  )
 
   const activeRouteItem = React.useMemo(() => {
     return (
@@ -260,7 +258,9 @@ export function AppSidebar({
               <div className="flex h-full min-h-0 flex-col">
                 <div className="flex h-14 items-center justify-between px-4">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-sidebar-foreground">{appTitle}</p>
+                    <p className="truncate text-sm font-semibold text-sidebar-foreground">
+                      {appTitle}
+                    </p>
                     <p className="truncate text-xs text-muted-foreground">{dualParent.title}</p>
                   </div>
                   <Button
@@ -315,11 +315,7 @@ export function AppSidebar({
             key={`${group.title ?? "group"}-${groupIndex}`}
             className={cn(
               "p-0",
-              showGroupSection && groupIndex > 0
-                ? group.title
-                  ? "mt-1.5"
-                  : "mt-0.5"
-                : null,
+              showGroupSection && groupIndex > 0 ? (group.title ? "mt-1.5" : "mt-0.5") : null,
             )}
           >
             {showGroupSection && !isIconMode && group.title ? (
@@ -442,7 +438,9 @@ export function AppSidebar({
                         <BaseLink to={item.to}>
                           <NavIcon item={item} />
                           {showLabel ? (
-                            <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
+                            <span className="group-data-[collapsible=icon]:hidden">
+                              {item.title}
+                            </span>
                           ) : null}
                         </BaseLink>
                       </SidebarMenuButton>

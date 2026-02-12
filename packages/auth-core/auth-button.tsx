@@ -1,8 +1,8 @@
-import type { Permission } from "./types"
-import { useAuthStore } from "./auth-store"
 import { Button, type ButtonProps } from "@/packages/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/packages/ui/tooltip"
 import { cn } from "@/packages/ui-utils"
+import { useAuthStore } from "./auth-store"
+import type { Permission } from "./types"
 
 interface AuthButtonProps extends ButtonProps {
   permission: Permission | Permission[]

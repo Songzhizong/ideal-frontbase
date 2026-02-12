@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useEffect } from "react"
 import { describe, expect, it, vi } from "vitest"
-import { local, stateInternal, useDataTable } from "../index"
 import { createColumnHelper } from "../columns"
 import type { DataTableInstance } from "../core/types"
+import { local, stateInternal, useDataTable } from "../index"
 import { DataTableRoot } from "./root"
 import { DataTableSearch } from "./search"
 
@@ -57,7 +57,9 @@ function SearchKeyHarness(props: { onReady: (dt: DataTableInstance<RowData, Filt
   )
 }
 
-function AdvancedSearchHarness(props: { onReady: (dt: DataTableInstance<RowData, Filters>) => void }) {
+function AdvancedSearchHarness(props: {
+  onReady: (dt: DataTableInstance<RowData, Filters>) => void
+}) {
   const helper = createColumnHelper<RowData>()
   const state = stateInternal<Filters>({
     initial: {

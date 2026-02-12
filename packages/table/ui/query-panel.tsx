@@ -46,8 +46,7 @@ export function DataTableQueryPanel<TFilterSchema>({
   const { i18n } = useDataTableConfig()
   const layout = useDataTableLayout()
   const stickyQueryPanel = layout?.stickyQueryPanel ?? false
-  const isStickyQueryPanel =
-    stickyQueryPanel === true || typeof stickyQueryPanel === "object"
+  const isStickyQueryPanel = stickyQueryPanel === true || typeof stickyQueryPanel === "object"
   const rootRef = useRef<HTMLDivElement>(null)
   const [expandedState, setExpandedState] = useState(defaultExpanded)
   const expanded = expandedProp ?? expandedState

@@ -6,13 +6,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/packages/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/packages/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/ui/select"
 import { cn } from "@/packages/ui-utils"
 import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
 import { useDataTableInstance, useDataTableLayout } from "./context"

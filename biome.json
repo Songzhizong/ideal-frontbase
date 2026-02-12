@@ -6,26 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
-    "includes": [
-      "apps/infera/src/app/**",
-      "apps/infera/src/components/**",
-      "apps/infera/src/config/**",
-      "apps/infera/src/features/**",
-      "apps/infera/src/hooks/**",
-      "apps/infera/src/mocks/**",
-      "apps/nexus/src/app/**",
-      "apps/nexus/src/components/**",
-      "apps/nexus/src/config/**",
-      "apps/nexus/src/features/**",
-      "apps/nexus/src/hooks/**",
-      "apps/nexus/src/mocks/**",
-      "packages/confirm/**",
-      "packages/error-core/**",
-      "packages/platform-router/**",
-      "packages/theme-system/**",
-      "packages/ui-utils/**"
-    ]
+    "ignoreUnknown": false
   },
   "formatter": {
     "enabled": true,

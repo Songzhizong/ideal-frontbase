@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest"
 import { createColumnHelper } from "../columns"
 import { local, stateInternal, useDataTable } from "../index"
 import type { DataTablePaginationProps } from "./pagination"
-import { createCrudQueryPreset } from "./query-preset"
 import type { DataTablePresetQueryProps } from "./preset"
 import { DataTablePreset } from "./preset"
+import { createCrudQueryPreset } from "./query-preset"
 import type { DataTableTableProps } from "./table"
 
 type RowData = {

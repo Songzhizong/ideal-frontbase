@@ -1,6 +1,6 @@
 {
-	"name": "@ideal-frontbase/app-config",
-	"private": true,
-	"version": "0.1.0",
-	"type": "module"
+  "name": "@ideal-frontbase/app-config",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module"
 }

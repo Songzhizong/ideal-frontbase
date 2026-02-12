@@ -1,10 +1,10 @@
-import { flexRender, type Row } from "@tanstack/react-table";
-import { AlertCircle, X } from "lucide-react";
-import type { ReactElement, ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
-import { Button } from "@/packages/ui/button";
-import { ScrollArea } from "@/packages/ui/scroll-area";
-import { Skeleton } from "@/packages/ui/skeleton";
+import { flexRender, type Row } from "@tanstack/react-table"
+import { AlertCircle, X } from "lucide-react"
+import type { ReactElement, ReactNode } from "react"
+import { useMemo, useRef, useState } from "react"
+import { Button } from "@/packages/ui/button"
+import { ScrollArea } from "@/packages/ui/scroll-area"
+import { Skeleton } from "@/packages/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -13,11 +13,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/packages/ui/table";
-import { cn } from "@/packages/ui-utils";
-import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config";
-import { useDataTableInstance, useDataTableLayout, useDataTableVariant } from "./context";
-import { DataTableDragSortBody } from "./table/drag-sort-body";
+} from "@/packages/ui/table"
+import { cn } from "@/packages/ui-utils"
+import { type DataTableI18nOverrides, mergeDataTableI18n, useDataTableConfig } from "./config"
+import { useDataTableInstance, useDataTableLayout, useDataTableVariant } from "./context"
+import { DataTableDragSortBody } from "./table/drag-sort-body"
 import {
   getAnalyticsMeta,
   getDensity,
@@ -28,19 +28,19 @@ import {
   getTreeAllowNesting,
   getTreeIndentSize,
   getVirtualizationMeta,
-} from "./table/helpers";
-import { useHorizontalScrollSync } from "./table/use-horizontal-scroll-sync";
-import { useTableBodyRows } from "./table/use-table-body";
+} from "./table/helpers"
+import { useHorizontalScrollSync } from "./table/use-horizontal-scroll-sync"
+import { useTableBodyRows } from "./table/use-table-body"
 
 export interface DataTableTableProps<TData> {
-  className?: string;
-  renderEmpty?: () => ReactNode;
-  renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode;
-  renderSubComponent?: (row: Row<TData>) => ReactNode;
-  i18n?: DataTableI18nOverrides;
+  className?: string
+  renderEmpty?: () => ReactNode
+  renderError?: (error: unknown, retry?: () => void | Promise<void>) => ReactNode
+  renderSubComponent?: (row: Row<TData>) => ReactNode
+  i18n?: DataTableI18nOverrides
 }
 
-const SKELETON_ROW_KEYS = ["dt-skeleton-1", "dt-skeleton-2", "dt-skeleton-3"];
+const SKELETON_ROW_KEYS = ["dt-skeleton-1", "dt-skeleton-2", "dt-skeleton-3"]
 
 export function DataTableTable<TData>({
   className,
@@ -49,53 +49,52 @@ export function DataTableTable<TData>({
   renderSubComponent,
   i18n: i18nOverrides,
 }: DataTableTableProps<TData>) {
-  const dt = useDataTableInstance<TData, unknown>();
-  const layout = useDataTableLayout();
-  const variant = useDataTableVariant();
-  const { i18n: globalI18n } = useDataTableConfig();
-  const scrollContainer = layout?.scrollContainer ?? "window";
-  const stickyQueryPanel = layout?.stickyQueryPanel ?? false;
-  const isStickyQueryPanel =
-    stickyQueryPanel === true || typeof stickyQueryPanel === "object";
-  const stickyHeader = layout?.stickyHeader ?? false;
-  const isStickyHeader = stickyHeader === true || typeof stickyHeader === "object";
+  const dt = useDataTableInstance<TData, unknown>()
+  const layout = useDataTableLayout()
+  const variant = useDataTableVariant()
+  const { i18n: globalI18n } = useDataTableConfig()
+  const scrollContainer = layout?.scrollContainer ?? "window"
+  const stickyQueryPanel = layout?.stickyQueryPanel ?? false
+  const isStickyQueryPanel = stickyQueryPanel === true || typeof stickyQueryPanel === "object"
+  const stickyHeader = layout?.stickyHeader ?? false
+  const isStickyHeader = stickyHeader === true || typeof stickyHeader === "object"
   const stickyHeaderTop = isStickyQueryPanel
     ? "calc(var(--dt-query-top,var(--dt-sticky-top,0px)) + var(--dt-sticky-query-height,0px))"
-    : "var(--dt-sticky-top,0px)";
+    : "var(--dt-sticky-top,0px)"
   const i18n = useMemo(() => {
-    return mergeDataTableI18n(globalI18n, i18nOverrides);
-  }, [globalI18n, i18nOverrides]);
+    return mergeDataTableI18n(globalI18n, i18nOverrides)
+  }, [globalI18n, i18nOverrides])
 
-  const tableMeta = dt.table.options.meta;
-  const density = getDensity(tableMeta);
+  const tableMeta = dt.table.options.meta
+  const density = getDensity(tableMeta)
   const cellDensityClass =
     density === "comfortable"
       ? "py-[var(--dt-cell-py-comfortable,0.75rem)]"
-      : "py-[var(--dt-cell-py-compact,0.375rem)]";
-  const treeIndentSize = getTreeIndentSize(tableMeta);
-  const treeAllowNesting = getTreeAllowNesting(tableMeta);
-  const useRootSplitHeaderBody = scrollContainer === "root" && isStickyHeader;
-  const useWindowSplitHeaderBody = scrollContainer === "window" && isStickyHeader;
-  const useSplitHeaderBody = useRootSplitHeaderBody || useWindowSplitHeaderBody;
+      : "py-[var(--dt-cell-py-compact,0.375rem)]"
+  const treeIndentSize = getTreeIndentSize(tableMeta)
+  const treeAllowNesting = getTreeAllowNesting(tableMeta)
+  const useRootSplitHeaderBody = scrollContainer === "root" && isStickyHeader
+  const useWindowSplitHeaderBody = scrollContainer === "window" && isStickyHeader
+  const useSplitHeaderBody = useRootSplitHeaderBody || useWindowSplitHeaderBody
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const splitHeaderScrollRef = useRef<HTMLDivElement>(null);
-  const splitBodyViewportRef = useRef<HTMLDivElement>(null);
-  const splitFooterScrollRef = useRef<HTMLDivElement>(null);
-  const syncRafRef = useRef<number | null>(null);
-  const syncingTargetRef = useRef<"header" | "body" | "footer" | null>(null);
-  const [scrollEdges, setScrollEdges] = useState({ left: false, right: false });
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const splitHeaderScrollRef = useRef<HTMLDivElement>(null)
+  const splitBodyViewportRef = useRef<HTMLDivElement>(null)
+  const splitFooterScrollRef = useRef<HTMLDivElement>(null)
+  const syncRafRef = useRef<number | null>(null)
+  const syncingTargetRef = useRef<"header" | "body" | "footer" | null>(null)
+  const [scrollEdges, setScrollEdges] = useState({ left: false, right: false })
 
-  const leftPinned = dt.table.getLeftLeafColumns();
-  const rightPinned = dt.table.getRightLeafColumns();
-  const lastLeftPinnedId = leftPinned[leftPinned.length - 1]?.id;
-  const firstRightPinnedId = rightPinned[0]?.id;
+  const leftPinned = dt.table.getLeftLeafColumns()
+  const rightPinned = dt.table.getRightLeafColumns()
+  const lastLeftPinnedId = leftPinned[leftPinned.length - 1]?.id
+  const firstRightPinnedId = rightPinned[0]?.id
 
-  const rowModel = dt.table.getRowModel();
-  const columnCount = dt.table.getVisibleLeafColumns().length;
-  const colSpan = Math.max(1, columnCount);
-  const isInitialLoading = dt.activity.isInitialLoading || !dt.activity.preferencesReady;
-  const isFetching = dt.activity.isFetching;
+  const rowModel = dt.table.getRowModel()
+  const columnCount = dt.table.getVisibleLeafColumns().length
+  const colSpan = Math.max(1, columnCount)
+  const isInitialLoading = dt.activity.isInitialLoading || !dt.activity.preferencesReady
+  const isFetching = dt.activity.isFetching
 
   useHorizontalScrollSync({
     useSplitHeaderBody,
@@ -108,16 +107,16 @@ export function DataTableTable<TData>({
     syncRafRef,
     syncingTargetRef,
     setScrollEdges,
-  });
+  })
 
-  const headerClassName = cn("[&_tr]:border-border/50");
+  const headerClassName = cn("[&_tr]:border-border/50")
 
-  const rowClassName = "border-border/50";
-  const dragSortEnabled = dt.dragSort.enabled;
-  const dragSortMeta = useMemo(() => getDragSortMeta(tableMeta), [tableMeta]);
-  const allowNestingEnabled = dragSortMeta.allowNesting && dt.tree.enabled && treeAllowNesting;
-  const virtualizationMeta = useMemo(() => getVirtualizationMeta(tableMeta), [tableMeta]);
-  const analyticsMeta = useMemo(() => getAnalyticsMeta<TData>(tableMeta), [tableMeta]);
+  const rowClassName = "border-border/50"
+  const dragSortEnabled = dt.dragSort.enabled
+  const dragSortMeta = useMemo(() => getDragSortMeta(tableMeta), [tableMeta])
+  const allowNestingEnabled = dragSortMeta.allowNesting && dt.tree.enabled && treeAllowNesting
+  const virtualizationMeta = useMemo(() => getVirtualizationMeta(tableMeta), [tableMeta])
+  const analyticsMeta = useMemo(() => getAnalyticsMeta<TData>(tableMeta), [tableMeta])
 
   const canVirtualize =
     virtualizationMeta.enabled &&
@@ -125,16 +124,16 @@ export function DataTableTable<TData>({
     !dragSortEnabled &&
     !renderSubComponent &&
     !dt.tree.enabled &&
-    !analyticsMeta.groupBy;
+    !analyticsMeta.groupBy
 
   const renderCells = (row: Row<TData>) => {
     return row.getVisibleCells().map((cell) => {
-      const pinned = cell.column.getIsPinned();
-      const isPinned = pinned === "left" || pinned === "right";
-      const isBoundaryLeft = scrollEdges.left && cell.column.id === lastLeftPinnedId;
-      const isBoundaryRight = scrollEdges.right && cell.column.id === firstRightPinnedId;
-      const cellMetaClass = getMetaClass(cell.column.columnDef.meta, "cellClassName");
-      const cellAlign = getMetaAlign(cell.column.columnDef.meta, "cell");
+      const pinned = cell.column.getIsPinned()
+      const isPinned = pinned === "left" || pinned === "right"
+      const isBoundaryLeft = scrollEdges.left && cell.column.id === lastLeftPinnedId
+      const isBoundaryRight = scrollEdges.right && cell.column.id === firstRightPinnedId
+      const cellMetaClass = getMetaClass(cell.column.columnDef.meta, "cellClassName")
+      const cellAlign = getMetaAlign(cell.column.columnDef.meta, "cell")
       return (
         <TableCell
           key={cell.id}
@@ -171,20 +170,20 @@ export function DataTableTable<TData>({
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         </TableCell>
-      );
-    });
-  };
+      )
+    })
+  }
 
   const renderExpandedRow = (row: Row<TData>): ReactElement | null => {
-    if (!renderSubComponent || !row.getIsExpanded()) return null;
+    if (!renderSubComponent || !row.getIsExpanded()) return null
     return (
       <TableRow key={`${row.id}__expanded`} className={rowClassName}>
         <TableCell colSpan={colSpan} className={cn("bg-muted/30", cellDensityClass)}>
           {renderSubComponent(row)}
         </TableCell>
       </TableRow>
-    );
-  };
+    )
+  }
 
   const renderDataRow = (row: Row<TData>) => {
     const rowInteractiveClass =
@@ -192,25 +191,22 @@ export function DataTableTable<TData>({
         ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.12))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.22))]"
         : variant === "dense"
           ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.25))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.4))]"
-          : "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]";
+          : "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]"
 
     const baseRow = (
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
-        className={cn(
-          rowClassName,
-          rowInteractiveClass,
-        )}
+        className={cn(rowClassName, rowInteractiveClass)}
       >
         {renderCells(row)}
       </TableRow>
-    );
-    const expandedRow = renderExpandedRow(row);
-    return expandedRow ? [baseRow, expandedRow] : [baseRow];
-  };
+    )
+    const expandedRow = renderExpandedRow(row)
+    return expandedRow ? [baseRow, expandedRow] : [baseRow]
+  }
 
-  const regularRows = rowModel.rows.flatMap((row) => renderDataRow(row as Row<TData>));
+  const regularRows = rowModel.rows.flatMap((row) => renderDataRow(row as Row<TData>))
   const { groupedRows, virtualizedRows, summaryCells } = useTableBodyRows<TData>({
     rows: rowModel.rows as Array<Row<TData>>,
     colSpan,
@@ -222,7 +218,7 @@ export function DataTableTable<TData>({
     analyticsMeta,
     renderDataRow,
     visibleLeafColumns: dt.table.getVisibleLeafColumns(),
-  });
+  })
 
   const dragSortRows = (
     <DataTableDragSortBody<TData>
@@ -238,17 +234,17 @@ export function DataTableTable<TData>({
       renderCells={(row) => renderCells(row)}
       renderExpandedRow={renderExpandedRow}
     />
-  );
+  )
 
-  const isStickyHeaderInTable = isStickyHeader && !useSplitHeaderBody;
+  const isStickyHeaderInTable = isStickyHeader && !useSplitHeaderBody
 
   const headerRows = dt.table.getHeaderGroups().map((headerGroup) => (
     <TableRow key={headerGroup.id} className={rowClassName}>
       {headerGroup.headers.map((header) => {
-        const headerMetaClass = getMetaClass(header.column.columnDef.meta, "headerClassName");
-        const headerAlign = getMetaAlign(header.column.columnDef.meta, "header");
-        const pinned = header.column.getIsPinned();
-        const isPinned = pinned === "left" || pinned === "right";
+        const headerMetaClass = getMetaClass(header.column.columnDef.meta, "headerClassName")
+        const headerAlign = getMetaAlign(header.column.columnDef.meta, "header")
+        const pinned = header.column.getIsPinned()
+        const isPinned = pinned === "left" || pinned === "right"
         return (
           <TableHead
             key={header.id}
@@ -316,15 +312,15 @@ export function DataTableTable<TData>({
               )}
             </div>
           </TableHead>
-        );
+        )
       })}
     </TableRow>
-  ));
+  ))
 
   const tableBodyContent =
     dt.status.type === "error"
       ? (() => {
-          const customError = renderError?.(dt.status.error, dt.actions.retry);
+          const customError = renderError?.(dt.status.error, dt.actions.retry)
           return (
             <TableRow className={rowClassName}>
               <TableCell colSpan={colSpan} className="h-24 text-center">
@@ -339,18 +335,18 @@ export function DataTableTable<TData>({
                 )}
               </TableCell>
             </TableRow>
-          );
+          )
         })()
       : !isInitialLoading && dt.status.type === "empty"
         ? (() => {
-            const customEmpty = renderEmpty?.();
+            const customEmpty = renderEmpty?.()
             return (
               <TableRow className={rowClassName}>
                 <TableCell colSpan={colSpan} className="h-24 text-center text-muted-foreground">
                   {customEmpty ?? i18n.emptyText}
                 </TableCell>
               </TableRow>
-            );
+            )
           })()
         : isInitialLoading
           ? SKELETON_ROW_KEYS.map((key) => (
@@ -364,7 +360,7 @@ export function DataTableTable<TData>({
             ? dragSortRows
             : canVirtualize
               ? virtualizedRows
-              : (groupedRows ?? regularRows);
+              : (groupedRows ?? regularRows)
 
   return (
     <div
@@ -515,5 +511,5 @@ export function DataTableTable<TData>({
         </div>
       )}
     </div>
-  );
+  )
 }

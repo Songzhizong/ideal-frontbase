@@ -1,6 +1,6 @@
 {
-	"name": "@ideal-frontbase/hooks-core",
-	"private": true,
-	"version": "0.1.0",
-	"type": "module"
+  "name": "@ideal-frontbase/hooks-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module"
 }

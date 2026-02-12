@@ -1,6 +1,6 @@
 import type * as React from "react"
-import type { Permission } from "./types"
 import { useAuthStore } from "./auth-store"
+import type { Permission } from "./types"
 
 interface PermissionGateProps {
   permission: Permission | Permission[]

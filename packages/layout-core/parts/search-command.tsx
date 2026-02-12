@@ -245,20 +245,24 @@ export function SearchCommand({
                     onFocus={() => setSelectedIndex(index)}
                   >
                     <span className="flex size-5 shrink-0 items-center justify-center text-muted-foreground">
-                      {Icon ? <Icon className="size-4" /> : <span className="size-1.5 rounded-full bg-current" />}
+                      {Icon ? (
+                        <Icon className="size-4" />
+                      ) : (
+                        <span className="size-1.5 rounded-full bg-current" />
+                      )}
                     </span>
 
                     <span className="min-w-0 flex-1 truncate text-sm font-medium">
                       {item.hierarchyTitle}
                     </span>
-                    <span className="max-w-44 truncate text-xs text-muted-foreground">{item.to}</span>
+                    <span className="max-w-44 truncate text-xs text-muted-foreground">
+                      {item.to}
+                    </span>
                   </button>
                 )
               })
             ) : (
-              <div className="py-7 text-center text-sm text-muted-foreground">
-                未找到匹配的菜单
-              </div>
+              <div className="py-7 text-center text-sm text-muted-foreground">未找到匹配的菜单</div>
             )}
           </div>
         </div>

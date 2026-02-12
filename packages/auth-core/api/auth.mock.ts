@@ -1,6 +1,6 @@
 import { delay, HttpResponse, http } from "msw"
-import { LoginResponseType } from "./login"
 import { mockRegistry } from "@/packages/mock-core"
+import { LoginResponseType } from "./login"
 
 export const authHandlers = [
   // Check Captcha

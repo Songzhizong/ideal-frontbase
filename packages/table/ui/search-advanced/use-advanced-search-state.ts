@@ -211,7 +211,9 @@ export function useAdvancedSearchState<TFilterSchema>({
     if (nextValue === "") {
       setFilter(
         activeField.key,
-        getClearedSearchValue(filtersState[activeField.key]) as TFilterSchema[typeof activeField.key],
+        getClearedSearchValue(
+          filtersState[activeField.key],
+        ) as TFilterSchema[typeof activeField.key],
       )
       resetAdvancedDraft("")
       return

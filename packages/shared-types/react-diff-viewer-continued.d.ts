@@ -1,5 +1,5 @@
 declare module "react-diff-viewer-continued" {
-  import type React from "react"
+  import type * as React from "react"
   import type { ReactNode } from "react"
 
   export enum DiffMethod {

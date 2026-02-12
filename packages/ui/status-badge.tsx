@@ -1,6 +1,6 @@
 import type * as React from "react"
-import { Badge } from "./badge"
 import { cn } from "@/packages/ui-utils"
+import { Badge } from "./badge"
 
 export type StatusBadgeTone = "success" | "warning" | "error" | "info" | "neutral"
 export type StatusBadgeVariant = "subtle" | "solid"

@@ -1,6 +1,6 @@
 import { useMemo } from "react"
-import type { Permission } from "./types"
 import { useAuthStore } from "./auth-store"
+import type { Permission } from "./types"
 
 /**
  * 性能优化的权限检查 Hook

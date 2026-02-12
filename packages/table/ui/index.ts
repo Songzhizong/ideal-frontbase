@@ -1,7 +1,5 @@
 export type { DataTableActiveFiltersProps } from "./active-filters"
 export { DataTableActiveFilters } from "./active-filters"
-export type { DataTableColumnToggleProps } from "./column-toggle"
-export { DataTableColumnToggle } from "./column-toggle"
 export type {
   DataTableIndicatorItem,
   DataTableIndicatorListProps,
@@ -23,6 +21,8 @@ export {
   DataTableTimeMetaCell,
   DataTableUserIdentityCell,
 } from "./cells"
+export type { DataTableColumnToggleProps } from "./column-toggle"
+export { DataTableColumnToggle } from "./column-toggle"
 export type { DataTableI18n, DataTableI18nOverrides } from "./config"
 export { DataTableConfigProvider } from "./config"
 export type { DataTableLayoutOptions, DataTableVariant } from "./context"
@@ -39,10 +39,10 @@ export { DataTableFilterItem } from "./filter-item"
 export { DataTablePagination } from "./pagination"
 export type { DataTablePresetProps, DataTablePresetQueryProps } from "./preset"
 export { DataTablePreset } from "./preset"
-export type { CrudQueryPresetOptions } from "./query-preset"
-export { createCrudQueryPreset } from "./query-preset"
 export type { DataTableQueryPanelProps } from "./query-panel"
 export { DataTableQueryPanel } from "./query-panel"
+export type { CrudQueryPresetOptions } from "./query-preset"
+export { createCrudQueryPreset } from "./query-preset"
 export { DataTableRoot } from "./root"
 export type { DataTableSearchProps } from "./search"
 export { DataTableSearch } from "./search"

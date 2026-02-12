@@ -14,39 +14,40 @@ interface DataTableVariantCssVariables {
   cellPaddingYComfortable: string
 }
 
-const DATA_TABLE_VARIANT_CSS_VARIABLES: Readonly<Record<DataTableVariant, DataTableVariantCssVariables>> =
-  {
-    default: {
-      headerForeground: "var(--color-table-header-fg-default)",
-      rowHoverBackground: "var(--color-table-row-hover-default)",
-      rowSelectedBackground: "var(--color-table-row-selected-default)",
-      headHeight: "var(--spacing-table-head-height-default)",
-      cellPaddingX: "var(--spacing-table-cell-x-default)",
-      cellPaddingYBase: "var(--spacing-table-cell-py-compact-default)",
-      cellPaddingYCompact: "var(--spacing-table-cell-py-compact-default)",
-      cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-default)",
-    },
-    subtle: {
-      headerForeground: "var(--color-table-header-fg-subtle)",
-      rowHoverBackground: "var(--color-table-row-hover-subtle)",
-      rowSelectedBackground: "var(--color-table-row-selected-subtle)",
-      headHeight: "var(--spacing-table-head-height-subtle)",
-      cellPaddingX: "var(--spacing-table-cell-x-subtle)",
-      cellPaddingYBase: "var(--spacing-table-cell-py-compact-subtle)",
-      cellPaddingYCompact: "var(--spacing-table-cell-py-compact-subtle)",
-      cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-subtle)",
-    },
-    dense: {
-      headerForeground: "var(--color-table-header-fg-dense)",
-      rowHoverBackground: "var(--color-table-row-hover-dense)",
-      rowSelectedBackground: "var(--color-table-row-selected-dense)",
-      headHeight: "var(--spacing-table-head-height-dense)",
-      cellPaddingX: "var(--spacing-table-cell-x-dense)",
-      cellPaddingYBase: "var(--spacing-table-cell-py-compact-dense)",
-      cellPaddingYCompact: "var(--spacing-table-cell-py-compact-dense)",
-      cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-dense)",
-    },
-  }
+const DATA_TABLE_VARIANT_CSS_VARIABLES: Readonly<
+  Record<DataTableVariant, DataTableVariantCssVariables>
+> = {
+  default: {
+    headerForeground: "var(--color-table-header-fg-default)",
+    rowHoverBackground: "var(--color-table-row-hover-default)",
+    rowSelectedBackground: "var(--color-table-row-selected-default)",
+    headHeight: "var(--spacing-table-head-height-default)",
+    cellPaddingX: "var(--spacing-table-cell-x-default)",
+    cellPaddingYBase: "var(--spacing-table-cell-py-compact-default)",
+    cellPaddingYCompact: "var(--spacing-table-cell-py-compact-default)",
+    cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-default)",
+  },
+  subtle: {
+    headerForeground: "var(--color-table-header-fg-subtle)",
+    rowHoverBackground: "var(--color-table-row-hover-subtle)",
+    rowSelectedBackground: "var(--color-table-row-selected-subtle)",
+    headHeight: "var(--spacing-table-head-height-subtle)",
+    cellPaddingX: "var(--spacing-table-cell-x-subtle)",
+    cellPaddingYBase: "var(--spacing-table-cell-py-compact-subtle)",
+    cellPaddingYCompact: "var(--spacing-table-cell-py-compact-subtle)",
+    cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-subtle)",
+  },
+  dense: {
+    headerForeground: "var(--color-table-header-fg-dense)",
+    rowHoverBackground: "var(--color-table-row-hover-dense)",
+    rowSelectedBackground: "var(--color-table-row-selected-dense)",
+    headHeight: "var(--spacing-table-head-height-dense)",
+    cellPaddingX: "var(--spacing-table-cell-x-dense)",
+    cellPaddingYBase: "var(--spacing-table-cell-py-compact-dense)",
+    cellPaddingYCompact: "var(--spacing-table-cell-py-compact-dense)",
+    cellPaddingYComfortable: "var(--spacing-table-cell-py-comfortable-dense)",
+  },
+}
 
 export interface DataTableRootProps<TData, TFilterSchema> {
   dt: DataTableInstance<TData, TFilterSchema>

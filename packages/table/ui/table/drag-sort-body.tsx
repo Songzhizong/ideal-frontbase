@@ -13,11 +13,11 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-
 import { flexRender, type Row } from "@tanstack/react-table"
 import type { CSSProperties, ReactElement, ReactNode } from "react"
 import { useState } from "react"
+import { DataTableDropIndicator } from "@/packages/table"
 import { Table, TableBody, TableCell, TableRow } from "@/packages/ui/table"
 import { cn } from "@/packages/ui-utils"
 import type { DataTableInstance } from "../../core"
 import { DataTableDragSortRowProvider } from "../drag-handle"
-import { DataTableDropIndicator } from "@/packages/table"
 import {
   type DragSortDropPosition,
   getParentRowId,

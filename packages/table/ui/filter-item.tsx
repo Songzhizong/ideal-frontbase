@@ -10,13 +10,7 @@ import {
 } from "@/packages/ui/dropdown-menu"
 import { Input } from "@/packages/ui/input"
 import { Label } from "@/packages/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/packages/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/ui/select"
 import { Switch } from "@/packages/ui/switch"
 import { cn } from "@/packages/ui-utils"
 import type { FilterDefinition } from "../core"

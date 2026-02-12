@@ -7,12 +7,7 @@ import { filterNavByPermission, flattenNavGroups } from "./nav-utils"
 import { AppSidebar } from "./parts/app-sidebar"
 import { Header } from "./parts/header"
 import { SearchCommand } from "./parts/search-command"
-import type {
-  LayoutIcon,
-  LayoutNavGroup,
-  LayoutNavItem,
-  LayoutPermissionChecker,
-} from "./types"
+import type { LayoutIcon, LayoutNavGroup, LayoutNavItem, LayoutPermissionChecker } from "./types"
 
 interface BaseLayoutProps {
   children: React.ReactNode

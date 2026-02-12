@@ -59,7 +59,9 @@ export function DataTableUserIdentityCell({
       </Avatar>
       <div className="min-w-0 flex flex-col justify-center">
         <div className="flex items-center gap-1.5">
-          <span className="truncate text-sm font-medium leading-tight text-foreground/90">{name}</span>
+          <span className="truncate text-sm font-medium leading-tight text-foreground/90">
+            {name}
+          </span>
           {verified ? <BadgeCheck className="size-4 shrink-0 text-primary" /> : null}
         </div>
         {hasRenderableValue(subtext) ? (
@@ -286,7 +288,9 @@ export function DataTableStatusPill({
         className,
       )}
     >
-      {showDot ? <span className={cn("mr-1.5 size-1.5 rounded-full", STATUS_DOT_CLASS[tone])} /> : null}
+      {showDot ? (
+        <span className={cn("mr-1.5 size-1.5 rounded-full", STATUS_DOT_CLASS[tone])} />
+      ) : null}
       {label}
     </Badge>
   )
