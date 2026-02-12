@@ -1,7 +1,6 @@
 import { AlertTriangle, Copy, RefreshCcw, RotateCcw, Square } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
-import { ContentLayout } from "@/components/content-layout"
 import { buildProjectPath } from "@/components/workspace/workspace-context"
 import {
   EmptyState,
@@ -10,6 +9,7 @@ import {
   LogViewer,
   StatusBadge,
 } from "@/features/shared/components"
+import { ContentLayout } from "@/packages/layout-core"
 import { BaseLink, useBaseNavigate } from "@/packages/platform-router"
 import { Button } from "@/packages/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/packages/ui/table"

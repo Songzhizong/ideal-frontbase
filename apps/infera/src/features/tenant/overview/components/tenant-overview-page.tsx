@@ -1,6 +1,5 @@
 import { AlertTriangle, Coins, FolderKanban, RefreshCcw, Server } from "lucide-react"
 import * as React from "react"
-import { ContentLayout } from "@/components/content-layout"
 import { EmptyState, ErrorState } from "@/features/shared/components"
 import {
   TenantOverviewLoadingState,
@@ -8,6 +7,7 @@ import {
   TenantTopProjectsTable,
   useTenantOverviewQuery,
 } from "@/features/tenant/overview"
+import { ContentLayout } from "@/packages/layout-core"
 import { Button } from "@/packages/ui/button"
 import type { TenantOverviewRange } from "../types/tenant-overview"
 import { formatCurrency, formatInteger } from "../utils/tenant-overview-formatters"

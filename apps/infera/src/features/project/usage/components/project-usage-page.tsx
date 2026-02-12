@@ -11,9 +11,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { ContentLayout } from "@/components/content-layout"
 import { buildProjectPath } from "@/components/workspace/workspace-context"
 import { EmptyState, ErrorState } from "@/features/shared/components"
+import { ContentLayout } from "@/packages/layout-core"
 import { useBaseNavigate } from "@/packages/platform-router"
 import { Button } from "@/packages/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/packages/ui/card"

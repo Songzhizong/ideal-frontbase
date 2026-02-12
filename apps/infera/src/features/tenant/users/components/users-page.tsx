@@ -1,9 +1,9 @@
 import { RefreshCw } from "lucide-react"
 import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { ContentLayout } from "@/components/content-layout"
 import type { UserManagementTableFilters } from "@/features/tenant/users"
 import { useConfirm } from "@/hooks"
+import { ContentLayout } from "@/packages/layout-core"
 import {
   createCrudQueryPreset,
   DataTablePreset,

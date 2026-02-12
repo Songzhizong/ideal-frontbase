@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm dev:app",
     "dev:app": "node scripts/run-turbo-for-apps.mjs dev",
-    "dev:admin": "node scripts/run-turbo-for-apps.mjs dev --app=admin",
+    "dev:nexus": "node scripts/run-turbo-for-apps.mjs dev --app=nexus",
     "dev:infera": "node scripts/run-turbo-for-apps.mjs dev --app=infera",
     "dev:all": "node scripts/run-turbo-for-apps.mjs dev --all --parallel",
     "build": "node scripts/run-turbo-for-apps.mjs build --all",

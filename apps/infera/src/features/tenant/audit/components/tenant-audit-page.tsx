@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { ContentLayout } from "@/components/content-layout"
 import { EmptyState, ErrorState } from "@/features/shared/components"
+import { ContentLayout } from "@/packages/layout-core"
 import { Skeleton } from "@/packages/ui/skeleton"
 import { useTenantAuditLogsQuery } from "../hooks"
 import type { TenantAuditTableFilters } from "../types/tenant-audit"

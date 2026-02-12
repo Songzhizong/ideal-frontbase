@@ -1,7 +1,6 @@
 import { Funnel, KeyRound, RefreshCcw } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
-import { ContentLayout } from "@/components/content-layout"
 import { buildProjectPath } from "@/components/workspace/workspace-context"
 import {
   CopySecretOnceDialog,
@@ -10,6 +9,7 @@ import {
   ErrorState,
   IdBadge,
 } from "@/features/shared/components"
+import { ContentLayout } from "@/packages/layout-core"
 import { BaseLink } from "@/packages/platform-router"
 import { Badge } from "@/packages/ui/badge"
 import { Button } from "@/packages/ui/button"

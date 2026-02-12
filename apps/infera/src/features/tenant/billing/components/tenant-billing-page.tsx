@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ContentLayout } from "@/components/content-layout"
+import { ContentLayout } from "@/packages/layout-core"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/packages/ui/tabs"
 import { TenantCostAllocationTab } from "./tenant-cost-allocation-tab"
 import { TenantInvoicesTab } from "./tenant-invoices-tab"
