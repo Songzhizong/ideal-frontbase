@@ -78,6 +78,7 @@ const ACTION_CONFIGS = [
 ]
 
 const USERS = [
+  { id: "1", account: "copilot", name: "Github Copilot" },
   { id: "u-001", account: "admin", name: "系统管理员" },
   { id: "u-002", account: "zhangsan", name: "张三" },
   { id: "u-003", account: "lisi", name: "李四" },
@@ -115,7 +116,7 @@ const allMockLogs: Api.OperationLog.SimpleLog[] = Array.from({ length: 100 }).ma
     userId: user.id,
     userDisplayName: user.name,
     userAccount: user.account,
-    tenantId: "t-001",
+    tenantId: "1",
     traceId: `trace-${Math.random().toString(36).substring(2, 10)}`,
     containerId: null,
     originalContainerId: null,
