@@ -266,12 +266,15 @@ export function useSelectionFeature<TData, TFilterSchema>(args: {
     }
   }, [enabled, mode, rowSelection, crossPageSelection])
 
+  const selectedRows = args.rows
+  const selectedRowsGetRowId = args.getRowId
+  const selectedRowsGetSubRows = args.getSubRows
   const selectedRowsCurrentPage = useMemo(() => {
     const selected = getSelectedIds(rowSelection)
     if (selected.size === 0) return []
-    if (!args.getSubRows) {
-      return args.rows.filter((row, index) => {
-        const rowId = args.getRowId ? args.getRowId(row) : String(index)
+    if (!selectedRowsGetSubRows) {
+      return selectedRows.filter((row, index) => {
+        const rowId = selectedRowsGetRowId ? selectedRowsGetRowId(row) : String(index)
         return selected.has(rowId)
       })
     }
@@ -279,23 +282,23 @@ export function useSelectionFeature<TData, TFilterSchema>(args: {
     const result: TData[] = []
     const walk = (rows: TData[], parentId: string | null) => {
       rows.forEach((row, index) => {
-        const rowId = args.getRowId
-          ? args.getRowId(row)
+        const rowId = selectedRowsGetRowId
+          ? selectedRowsGetRowId(row)
           : parentId
             ? `${parentId}.${index}`
             : String(index)
         if (selected.has(rowId)) {
           result.push(row)
         }
-        const children = args.getSubRows?.(row)
+        const children = selectedRowsGetSubRows?.(row)
         if (children && children.length > 0) {
           walk(children, rowId)
         }
       })
     }
-    walk(args.rows, null)
+    walk(selectedRows, null)
     return result
-  }, [args.rows, args.getRowId, args.getSubRows, rowSelection])
+  }, [selectedRows, selectedRowsGetRowId, selectedRowsGetSubRows, rowSelection])
 
   const selection: DataTableSelection<TData> = useStableObject(
     useMemo(() => {

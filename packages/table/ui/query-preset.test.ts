@@ -8,14 +8,14 @@ type Filters = {
   role: string | null
 }
 
-const STATUS_FILTER: FilterDefinition<Filters, "status"> = {
+const STATUS_FILTER: FilterDefinition<Filters, keyof Filters> = {
   key: "status",
   label: "状态",
   type: "select",
   options: [],
 }
 
-const ROLE_FILTER: FilterDefinition<Filters, "role"> = {
+const ROLE_FILTER: FilterDefinition<Filters, keyof Filters> = {
   key: "role",
   label: "角色",
   type: "select",
@@ -39,7 +39,10 @@ describe("createCrudQueryPreset", () => {
       advancedFilters: [ROLE_FILTER, STATUS_FILTER],
     })
 
-    expect(query.activeFilters.map((filter) => String(filter.key))).toEqual(["status", "role"])
+    expect((query.activeFilters ?? []).map((filter) => String(filter.key))).toEqual([
+      "status",
+      "role",
+    ])
   })
 
   it("允许显式覆盖 search 与 activeFilters", () => {
@@ -52,7 +55,7 @@ describe("createCrudQueryPreset", () => {
     })
 
     expect(query.search).toBe(false)
-    expect(query.activeFilters.map((filter) => String(filter.key))).toEqual(["role"])
+    expect((query.activeFilters ?? []).map((filter) => String(filter.key))).toEqual(["role"])
     expect(query.showActiveFilters).toBe(false)
   })
 })

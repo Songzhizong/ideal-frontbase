@@ -118,7 +118,6 @@ export function LoginPage() {
                   desc: "签名直连分发系统，确保模型从存储安全直达算力节点，避开流量瓶颈。",
                 },
               ].map((feature, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: Static list
                 <div key={index} className="flex items-start gap-4">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2" />
                   <div>

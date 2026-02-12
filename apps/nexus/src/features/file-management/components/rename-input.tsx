@@ -35,7 +35,6 @@ export function RenameInput({
     el.style.height = `${el.scrollHeight}px`
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Reset refs on defaultValue change
   useEffect(() => {
     mountedAtRef.current = Date.now()
     hasEditedRef.current = false
@@ -57,7 +56,6 @@ export function RenameInput({
     return () => cancelAnimationFrame(rafId)
   }, [defaultValue])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Update height on value change
   useLayoutEffect(() => {
     if (!multiline) return
     adjustTextareaHeight()

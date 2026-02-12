@@ -118,7 +118,6 @@ export function LoginPage() {
                   desc: "按项目 / 服务 / API Key 精细计量与预算控制",
                 },
               ].map((feature, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: Static list
                 <div key={index} className="flex items-start gap-4">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2" />
                   <div>

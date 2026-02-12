@@ -23,30 +23,41 @@ export function useTableBodyRows<TData>(args: {
   virtualizedRows: ReactElement[] | null
   summaryCells: ReactNode[] | null
 } {
+  const {
+    rows,
+    colSpan,
+    rowClassName,
+    cellDensityClass,
+    canVirtualize,
+    wrapperRef,
+    virtualizationMeta,
+    analyticsMeta,
+    renderDataRow,
+    visibleLeafColumns,
+  } = args
+  const { rowHeight, overscan, mode, loadMore, loadMoreOffset } = virtualizationMeta
+  const { groupBy, groupLabel, summary } = analyticsMeta
+
   const [virtualWindow, setVirtualWindow] = useState(() => ({
     start: 0,
-    end: args.rows.length,
+    end: rows.length,
   }))
   const loadingMoreRef = useRef(false)
   const lastLoadMoreRef = useRef<{ at: number; rowCount: number; scrollTop: number } | null>(null)
 
   useEffect(() => {
-    if (!args.canVirtualize) {
+    if (!canVirtualize) {
       loadingMoreRef.current = false
       lastLoadMoreRef.current = null
       setVirtualWindow((prev) =>
-        prev.start === 0 && prev.end === args.rows.length
-          ? prev
-          : { start: 0, end: args.rows.length },
+        prev.start === 0 && prev.end === rows.length ? prev : { start: 0, end: rows.length },
       )
       return
     }
-    const root = args.wrapperRef.current
+    const root = wrapperRef.current
     if (!root) return
 
-    const rowCount = args.rows.length
-    const rowHeight = args.virtualizationMeta.rowHeight
-    const overscan = args.virtualizationMeta.overscan
+    const rowCount = rows.length
 
     const updateWindow = () => {
       const viewportHeight = root.clientHeight
@@ -55,13 +66,9 @@ export function useTableBodyRows<TData>(args: {
       const end = Math.min(rowCount, Math.ceil((scrollTop + viewportHeight) / rowHeight) + overscan)
       setVirtualWindow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }))
 
-      if (
-        args.virtualizationMeta.mode === "infinite" &&
-        args.virtualizationMeta.loadMore &&
-        !loadingMoreRef.current
-      ) {
+      if (mode === "infinite" && loadMore && !loadingMoreRef.current) {
         const totalHeight = rowCount * rowHeight
-        if (scrollTop + viewportHeight >= totalHeight - args.virtualizationMeta.loadMoreOffset) {
+        if (scrollTop + viewportHeight >= totalHeight - loadMoreOffset) {
           const now = Date.now()
           const last = lastLoadMoreRef.current
           const passedCooldown = !last || now - last.at >= LOAD_MORE_COOLDOWN_MS
@@ -76,7 +83,7 @@ export function useTableBodyRows<TData>(args: {
             rowCount,
             scrollTop,
           }
-          Promise.resolve(args.virtualizationMeta.loadMore()).finally(() => {
+          Promise.resolve(loadMore()).finally(() => {
             loadingMoreRef.current = false
           })
         }
@@ -90,84 +97,60 @@ export function useTableBodyRows<TData>(args: {
       root.removeEventListener("scroll", updateWindow)
       window.removeEventListener("resize", updateWindow)
     }
-  }, [
-    args.canVirtualize,
-    args.rows.length,
-    args.wrapperRef,
-    args.virtualizationMeta.rowHeight,
-    args.virtualizationMeta.overscan,
-    args.virtualizationMeta.mode,
-    args.virtualizationMeta.loadMore,
-    args.virtualizationMeta.loadMoreOffset,
-  ])
+  }, [canVirtualize, rows.length, wrapperRef, rowHeight, overscan, mode, loadMore, loadMoreOffset])
 
   const groupedRows = useMemo(() => {
-    if (!args.analyticsMeta.groupBy) return null
+    if (!groupBy) return null
     const groups = new Map<string, Array<Row<TData>>>()
-    for (const row of args.rows) {
-      const key = args.analyticsMeta.groupBy(row.original as TData)
+    for (const row of rows) {
+      const key = groupBy(row.original as TData)
       if (!groups.has(key)) groups.set(key, [])
       groups.get(key)?.push(row)
     }
     return Array.from(groups.entries()).flatMap(([group, rows]) => {
-      const label = args.analyticsMeta.groupLabel
-        ? args.analyticsMeta.groupLabel({ group, count: rows.length })
+      const label = groupLabel
+        ? groupLabel({ group, count: rows.length })
         : `${group} (${rows.length})`
       const rowsWithHeader: ReactElement[] = [
         <TableRow
           key={`__group__${group}`}
-          className={cn(args.rowClassName, "bg-muted/30 hover:bg-muted/40")}
+          className={cn(rowClassName, "bg-muted/30 hover:bg-muted/40")}
         >
           <TableCell
-            colSpan={args.colSpan}
-            className={cn("text-xs font-medium text-muted-foreground", args.cellDensityClass)}
+            colSpan={colSpan}
+            className={cn("text-xs font-medium text-muted-foreground", cellDensityClass)}
           >
             {label}
           </TableCell>
         </TableRow>,
       ]
-      rowsWithHeader.push(...rows.flatMap((row) => args.renderDataRow(row)))
+      rowsWithHeader.push(...rows.flatMap((row) => renderDataRow(row)))
       return rowsWithHeader
     })
-  }, [
-    args.analyticsMeta.groupBy,
-    args.analyticsMeta.groupLabel,
-    args.rows,
-    args.rowClassName,
-    args.colSpan,
-    args.cellDensityClass,
-    args.renderDataRow,
-  ])
+  }, [groupBy, groupLabel, rows, rowClassName, colSpan, cellDensityClass, renderDataRow])
 
   const virtualizedRows = useMemo(() => {
-    if (!args.canVirtualize) return null
-    const totalRows = args.rows.length
+    if (!canVirtualize) return null
+    const totalRows = rows.length
     const start = Math.min(totalRows, virtualWindow.start)
     const end = Math.min(totalRows, Math.max(start, virtualWindow.end))
-    const topSpacerHeight = start * args.virtualizationMeta.rowHeight
-    const bottomSpacerHeight = Math.max(0, (totalRows - end) * args.virtualizationMeta.rowHeight)
-    const visibleRows = args.rows.slice(start, end).flatMap((row) => args.renderDataRow(row))
+    const topSpacerHeight = start * rowHeight
+    const bottomSpacerHeight = Math.max(0, (totalRows - end) * rowHeight)
+    const visibleRows = rows.slice(start, end).flatMap((row) => renderDataRow(row))
 
     const spacerRows: ReactElement[] = []
     if (topSpacerHeight > 0) {
       spacerRows.push(
-        <TableRow key="__virtual_top__" className={cn(args.rowClassName, "hover:bg-transparent")}>
-          <TableCell
-            colSpan={args.colSpan}
-            style={{ height: `${topSpacerHeight}px` }}
-            className="p-0"
-          />
+        <TableRow key="__virtual_top__" className={cn(rowClassName, "hover:bg-transparent")}>
+          <TableCell colSpan={colSpan} style={{ height: `${topSpacerHeight}px` }} className="p-0" />
         </TableRow>,
       )
     }
     if (bottomSpacerHeight > 0) {
       spacerRows.push(
-        <TableRow
-          key="__virtual_bottom__"
-          className={cn(args.rowClassName, "hover:bg-transparent")}
-        >
+        <TableRow key="__virtual_bottom__" className={cn(rowClassName, "hover:bg-transparent")}>
           <TableCell
-            colSpan={args.colSpan}
+            colSpan={colSpan}
             style={{ height: `${bottomSpacerHeight}px` }}
             className="p-0"
           />
@@ -180,29 +163,28 @@ export function useTableBodyRows<TData>(args: {
     if (spacerRows.length === 1) return [...visibleRows, ...spacerRows]
     return [spacerRows[0] as ReactElement, ...visibleRows, spacerRows[1] as ReactElement]
   }, [
-    args.canVirtualize,
-    args.rows,
-    args.virtualizationMeta.rowHeight,
-    args.rowClassName,
-    args.colSpan,
-    args.renderDataRow,
+    canVirtualize,
+    rows,
+    rowHeight,
+    rowClassName,
+    colSpan,
+    renderDataRow,
     virtualWindow.end,
     virtualWindow.start,
   ])
 
   const summaryCells = useMemo(() => {
-    if (!args.analyticsMeta.summary) return null
-    const rows = args.rows.map((row) => row.original as TData)
-    const values = args.analyticsMeta.summary.values
-    const labelColumnId =
-      args.analyticsMeta.summary.labelColumnId ?? args.visibleLeafColumns[0]?.id ?? null
-    return args.visibleLeafColumns.map((column) => {
+    if (!summary) return null
+    const rowData = rows.map((row) => row.original as TData)
+    const values = summary.values
+    const labelColumnId = summary.labelColumnId ?? visibleLeafColumns[0]?.id ?? null
+    return visibleLeafColumns.map((column) => {
       const valueGetter = values[column.id]
-      if (valueGetter) return valueGetter(rows)
-      if (column.id === labelColumnId) return args.analyticsMeta.summary?.label ?? "汇总"
+      if (valueGetter) return valueGetter(rowData)
+      if (column.id === labelColumnId) return summary.label ?? "汇总"
       return null
     })
-  }, [args.analyticsMeta.summary, args.rows, args.visibleLeafColumns])
+  }, [summary, rows, visibleLeafColumns])
 
   return {
     groupedRows,

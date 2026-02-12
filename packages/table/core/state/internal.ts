@@ -72,6 +72,6 @@ export function stateInternal<TFilterSchema>(
         ? { searchKey: searchKeyRef.current }
         : {}),
     }),
-    [getSnapshot, setSnapshot, subscribe, options.searchKey],
+    [getSnapshot, setSnapshot, subscribe],
   )
 }

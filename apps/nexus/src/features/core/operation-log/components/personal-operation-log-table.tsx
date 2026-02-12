@@ -254,7 +254,6 @@ export function PersonalOperationLogTable({
     actionType: Api.ActionType | "all"
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Reset page when userId changes
   useEffect(() => {
     setPage(1)
   }, [setPage, userId])

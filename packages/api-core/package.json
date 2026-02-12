@@ -2,5 +2,15 @@
   "name": "@ideal-frontbase/api-core",
   "private": true,
   "version": "0.1.0",
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "ky": "^1.14.3"
+  }
 }

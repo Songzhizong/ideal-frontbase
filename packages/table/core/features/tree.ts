@@ -99,17 +99,20 @@ export function useTreeFeature<TData, TFilterSchema>(args: {
   const [expanded, setExpanded] = useState<ExpandedState>(() => ({}))
   const expandedRef = useRef(expanded)
   expandedRef.current = expanded
+  const featureGetSubRows = args.feature?.getSubRows
+  const featureLoadChildren = args.feature?.loadChildren
+  const treeGetRowId = args.getRowId
 
   const getSubRows = useCallback(
     (row: TData): TData[] | undefined => {
       if (!enabled) return undefined
-      if (args.feature?.getSubRows) return args.feature.getSubRows(row)
-      if (!args.feature?.loadChildren) return undefined
-      if (!args.getRowId) return undefined
-      const rowId = args.getRowId(row)
+      if (featureGetSubRows) return featureGetSubRows(row)
+      if (!featureLoadChildren) return undefined
+      if (!treeGetRowId) return undefined
+      const rowId = treeGetRowId(row)
       return childrenById[rowId]
     },
-    [enabled, args.feature?.getSubRows, args.feature?.loadChildren, args.getRowId, childrenById],
+    [enabled, featureGetSubRows, featureLoadChildren, treeGetRowId, childrenById],
   )
 
   useEffect(() => {

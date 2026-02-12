@@ -236,7 +236,6 @@ export function useFileUploadManager(options: UploadOptions) {
     }
   }, [startUpload])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Trigger processQueue on uploadTasks change
   useEffect(() => {
     processQueue()
   }, [processQueue, uploadTasks])
