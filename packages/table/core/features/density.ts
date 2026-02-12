@@ -29,7 +29,7 @@ export function useDensityFeature<TData, TFilterSchema>(args: {
   const storageKey = args.feature?.storageKey ?? ""
   const persistenceEnabled = enabled && storageKey.trim() !== ""
   const schemaVersion = args.feature?.schemaVersion ?? 1
-  const defaultDensity: DensityValue = args.feature?.default ?? "compact"
+  const defaultDensity: DensityValue = args.feature?.default ?? "comfortable"
 
   const {
     envelope,

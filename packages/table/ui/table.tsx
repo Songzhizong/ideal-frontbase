@@ -126,6 +126,20 @@ export function DataTableTable<TData>({
     !dt.tree.enabled &&
     !analyticsMeta.groupBy
 
+  const rowInteractiveClass =
+    variant === "subtle"
+      ? "group/row hover:!bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.12))] data-[state=selected]:!bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.22))]"
+      : variant === "dense"
+        ? "group/row hover:!bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.25))] data-[state=selected]:!bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.4))]"
+        : "group/row hover:!bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] data-[state=selected]:!bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]"
+
+  const pinnedCellInteractiveClass =
+    variant === "subtle"
+      ? "bg-card transition-colors group-hover/row:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.12))] group-data-[state=selected]/row:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.22))]"
+      : variant === "dense"
+        ? "bg-card transition-colors group-hover/row:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.25))] group-data-[state=selected]/row:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.4))]"
+        : "bg-card transition-colors group-hover/row:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] group-data-[state=selected]/row:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]"
+
   const renderCells = (row: Row<TData>) => {
     return row.getVisibleCells().map((cell) => {
       const pinned = cell.column.getIsPinned()
@@ -149,8 +163,7 @@ export function DataTableTable<TData>({
           }}
           className={cn(
             cellDensityClass,
-            isPinned &&
-              "bg-card transition-colors group-hover/row:bg-[color-mix(in_srgb,hsl(var(--muted))_30%,hsl(var(--card)))]",
+            isPinned && pinnedCellInteractiveClass,
             isBoundaryLeft &&
               "relative after:absolute after:inset-y-0 after:right-0 after:w-2 after:translate-x-full after:bg-linear-to-r after:from-border/50 after:to-transparent after:pointer-events-none",
             isBoundaryRight &&
@@ -186,13 +199,6 @@ export function DataTableTable<TData>({
   }
 
   const renderDataRow = (row: Row<TData>) => {
-    const rowInteractiveClass =
-      variant === "subtle"
-        ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.12))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.22))]"
-        : variant === "dense"
-          ? "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.25))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.4))]"
-          : "group/row hover:bg-[var(--dt-row-hover-bg,hsl(var(--muted)/0.2))] data-[state=selected]:bg-[var(--dt-row-selected-bg,hsl(var(--muted)/0.35))]"
-
     const baseRow = (
       <TableRow
         key={row.id}

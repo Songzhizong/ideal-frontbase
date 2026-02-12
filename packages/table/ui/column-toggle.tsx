@@ -48,6 +48,7 @@ export function DataTableColumnToggle({
   const hasColumns = columns.length > 0
   const allVisible = hasColumns ? columns.every((column) => column.getIsVisible()) : true
   const someVisible = hasColumns ? columns.some((column) => column.getIsVisible()) : false
+  const hasColumnVisibilityFeature = dt.meta.feature.columnVisibilityEnabled
   const hasPinning = dt.meta.feature.pinningEnabled
   const hasColumnOrder = dt.meta.feature.columnOrderEnabled
   const currentColumnOrder = dt.table.getState().columnOrder
@@ -70,6 +71,14 @@ export function DataTableColumnToggle({
     for (const column of rest) {
       column.toggleVisibility(false)
     }
+  }
+
+  const handleResetColumnVisibility = () => {
+    if (hasColumnVisibilityFeature) {
+      dt.actions.resetColumnVisibility()
+      return
+    }
+    dt.table.resetColumnVisibility()
   }
 
   const defaultTrigger = (
@@ -118,7 +127,7 @@ export function DataTableColumnToggle({
               variant="ghost"
               size="sm"
               className="h-7 px-2 text-xs"
-              onClick={() => dt.actions.resetColumnVisibility()}
+              onClick={handleResetColumnVisibility}
             >
               {i18n.columnToggle.resetText}
             </Button>

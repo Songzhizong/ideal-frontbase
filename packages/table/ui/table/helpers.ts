@@ -33,8 +33,8 @@ export function getMetaAlign(
 }
 
 export function getDensity(meta: unknown): "compact" | "comfortable" {
-  if (!isRecord(meta)) return "compact"
-  return meta.dtDensity === "comfortable" ? "comfortable" : "compact"
+  if (!isRecord(meta)) return "comfortable"
+  return meta.dtDensity === "compact" ? "compact" : "comfortable"
 }
 
 export function getTreeIndentSize(meta: unknown): number {

@@ -107,8 +107,8 @@ function formatIp(ip?: string | null) {
 
 export function TenantAuditPage({
   tenantId,
-  title = "租户审计日志",
-  description = "查看租户内所有用户与系统操作记录，支持按时间、状态和操作类型筛选。",
+  title = "安全审计看板",
+  description = "监控系统核心敏感操作，追溯每一次请求背后的来源与意图。",
   lockedProjectId,
 }: TenantAuditPageProps) {
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null)
@@ -378,7 +378,7 @@ export function TenantAuditPage({
     features: {
       density: {
         enabled: true,
-        default: "compact",
+        default: "comfortable",
         storageKey: `infera_tenant_audit_density_${tenantId}`,
       },
     },

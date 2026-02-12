@@ -74,6 +74,7 @@ export function DataTableViewOptions({
   const density = getDensity(dt.table.options.meta)
   const setDensity = getSetDensity(dt.table.options.meta)
   const hasDensity = Boolean(density && setDensity)
+  const hasColumnVisibilityFeature = dt.meta.feature.columnVisibilityEnabled
   const hasPinning = dt.meta.feature.pinningEnabled
   const hasColumnOrder = dt.meta.feature.columnOrderEnabled
 
@@ -97,6 +98,21 @@ export function DataTableViewOptions({
     if (!setDensity) return
     if (nextDensity !== "compact" && nextDensity !== "comfortable") return
     setDensity(nextDensity)
+  }
+
+  const handleResetColumnVisibility = () => {
+    if (hasColumnVisibilityFeature) {
+      dt.actions.resetColumnVisibility()
+      return
+    }
+    dt.table.resetColumnVisibility()
+  }
+
+  const handleResetAll = () => {
+    dt.actions.resetAll()
+    if (!hasColumnVisibilityFeature && hasColumns) {
+      dt.table.resetColumnVisibility()
+    }
   }
 
   const defaultTrigger = (
@@ -147,7 +163,7 @@ export function DataTableViewOptions({
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs"
-                onClick={() => dt.actions.resetColumnVisibility()}
+                onClick={handleResetColumnVisibility}
               >
                 {i18n.columnToggle.resetText}
               </Button>
@@ -190,7 +206,7 @@ export function DataTableViewOptions({
               </DropdownMenuItem>
             ) : null}
             {hasPinning || hasColumnOrder ? <DropdownMenuSeparator /> : null}
-            <DropdownMenuItem onSelect={() => dt.actions.resetAll()}>
+            <DropdownMenuItem onSelect={handleResetAll}>
               <RotateCcw className="h-4 w-4" />
               {i18n.viewOptions.resetAllText}
             </DropdownMenuItem>

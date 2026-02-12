@@ -206,7 +206,7 @@ export function UsersPage({ tenantId }: UsersPageProps) {
     features: {
       density: {
         enabled: true,
-        default: "compact",
+        default: "comfortable",
         storageKey: `infera_user_mgmt_density_${tenantId}`,
       },
       pinning: {
