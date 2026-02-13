@@ -112,6 +112,13 @@ export function AppSidebar({
   const [accordionOpenParentTo, setAccordionOpenParentTo] = React.useState<string | null>(
     activeChildParent?.to ?? null,
   )
+  const [expandedParentMap, setExpandedParentMap] = React.useState<Record<string, boolean>>(() => {
+    if (!activeChildParent) {
+      return {}
+    }
+
+    return { [activeChildParent.to]: true }
+  })
   const enableAccordion = menuAccordion && !isIconMode && !isDualMode
 
   const [dualPinned, setDualPinned] = React.useState(false)
@@ -153,6 +160,20 @@ export function AppSidebar({
     }
 
     setAccordionOpenParentTo(activeChildParent.to)
+  }, [activeChildParent, enableAccordion])
+
+  React.useEffect(() => {
+    if (enableAccordion || !activeChildParent) {
+      return
+    }
+
+    setExpandedParentMap((prev) => {
+      if (prev[activeChildParent.to]) {
+        return prev
+      }
+
+      return { ...prev, [activeChildParent.to]: true }
+    })
   }, [activeChildParent, enableAccordion])
 
   const openDualPanel = React.useCallback((item: ParentLayoutNavItem) => {
@@ -355,7 +376,10 @@ export function AppSidebar({
                           },
                         }
                       : {
-                          defaultOpen: isActive,
+                          open: expandedParentMap[item.to] ?? isActive,
+                          onOpenChange: (open: boolean) => {
+                            setExpandedParentMap((prev) => ({ ...prev, [item.to]: open }))
+                          },
                         }
 
                     if (isIconMode) {
