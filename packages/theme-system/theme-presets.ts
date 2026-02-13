@@ -24,7 +24,7 @@ export const defaultThemeSettings: ThemeConfig = {
   ui: {
     showBreadcrumb: true,
     showBreadcrumbIcon: true,
-    sidebarAccordion: true,
+    sidebarAccordion: false,
     pageAnimation: "slide-left",
     borderRadius: 16,
   },

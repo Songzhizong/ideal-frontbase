@@ -48,7 +48,7 @@ export function BaseLayout({
     select: (state) => state.location.pathname,
   })
 
-  const enableRouteRemount = pageAnimation !== "none" && !import.meta.env.DEV
+  const enableRouteRemount = pageAnimation !== "none"
   const [searchOpen, setSearchOpen] = React.useState(false)
 
   const primarySidebarGroups = React.useMemo(() => {
