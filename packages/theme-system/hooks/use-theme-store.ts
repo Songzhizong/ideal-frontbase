@@ -19,6 +19,7 @@ export interface ThemeStore extends ThemeConfig {
   setHeaderHeight: (height: number) => void
   setShowBreadcrumb: (show: boolean) => void
   setShowBreadcrumbIcon: (show: boolean) => void
+  setSidebarAccordion: (enabled: boolean) => void
   setBorderRadius: (radius: number) => void
   setPageAnimation: (
     animation: "none" | "fade" | "slide-left" | "slide-bottom" | "slide-top",
@@ -122,6 +123,11 @@ export const useThemeStore = create<ThemeStore>()(
       setShowBreadcrumbIcon: (showBreadcrumbIcon) =>
         set((state) => ({
           ui: { ...state.ui, showBreadcrumbIcon },
+        })),
+
+      setSidebarAccordion: (sidebarAccordion) =>
+        set((state) => ({
+          ui: { ...state.ui, sidebarAccordion },
         })),
 
       setBorderRadius: (borderRadius) =>

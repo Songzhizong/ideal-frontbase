@@ -271,6 +271,11 @@ export function ThemeSettingsContent({ store, modeImages }: ThemeSettingsContent
             max={96}
             onChange={store.setSidebarCollapsedWidth}
           />
+          <SwitchSetting
+            label="菜单手风琴模式"
+            checked={store.ui.sidebarAccordion}
+            onChange={store.setSidebarAccordion}
+          />
         </div>
       </Section>
 

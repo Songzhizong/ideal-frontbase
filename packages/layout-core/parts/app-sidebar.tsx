@@ -63,7 +63,7 @@ export function AppSidebar({
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
-  const { isMobile, state } = useSidebar()
+  const { isMobile, menuAccordion, state } = useSidebar()
 
   const iconOnly = !showLabel
   const isDualMode = collapsible === "none" && iconOnly
@@ -109,6 +109,11 @@ export function AppSidebar({
     return activeRouteItem
   }, [activeRouteItem])
 
+  const [accordionOpenParentTo, setAccordionOpenParentTo] = React.useState<string | null>(
+    activeChildParent?.to ?? null,
+  )
+  const enableAccordion = menuAccordion && !isIconMode && !isDualMode
+
   const [dualPinned, setDualPinned] = React.useState(false)
   const [dualPanelOpen, setDualPanelOpen] = React.useState(() => Boolean(activeChildParent))
   const [dualParentTo, setDualParentTo] = React.useState<string | null>(
@@ -141,6 +146,14 @@ export function AppSidebar({
     setDualParentTo(activeChildParent.to)
     setDualPanelOpen(true)
   }, [activeChildParent, isDualMode])
+
+  React.useEffect(() => {
+    if (!enableAccordion || !activeChildParent) {
+      return
+    }
+
+    setAccordionOpenParentTo(activeChildParent.to)
+  }, [activeChildParent, enableAccordion])
 
   const openDualPanel = React.useCallback((item: ParentLayoutNavItem) => {
     setDualParentTo(item.to)
@@ -334,6 +347,16 @@ export function AppSidebar({
                 {group.items.map((item) => {
                   if (hasChildren(item)) {
                     const isActive = isParentActive(item, pathname)
+                    const collapsibleProps = enableAccordion
+                      ? {
+                          open: accordionOpenParentTo === item.to,
+                          onOpenChange: (open: boolean) => {
+                            setAccordionOpenParentTo(open ? item.to : null)
+                          },
+                        }
+                      : {
+                          defaultOpen: isActive,
+                        }
 
                     if (isIconMode) {
                       return (
@@ -384,10 +407,10 @@ export function AppSidebar({
 
                     return (
                       <Collapsible
-                        key={item.title}
+                        key={`${item.title}-${enableAccordion ? "accordion" : "independent"}`}
                         asChild
-                        defaultOpen={isActive}
                         className="group/collapsible"
+                        {...collapsibleProps}
                       >
                         <SidebarMenuItem>
                           <CollapsibleTrigger asChild>
@@ -402,7 +425,7 @@ export function AppSidebar({
                               <ChevronRight className="ml-auto size-4 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                             </SidebarMenuButton>
                           </CollapsibleTrigger>
-                          <CollapsibleContent>
+                          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                             <SidebarMenuSub className="ml-8 mr-0 space-y-0.5 border-none px-0 py-0.5">
                               {item.children.map((subItem) => (
                                 <SidebarMenuSubItem key={subItem.title}>

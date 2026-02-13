@@ -42,6 +42,7 @@ export function BaseLayout({
   const sidebarCollapsedWidth = useThemeStore((state) => state.layout.sidebarCollapsedWidth)
   const containerWidth = useThemeStore((state) => state.layout.containerWidth)
   const pageAnimation = useThemeStore((state) => state.ui.pageAnimation)
+  const sidebarAccordion = useThemeStore((state) => state.ui.sidebarAccordion)
   const menuLayout = useThemeStore((state) => state.layout.menuLayout)
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -113,6 +114,7 @@ export function BaseLayout({
 
   return (
     <SidebarProvider
+      menuAccordion={sidebarAccordion}
       className="bg-transparent"
       style={
         {

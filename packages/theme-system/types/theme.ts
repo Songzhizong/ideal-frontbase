@@ -270,6 +270,7 @@ export interface ThemeConfig {
   ui: {
     showBreadcrumb: boolean
     showBreadcrumbIcon: boolean
+    sidebarAccordion: boolean
     pageAnimation: "none" | "fade" | "slide-left" | "slide-bottom" | "slide-top"
     borderRadius: number
   }

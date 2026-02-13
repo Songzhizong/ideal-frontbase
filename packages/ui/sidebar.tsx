@@ -24,6 +24,7 @@ type SidebarContextProps = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
+  menuAccordion: boolean
   toggleSidebar: () => void
 }
 
@@ -42,6 +43,7 @@ function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
+  menuAccordion = false,
   className,
   style,
   children,
@@ -50,6 +52,7 @@ function SidebarProvider({
   defaultOpen?: boolean
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  menuAccordion?: boolean
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
@@ -100,9 +103,10 @@ function SidebarProvider({
       isMobile,
       openMobile,
       setOpenMobile,
+      menuAccordion,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, toggleSidebar],
+    [state, open, setOpen, isMobile, openMobile, menuAccordion, toggleSidebar],
   )
 
   return (
