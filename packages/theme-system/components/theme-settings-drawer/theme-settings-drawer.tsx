@@ -38,7 +38,7 @@ export function ThemeSettingsDrawer({ modeImages }: ThemeSettingsDrawerProps) {
     navigator.clipboard.writeText(configStr).then(() => {
       toast.success("配置已复制到剪贴板", {
         description:
-          "请将其粘贴到 src/config/theme-presets.ts 文件中的 defaultThemeSettings 常量中。",
+          "请将其粘贴到 packages/theme-system/theme-presets.ts 文件中的 defaultThemeSettings 常量中。",
       })
     })
   }

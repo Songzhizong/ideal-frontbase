@@ -17,7 +17,7 @@ export const defaultThemeSettings: ThemeConfig = {
   layout: {
     menuLayout: "single",
     containerWidth: "fixed",
-    sidebarWidth: 230,
+    sidebarWidth: 200,
     sidebarCollapsedWidth: 64,
     headerHeight: 64,
   },
