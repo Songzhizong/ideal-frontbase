@@ -1,16 +1,5 @@
-import {
-  CircleAlert,
-  CircleCheck,
-  Copy,
-  Eye,
-  MapPin,
-  Plus,
-  RefreshCw,
-  RotateCcw,
-  Shield,
-  Timer,
-} from "lucide-react"
-import { parseAsInteger, parseAsStringLiteral } from "nuqs"
+import { CircleAlert, CircleCheck, Copy, Eye, MapPin, RefreshCw, Shield, Timer } from "lucide-react"
+import { parseAsInteger, parseAsString, parseAsStringLiteral } from "nuqs"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 import { OperationLogDetailDrawer } from "@/features/core/operation-log"
@@ -23,25 +12,16 @@ import { EmptyState } from "@/features/shared/components"
 import { ContentLayout } from "@/packages/layout-core"
 import {
   createColumnHelper,
-  createCrudQueryPreset,
+  createDataTableQueryPreset,
   DataTablePreset,
+  type DataTableQueryField,
   DataTableViewOptions,
-  type FilterDefinition,
   remote,
   stateUrl,
   useDataTable,
 } from "@/packages/table"
 import { Button } from "@/packages/ui/button"
 import { DateRangePicker } from "@/packages/ui/date-picker-rac"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/packages/ui/dropdown-menu"
 import { StatusBadge } from "@/packages/ui/status-badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/packages/ui/tooltip"
 import { cn } from "@/packages/ui-utils"
@@ -64,45 +44,62 @@ const SUCCESS_FILTER_VALUES = ["", "true", "false"] as const
 const ACTION_TYPE_FILTER_VALUES = ["", ...Object.values(Api.ActionType)] as const
 
 type TenantAuditTableFilters = {
+  keyword: string
   startTimeMs: number | null
   endTimeMs: number | null
   success: (typeof SUCCESS_FILTER_VALUES)[number]
   actionType: "" | Api.ActionType
 }
 
-const FILTER_FIELDS: Array<FilterDefinition<TenantAuditTableFilters>> = [
-  {
-    key: "success",
-    label: "状态",
-    type: "select",
-    placeholder: "状态",
-    options: [
-      { label: "全部", value: "" },
-      { label: "成功", value: "true" },
-      { label: "失败", value: "false" },
-    ],
-  },
-  {
-    key: "actionType",
-    label: "操作类型",
-    type: "select",
-    placeholder: "操作类型",
-    options: [
-      { label: "全部", value: "" },
-      ...actionTypeOptions
-        .filter((item) => item.value !== "all")
-        .map((item) => ({
-          label: item.label,
-          value: item.value as Api.ActionType,
-        })),
-    ],
-  },
-]
+type AuditTimeRangeValue = { from: Date | undefined; to: Date | undefined }
+type AuditQuickRangeValue = {
+  startTimeMs: number | null
+  endTimeMs: number | null
+}
 
 function formatIp(ip?: string | null) {
   if (!ip) return "--"
   if (ip === "0:0:0:0:0:0:0:1") return "127.0.0.1"
   return ip
+}
+
+function formatRangeDate(ms: number) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(new Date(ms))
+}
+
+function resolveAuditTimeRange(filters: TenantAuditTableFilters): AuditTimeRangeValue | undefined {
+  if (filters.startTimeMs == null && filters.endTimeMs == null) return undefined
+  return {
+    from: filters.startTimeMs != null ? new Date(filters.startTimeMs) : undefined,
+    to: filters.endTimeMs != null ? new Date(filters.endTimeMs) : undefined,
+  }
+}
+
+function resolveAuditTimeRangeUpdate(
+  value: unknown,
+): Pick<TenantAuditTableFilters, "startTimeMs" | "endTimeMs"> {
+  if (typeof value !== "object" || value === null) {
+    return {
+      startTimeMs: null,
+      endTimeMs: null,
+    }
+  }
+  const from = "from" in value && value.from instanceof Date ? value.from : undefined
+  const to = "to" in value && value.to instanceof Date ? value.to : undefined
+  if (!from) {
+    return {
+      startTimeMs: null,
+      endTimeMs: null,
+    }
+  }
+  return {
+    startTimeMs: from.getTime(),
+    endTimeMs: to ? new Date(to).setHours(23, 59, 59, 999) : null,
+  }
 }
 
 export function TenantAuditPage({
@@ -116,12 +113,14 @@ export function TenantAuditPage({
   const state = stateUrl({
     key: `infera_tenant_audit_${tenantId}`,
     parsers: {
+      keyword: parseAsString.withDefault(""),
       startTimeMs: parseAsInteger,
       endTimeMs: parseAsInteger,
       success: parseAsStringLiteral(SUCCESS_FILTER_VALUES).withDefault(""),
       actionType: parseAsStringLiteral(ACTION_TYPE_FILTER_VALUES).withDefault(""),
     },
     defaults: {
+      keyword: "",
       startTimeMs: null,
       endTimeMs: null,
       success: "",
@@ -181,13 +180,13 @@ export function TenantAuditPage({
           return (
             <div
               className={cn(
-                "flex min-w-0 items-start gap-3 border-l-2 border-l-transparent py-2 pl-2",
+                "flex min-w-0 items-center gap-3 border-l-2 border-l-transparent pl-2",
                 log.sensitive && "border-l-error",
               )}
             >
               <div
                 className={cn(
-                  "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full",
+                  "flex size-7 shrink-0 items-center justify-center rounded-full",
                   log.success ? "text-success" : "bg-error-subtle text-error-on-subtle",
                 )}
               >
@@ -261,7 +260,7 @@ export function TenantAuditPage({
           const log = info.row.original
           const formattedIp = formatIp(log.clientIp)
           return (
-            <div className="group flex items-center gap-1.5 py-1 text-xs text-muted-foreground/80">
+            <div className="group flex items-center gap-1.5 text-xs text-muted-foreground/80">
               <MapPin className="size-3 shrink-0 opacity-60" />
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -306,7 +305,7 @@ export function TenantAuditPage({
           return (
             <div
               className={cn(
-                "flex items-center gap-1.5 py-1 font-mono text-xs",
+                "flex items-center gap-1.5 font-mono text-xs",
                 duration > 800
                   ? "text-destructive"
                   : duration > 200
@@ -327,7 +326,7 @@ export function TenantAuditPage({
         cell: (info) => {
           const log = info.row.original
           return (
-            <div className="flex min-w-0 flex-col gap-1 py-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <span className="truncate text-sm font-medium text-foreground">
                 {log.userDisplayName || "未知用户"}
               </span>
@@ -345,7 +344,7 @@ export function TenantAuditPage({
         cell: (info) => {
           const log = info.row.original
           return (
-            <div className="mr-2 flex items-center justify-between gap-2 py-1">
+            <div className="mr-2 flex items-center justify-between gap-2">
               <div className="min-w-0 space-y-1">
                 <span className="block whitespace-nowrap text-sm font-semibold text-foreground">
                   {formatTimestampToDateTime(log.operationTime)}
@@ -384,7 +383,168 @@ export function TenantAuditPage({
     },
   })
 
-  const filterState = dt.filters.state
+  const queryFields = useMemo<Array<DataTableQueryField<TenantAuditTableFilters>>>(() => {
+    return [
+      {
+        id: "keyword",
+        label: "关键字",
+        kind: "text",
+        search: {
+          pickerVisible: false,
+        },
+        ui: {
+          panel: "hidden",
+        },
+        placeholder: "搜索操作名称、操作人、资源 ID（即将支持）",
+        binding: {
+          mode: "single",
+          key: "keyword",
+        },
+      },
+      {
+        id: "timeRange",
+        label: "时间范围",
+        kind: "custom",
+        binding: {
+          mode: "composite",
+          keys: ["startTimeMs", "endTimeMs"],
+          getValue: resolveAuditTimeRange,
+          setValue: (value) => resolveAuditTimeRangeUpdate(value),
+          clearValue: () => ({
+            startTimeMs: null,
+            endTimeMs: null,
+          }),
+          isEmpty: (value) => {
+            if (typeof value !== "object" || value === null) return true
+            const from = "from" in value ? value.from : undefined
+            const to = "to" in value ? value.to : undefined
+            return !(from instanceof Date) && !(to instanceof Date)
+          },
+        },
+        render: ({ value, setValue }) => (
+          <DateRangePicker
+            value={value as AuditTimeRangeValue | undefined}
+            onChange={(range) => {
+              setValue(range)
+            }}
+            className="w-fit"
+            triggerClassName="border-border/50 bg-muted/20 shadow-none hover:bg-muted/30"
+          />
+        ),
+        chip: {
+          formatValue: (value) => {
+            if (typeof value !== "object" || value === null) return ""
+            const from = "from" in value && value.from instanceof Date ? value.from : undefined
+            const to = "to" in value && value.to instanceof Date ? value.to : undefined
+            if (!from && !to) return ""
+            const startLabel = from ? formatRangeDate(from.getTime()) : "起始未设定"
+            const endLabel = to ? formatRangeDate(to.getTime()) : "至今"
+            return `${startLabel} - ${endLabel}`
+          },
+        },
+      },
+      {
+        id: "timeQuickPreset",
+        label: "快速时间",
+        kind: "custom",
+        ui: {
+          containerClassName: "min-w-fit",
+        },
+        binding: {
+          mode: "composite",
+          keys: ["startTimeMs", "endTimeMs"],
+          getValue: () => null,
+          setValue: (value) => {
+            if (typeof value !== "object" || value === null) {
+              return {
+                startTimeMs: null,
+                endTimeMs: null,
+              }
+            }
+            const next = value as Partial<AuditQuickRangeValue>
+            return {
+              startTimeMs: typeof next.startTimeMs === "number" ? next.startTimeMs : null,
+              endTimeMs: typeof next.endTimeMs === "number" ? next.endTimeMs : null,
+            }
+          },
+          clearValue: () => ({
+            startTimeMs: null,
+            endTimeMs: null,
+          }),
+          isEmpty: () => true,
+        },
+        render: ({ setValue }) => (
+          <div className="flex items-center gap-0.5 rounded-lg border border-border/40 bg-background p-0.5 shadow-sm">
+            {[
+              { label: "1h", value: 1 * 60 * 60 * 1000 },
+              { label: "1d", value: 24 * 60 * 60 * 1000 },
+              { label: "7d", value: 7 * 24 * 60 * 60 * 1000 },
+            ].map((item) => (
+              <Button
+                key={item.label}
+                variant="ghost"
+                size="sm"
+                className="h-7 w-8 px-0 text-[10px] font-medium hover:bg-muted"
+                onClick={() => {
+                  const end = Date.now()
+                  const start = end - item.value
+                  setValue({
+                    startTimeMs: start,
+                    endTimeMs: end,
+                  } satisfies AuditQuickRangeValue)
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        ),
+        chip: {
+          hidden: true,
+        },
+      },
+      {
+        id: "success",
+        label: "状态",
+        kind: "select",
+        ui: {
+          panel: "secondary",
+        },
+        placeholder: "状态",
+        binding: {
+          mode: "single",
+          key: "success",
+        },
+        options: [
+          { label: "全部", value: "" },
+          { label: "成功", value: "true" },
+          { label: "失败", value: "false" },
+        ],
+      },
+      {
+        id: "actionType",
+        label: "操作类型",
+        kind: "select",
+        ui: {
+          panel: "secondary",
+        },
+        placeholder: "操作类型",
+        binding: {
+          mode: "single",
+          key: "actionType",
+        },
+        options: [
+          { label: "全部", value: "" },
+          ...actionTypeOptions
+            .filter((item) => item.value !== "all")
+            .map((item) => ({
+              label: item.label,
+              value: item.value as Api.ActionType,
+            })),
+        ],
+      },
+    ]
+  }, [])
   const isRefreshing = dt.activity.isInitialLoading || dt.activity.isFetching
   const currentRows = dt.table.getRowModel().rows.map((row) => row.original)
   const auditStats = useMemo(() => {
@@ -420,11 +580,6 @@ export function TenantAuditPage({
       successRate,
     }
   }, [currentRows, dt.pagination.total])
-  const successLabel =
-    filterState.success === "" ? "状态" : filterState.success === "true" ? "成功" : "失败"
-  const actionTypeLabel =
-    actionTypeOptions.find((item) => item.value === filterState.actionType)?.label ?? "操作类型"
-
   return (
     <>
       <ContentLayout title={title} description={description} className="min-h-full">
@@ -444,177 +599,31 @@ export function TenantAuditPage({
             <DataTablePreset<Api.OperationLog.SimpleLog, TenantAuditTableFilters>
               dt={dt}
               layout={{ stickyQueryPanel: true, stickyHeader: true, stickyPagination: true }}
-              query={createCrudQueryPreset<TenantAuditTableFilters>({
-                search: false,
-                activeFilters: FILTER_FIELDS,
-                actions: (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <DateRangePicker
-                      value={
-                        filterState.startTimeMs
-                          ? {
-                              from: new Date(filterState.startTimeMs),
-                              to: filterState.endTimeMs
-                                ? new Date(filterState.endTimeMs)
-                                : undefined,
-                            }
-                          : undefined
-                      }
-                      onChange={(range) => {
-                        if (!range?.from) {
-                          dt.filters.setBatch({
-                            startTimeMs: null,
-                            endTimeMs: null,
-                          })
-                          return
-                        }
-
-                        dt.filters.setBatch({
-                          startTimeMs: range.from.getTime(),
-                          endTimeMs: range.to ? new Date(range.to).setHours(23, 59, 59, 999) : null,
-                        })
-                      }}
-                      placeholder="时间范围"
-                    />
-
-                    <div className="flex items-center gap-0.5 rounded-lg border border-border/40 bg-background p-0.5 shadow-sm">
-                      {[
-                        { label: "1h", value: 1 * 60 * 60 * 1000 },
-                        { label: "1d", value: 24 * 60 * 60 * 1000 },
-                        { label: "7d", value: 7 * 24 * 60 * 60 * 1000 },
-                      ].map((item) => (
-                        <Button
-                          key={item.label}
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-8 px-0 text-[10px] font-medium hover:bg-muted"
-                          onClick={() => {
-                            const end = Date.now()
-                            const start = end - item.value
-                            dt.filters.setBatch({
-                              startTimeMs: start,
-                              endTimeMs: end,
-                            })
-                          }}
-                        >
-                          {item.label}
-                        </Button>
-                      ))}
-                    </div>
-
-                    <div className="h-4 w-px bg-border/40" />
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-9 gap-1.5 px-3">
-                          <Plus className="size-3.5 opacity-60" />
-                          <span className="text-xs">
-                            {filterState.success === "" ? "状态" : `状态: ${successLabel}`}
-                          </span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-36">
-                        <DropdownMenuLabel>状态对比</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup
-                          value={filterState.success}
-                          onValueChange={(value) =>
-                            dt.filters.set(
-                              "success",
-                              (value === "true" || value === "false" ? value : "") as
-                                | ""
-                                | "true"
-                                | "false",
-                            )
-                          }
-                        >
-                          <DropdownMenuRadioItem value="">全部</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="true">成功</DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="false">失败</DropdownMenuRadioItem>
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-9 gap-1.5 px-3">
-                          <Plus className="size-3.5 opacity-60" />
-                          <span className="text-xs">
-                            {filterState.actionType === ""
-                              ? "操作类型"
-                              : `类型: ${actionTypeLabel}`}
-                          </span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-44">
-                        <DropdownMenuLabel>操作类型</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup
-                          value={filterState.actionType}
-                          onValueChange={(value) =>
-                            dt.filters.set(
-                              "actionType",
-                              (value === "" ||
-                              Object.values(Api.ActionType).includes(value as Api.ActionType)
-                                ? value
-                                : "") as "" | Api.ActionType,
-                            )
-                          }
-                        >
-                          <DropdownMenuRadioItem value="">全部</DropdownMenuRadioItem>
-                          {actionTypeOptions
-                            .filter((option) => option.value !== "all")
-                            .map((option) => (
-                              <DropdownMenuRadioItem key={option.value} value={option.value}>
-                                {option.label}
-                              </DropdownMenuRadioItem>
-                            ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <div className="ml-auto flex items-center gap-2">
-                      <div className="flex items-center gap-1 rounded-md border border-border p-1 shadow-sm">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-                          onClick={() =>
-                            dt.filters.setBatch({
-                              startTimeMs: null,
-                              endTimeMs: null,
-                              success: "",
-                              actionType: "",
-                            })
-                          }
-                        >
-                          <RotateCcw className="size-3" />
-                          重置
-                        </Button>
-                        <div className="h-3 w-px bg-border" />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className={cn(
-                            "h-7 gap-1.5 px-2 text-xs transition-all",
-                            isRefreshing
-                              ? "bg-muted text-muted-foreground"
-                              : "text-foreground hover:bg-primary/5",
-                          )}
-                          onClick={() => dt.actions.refetch()}
-                          disabled={isRefreshing}
-                        >
-                          <RefreshCw className={cn("size-3", isRefreshing && "animate-spin")} />
-                          刷新
-                        </Button>
-                      </div>
-                      <div className="h-4 w-px bg-border/40" />
+              query={createDataTableQueryPreset<TenantAuditTableFilters>({
+                schema: {
+                  fields: queryFields,
+                  search: {
+                    placeholder: "搜索操作名称、操作人、资源 ID（即将支持）",
+                  },
+                },
+                slots: {
+                  actionsRight: (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 border border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground"
+                        onClick={() => dt.actions.refetch()}
+                        aria-label="刷新"
+                        disabled={isRefreshing}
+                      >
+                        <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                      </Button>
                       <DataTableViewOptions />
                     </div>
-                  </div>
-                ),
+                  ),
+                },
               })}
               table={{
                 renderEmpty: () => (

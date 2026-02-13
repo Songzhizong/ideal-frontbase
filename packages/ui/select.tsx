@@ -22,9 +22,11 @@ function SelectTrigger({
   className,
   size = "default",
   children,
+  endAdornment,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default"
+  endAdornment?: React.ReactNode
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -37,9 +39,18 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
+      {endAdornment ? (
+        <span
+          data-slot="select-end-adornment"
+          className="flex size-4 shrink-0 items-center justify-center"
+        >
+          {endAdornment}
+        </span>
+      ) : (
+        <SelectPrimitive.Icon data-slot="select-icon" asChild>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }

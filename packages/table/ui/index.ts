@@ -1,5 +1,3 @@
-export type { DataTableActiveFiltersProps } from "./active-filters"
-export { DataTableActiveFilters } from "./active-filters"
 export type {
   DataTableIndicatorItem,
   DataTableIndicatorListProps,
@@ -11,6 +9,7 @@ export type {
   DataTableTagTone,
   DataTableTextPairCellProps,
   DataTableTimeMetaCellProps,
+  DataTableTreeCellProps,
   DataTableUserIdentityCellProps,
 } from "./cells"
 export {
@@ -19,41 +18,62 @@ export {
   DataTableTagListCell,
   DataTableTextPairCell,
   DataTableTimeMetaCell,
+  DataTableTreeCell,
   DataTableUserIdentityCell,
 } from "./cells"
-export type { DataTableColumnToggleProps } from "./column-toggle"
-export { DataTableColumnToggle } from "./column-toggle"
+export type {
+  DataTableColumnToggleProps,
+  DataTableDensityToggleProps,
+  DataTableDragHandleProps,
+  DataTableDropIndicatorPosition,
+  DataTableDropIndicatorProps,
+  DataTableSortableHeaderProps,
+  DataTableViewOptionsProps,
+} from "./columns"
+export {
+  DataTableColumnToggle,
+  DataTableDensityToggle,
+  DataTableDragHandle,
+  DataTableDropIndicator,
+  DataTableSortableHeader,
+  DataTableViewOptions,
+} from "./columns"
 export type { DataTableI18n, DataTableI18nOverrides } from "./config"
 export { DataTableConfigProvider } from "./config"
-export type { DataTableLayoutOptions, DataTableVariant } from "./context"
-export type { DataTableDensityToggleProps } from "./density-toggle"
-export { DataTableDensityToggle } from "./density-toggle"
-export type { DataTableDragHandleProps } from "./drag-handle"
-export { DataTableDragHandle } from "./drag-handle"
-export type { DataTableDropIndicatorPosition, DataTableDropIndicatorProps } from "./drop-indicator"
-export { DataTableDropIndicator } from "./drop-indicator"
-export type { DataTableFilterBarProps } from "./filter-bar"
-export { DataTableFilterBar } from "./filter-bar"
-export type { DataTableFilterItemProps } from "./filter-item"
-export { DataTableFilterItem } from "./filter-item"
-export { DataTablePagination } from "./pagination"
-export type { DataTablePresetProps, DataTablePresetQueryProps } from "./preset"
+export type { DataTablePresetProps } from "./preset"
 export { DataTablePreset } from "./preset"
-export type { DataTableQueryPanelProps } from "./query-panel"
-export { DataTableQueryPanel } from "./query-panel"
-export type { CrudQueryPresetOptions } from "./query-preset"
-export { createCrudQueryPreset } from "./query-preset"
-export { DataTableRoot } from "./root"
-export type { DataTableSearchProps } from "./search"
-export { DataTableSearch } from "./search"
-export type { DataTableSelectionBarProps } from "./selection-bar"
-export { DataTableSelectionBar } from "./selection-bar"
-export type { DataTableSortableHeaderProps } from "./sortable-header"
-export { DataTableSortableHeader } from "./sortable-header"
-export { DataTableTable } from "./table"
-export type { DataTableToolbarProps } from "./toolbar"
-export { DataTableToolbar } from "./toolbar"
-export type { DataTableTreeCellProps } from "./tree-cell"
-export { DataTableTreeCell } from "./tree-cell"
-export type { DataTableViewOptionsProps } from "./view-options"
-export { DataTableViewOptions } from "./view-options"
+export type {
+  DataTablePresetQueryProps,
+  DataTableQueryCompositeBinding,
+  DataTableQueryField,
+  DataTableQueryFieldBinding,
+  DataTableQueryFieldId,
+  DataTableQueryFieldLabelMode,
+  DataTableQueryFieldOption,
+  DataTableQueryFieldPanelSlot,
+  DataTableQueryFieldSearchConfig,
+  DataTableQueryFieldUiConfig,
+  DataTableQueryLayout,
+  DataTableQueryLayoutMode,
+  DataTableQuerySchema,
+  DataTableQuerySearchConfig,
+  DataTableQuerySingleBinding,
+  DataTableQuerySlots,
+} from "./query"
+export { createDataTableQueryPreset, DataTableQueryPanel } from "./query"
+
+export type {
+  DataTableLayoutOptions,
+  DataTablePaginationProps,
+  DataTableSelectionBarProps,
+  DataTableTableProps,
+  DataTableToolbarProps,
+  DataTableVariant,
+} from "./table"
+export {
+  DataTablePagination,
+  DataTableRoot,
+  DataTableSelectionBar,
+  DataTableTable,
+  DataTableToolbar,
+} from "./table"

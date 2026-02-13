@@ -5,10 +5,10 @@ import type { UserManagementTableFilters } from "@/features/tenant/users"
 import { useConfirm } from "@/hooks"
 import { ContentLayout } from "@/packages/layout-core"
 import {
-  createCrudQueryPreset,
+  createDataTableQueryPreset,
   DataTablePreset,
+  type DataTableQueryField,
   DataTableViewOptions,
-  type FilterDefinition,
   remote,
   useDataTable,
 } from "@/packages/table"
@@ -44,12 +44,38 @@ interface UnmaskState {
   detail: Api.User.UserDetail | null
 }
 
-const ADVANCED_SEARCH_FIELDS: Array<FilterDefinition<UserManagementTableFilters>> = [
+const USER_QUERY_FIELDS: Array<DataTableQueryField<UserManagementTableFilters>> = [
   {
-    key: "blocked",
+    id: "keyword",
+    label: "关键字",
+    kind: "text",
+    search: {
+      pickerVisible: false,
+    },
+    ui: {
+      panel: "hidden",
+    },
+    placeholder: "搜索姓名、账号、手机或邮箱...",
+    binding: {
+      mode: "single",
+      key: "keyword",
+    },
+  },
+  {
+    id: "blocked",
     label: "状态",
-    type: "select",
+    kind: "select",
+    search: {
+      enabled: true,
+    },
+    ui: {
+      panel: "hidden",
+    },
     placeholder: "状态",
+    binding: {
+      mode: "single",
+      key: "blocked",
+    },
     options: [
       { label: "全部", value: "" },
       { label: "正常", value: "false" },
@@ -57,25 +83,26 @@ const ADVANCED_SEARCH_FIELDS: Array<FilterDefinition<UserManagementTableFilters>
     ],
   },
   {
-    key: "mfaEnabled",
+    id: "mfaEnabled",
     label: "MFA",
-    type: "select",
+    kind: "select",
+    search: {
+      enabled: true,
+    },
+    ui: {
+      panel: "hidden",
+    },
     placeholder: "MFA状态",
+    binding: {
+      mode: "single",
+      key: "mfaEnabled",
+    },
     options: [
       { label: "全部", value: "" },
       { label: "已开启", value: "true" },
       { label: "未开启", value: "false" },
     ],
   },
-]
-
-const ACTIVE_FILTER_FIELDS: Array<FilterDefinition<UserManagementTableFilters>> = [
-  {
-    key: "keyword",
-    label: "关键字",
-    type: "text",
-  },
-  ...ADVANCED_SEARCH_FIELDS,
 ]
 
 export function UsersPage({ tenantId }: UsersPageProps) {
@@ -258,34 +285,42 @@ export function UsersPage({ tenantId }: UsersPageProps) {
           <DataTablePreset<Api.User.ListUser, UserManagementTableFilters>
             dt={dt}
             layout={{ stickyQueryPanel: true, stickyHeader: true, stickyPagination: true }}
-            query={createCrudQueryPreset<UserManagementTableFilters>({
-              search: {
-                filterKey: "keyword",
-                mode: "advanced",
-                advancedFields: ADVANCED_SEARCH_FIELDS,
-                placeholder: "搜索姓名、账号、手机或邮箱...",
-                className: "max-w-md",
+            query={createDataTableQueryPreset<UserManagementTableFilters>({
+              schema: {
+                fields: USER_QUERY_FIELDS,
+                search: {
+                  defaultFieldId: "keyword",
+                  mode: "advanced",
+                  placeholder: "搜索姓名、账号、手机或邮箱...",
+                  className: "w-[460px]",
+                },
               },
-              activeFilters: ACTIVE_FILTER_FIELDS,
-              actions: (
-                <div className="flex flex-wrap gap-2">
-                  <Button onClick={handleOpenCreate} className="h-9 px-3 text-sm font-medium">
-                    <span className="mr-1 text-base font-light">+</span> 新增用户
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 border border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground"
-                    onClick={() => dt.actions.refetch()}
-                    aria-label="刷新"
-                    disabled={isRefreshing}
-                  >
-                    <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-                  </Button>
-                  <DataTableViewOptions />
-                </div>
-              ),
+              layout: {
+                inline: {
+                  queryGrow: false,
+                },
+              },
+              slots: {
+                actionsRight: (
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleOpenCreate} className="h-9 px-3 text-sm font-medium">
+                      <span className="mr-1 text-base font-light">+</span> 新增用户
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 border border-border/50 bg-muted/20 text-muted-foreground shadow-none hover:bg-muted/30 hover:text-foreground"
+                      onClick={() => dt.actions.refetch()}
+                      aria-label="刷新"
+                      disabled={isRefreshing}
+                    >
+                      <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                    </Button>
+                    <DataTableViewOptions />
+                  </div>
+                ),
+              },
             })}
             table={{
               renderEmpty: () => <UserTableEmpty />,

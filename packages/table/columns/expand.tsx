@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/packages/ui/button"
-import { useDataTableConfig } from "../ui/config"
+import { useDataTableConfig } from "../ui/config/provider"
 
 export function expand<TData>(): ColumnDef<TData> {
   return {

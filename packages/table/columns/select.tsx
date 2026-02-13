@@ -1,6 +1,6 @@
 import type { ColumnDef, Row, Table } from "@tanstack/react-table"
 import { Checkbox } from "@/packages/ui/checkbox"
-import { useDataTableConfig } from "../ui/config"
+import { useDataTableConfig } from "../ui/config/provider"
 
 function SelectAllCheckbox<TData>({ table }: { table: Table<TData> }) {
   const { i18n } = useDataTableConfig()

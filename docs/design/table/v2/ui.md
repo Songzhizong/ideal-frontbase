@@ -48,21 +48,10 @@ export function DataTablePreset<TData, TFilterSchema>(props: {
   pagination?: DataTablePaginationProps | false
 }): JSX.Element
 
-export function createCrudQueryPreset<TFilterSchema>(
-  options?: CrudQueryPresetOptions<TFilterSchema>,
+export function createDataTableQueryPreset<TFilterSchema>(
+  options: DataTablePresetQueryProps<TFilterSchema>,
 ): DataTablePresetQueryProps<TFilterSchema>
 
-export function DataTableToolbar(props: { children?: ReactNode; actions?: ReactNode }): JSX.Element
-export function DataTableSearch<TFilterSchema>(props: {
-  filterKey?: keyof TFilterSchema
-  placeholder?: string
-  debounceMs?: number
-  className?: string
-  inputClassName?: string
-  i18n?: DataTableI18nOverrides
-  mode?: "simple" | "advanced"
-  advancedFields?: FilterDefinition<TFilterSchema, keyof TFilterSchema>[]
-}): JSX.Element
 export function DataTableViewOptions(props?: {
   showResetAll?: boolean
 }): JSX.Element
@@ -83,19 +72,18 @@ export function DataTableSelectionBar<TData, TFilterSchema = unknown>(props: {
     selectionScope: DataTableSelection<TData>["selectionScope"]
     exportPayload: DataTableSelectionExportPayload<TFilterSchema>
   }) => ReactNode
-  i18n?: DataTableI18nOverrides
+ i18n?: DataTableI18nOverrides
 }): JSX.Element
 ```
 
 说明：
 
 - 需要“一把梭”的标准 CRUD 列表，优先使用 `DataTablePreset`（`query` 必填）；需要深度定制时再回退到组合式（见 9.2）。
-- `createCrudQueryPreset()` 提供标准查询区默认值与定义合并策略，建议优先用于生成 `query`。
-- `DataTableSearch` 只更新 `dt.filters.set(filterKey, value)`，`filterKey` 解析优先级为：`props.filterKey > dt.meta.state.searchKey > "q"`。
-- `DataTableSearch` 内置输入尾部清空按钮；清空后立即写回空值，并取消 pending 的 debounce。
-- `DataTableSearch.debounceMs` 默认 300ms；URL 模式下由 state adapter 负责将“输入态”和“已提交态”统一为一个规范（UI 不直接操作 URL）。
-- `DataTableSearch.mode = "simple"` 为默认行为；`mode = "advanced"` 启用结构化搜索（字段选择 + 条件输入 + 回车/确认提交）。
-- `DataTableSearch.mode = "advanced"` 当前支持 `text` / `select` / `multi-select` / `boolean` / `number-range` / `date` / `date-range` 七种字段类型。
+- `createDataTableQueryPreset()` 仅做 schema 校验与默认化，查询语义统一来自 `query.schema.fields`。
+- `query.schema.search` 仅负责搜索行为（mode/defaultFieldId/debounce/placeholder），可搜索字段由 `fields[].search` 声明。
+- `query.layout.mode` 提供 `inline` / `stacked` 两种标准布局，`query.layout.secondary` 控制隐藏条件展开区。
+- `query.slots.actionsLeft/actionsRight` 提供动作区左右插槽，且 secondary 展开区固定全宽渲染。
+- 活动 chips 由 `fields` 自动生成；单项清除与“清除全部”统一走字段 binding。
 - `DataTablePagination` 调用 `dt.actions.setPage/setPageSize`，显示 `dt.pagination`。
 - `DataTableTable` 仅渲染 table（header/body/empty/error/loading），其状态来自 `dt.status`。
 - `DataTableSelectionBar` 以 `selectedRowIds` 为跨页批量的主入口；`selectedRowsCurrentPage` 仅用于“当前页批量”或展示选中摘要。
@@ -122,7 +110,15 @@ return (
     dt={dt}
     height="calc(100vh - 240px)"
     layout={{ scrollContainer: "root", stickyHeader: true }}
-    query={createCrudQueryPreset({ search: {} })}
+    query={createDataTableQueryPreset({
+      schema: {
+        fields: QUERY_FIELDS,
+        search: { defaultFieldId: "keyword" },
+      },
+      slots: {
+        actionsRight: <DataTableViewOptions />,
+      },
+    })}
   />
 )
 ```
@@ -139,18 +135,16 @@ return (
       stickyHeader: true,
     }}
   >
-    <DataTableToolbar
-      actions={
-        <div className="flex items-center gap-2">
+    <DataTableQueryPanel
+      schema={{ fields: QUERY_FIELDS, search: { defaultFieldId: "keyword" } }}
+      slots={{
+        actionsRight: (
           <Button type="button" variant="outline" size="icon-sm" aria-label="刷新" onClick={dt.actions.refetch}>
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <DataTableViewOptions />
-        </div>
-      }
-    >
-      <DataTableSearch filterKey="q" />
-    </DataTableToolbar>
+        ),
+      }}
+    />
     <DataTableTable />
     <DataTableSelectionBar
       actions={({ selectedRowIds, selectedRowsCurrentPage, mode }) => (
@@ -360,123 +354,97 @@ export interface DataTableErrors {
 ---
 
 
-## 16. 筛选器 UI 层规范
+## 16. 查询区 UI 规范
 
-### 20.1 筛选器组件体系
-
-```
-DataTableToolbar
-├── DataTableSearch          # 全局搜索（支持 simple/advanced）
-├── DataTableFilterBar       # 筛选条容器
-│   └── DataTableFilterItem  # 单个筛选项（内置清空）
-└── DataTableActiveFilters   # 已激活筛选标签展示
-```
-
-### 20.2 筛选器类型定义
+### 16.1 单一 Query Schema
 
 ```ts
-export type FilterType =
-  | "text"           // 文本输入
-  | "select"         // 单选下拉
-  | "multi-select"   // 多选下拉
-  | "date"           // 日期选择
-  | "date-range"     // 日期范围
-  | "number-range"   // 数字范围
-  | "boolean"        // 布尔开关
-  | "custom"         // 自定义渲染
+export type DataTableQueryFieldPanelSlot = "primary" | "secondary" | "hidden"
 
-export interface FilterDefinition<TFilterSchema, K extends keyof TFilterSchema> {
-  key: K
+export interface DataTableQueryFieldSearchConfig {
+  enabled?: boolean
+  pickerVisible?: boolean
+  order?: number
+}
+
+export interface DataTableQueryFieldUiConfig {
+  panel?: DataTableQueryFieldPanelSlot
+  containerClassName?: string
+}
+
+export interface DataTableQuerySchema<TFilterSchema> {
+  fields: DataTableQueryField<TFilterSchema>[]
+  search?: {
+    defaultFieldId?: string
+    mode?: "simple" | "advanced"
+    debounceMs?: number
+    placeholder?: string
+    className?: string
+  } | false
+}
+
+export interface DataTableQueryField<TFilterSchema, TValue = unknown> {
+  id: string
   label: string
-  type: FilterType
-
-  // 类型特定配置
-  options?: { label: string; value: TFilterSchema[K] }[] // 用于 select/multi-select
-  placeholder?: string
-
-  // 自定义渲染
-  render?: (props: {
-    value: TFilterSchema[K]
-    onChange: (value: TFilterSchema[K]) => void
-    onRemove: () => void
-  }) => ReactNode
-
-  // 显示控制
-  defaultVisible?: boolean // 是否默认显示在筛选条
-  alwaysVisible?: boolean  // 是否始终显示（不可收起）
-}
-
-export interface DataTableFilterBarProps<TFilterSchema> {
-  filters: FilterDefinition<TFilterSchema, keyof TFilterSchema>[]
-  activeFilters?: FilterDefinition<TFilterSchema, keyof TFilterSchema>[] // 仅用于激活标签展示
-  showActiveFilters?: boolean // 是否显示已激活筛选标签
-  collapsible?: boolean       // 是否可折叠
-  maxVisible?: number         // 默认显示的最大筛选项数
-  labelMode?: "top" | "inside"
-  showItemClearButtons?: boolean // 默认: showActiveFilters=true 时自动隐藏项内清空按钮
-  className?: string
-}
-```
-
-### 20.3 筛选器与 dt.filters 协作
-
-```tsx
-// 筛选器组件内部实现
-function DataTableFilterItem<TFilterSchema, K extends keyof TFilterSchema>({
-  definition,
-}: {
-  definition: FilterDefinition<TFilterSchema, K>
-}) {
-  const dt = useDataTableInstance<unknown, TFilterSchema>()
-
-  // 从 dt.filters.state 读取当前值
-  const value = dt.filters.state[definition.key]
-
-  // 通过 dt.filters.set 更新值
-  const handleChange = (newValue: TFilterSchema[K]) => {
-    dt.filters.set(definition.key, newValue)
-    // 注意：state adapter 会自动处理 resetPageOnFilterChange
+  kind: FilterType
+  search?: DataTableQueryFieldSearchConfig
+  ui?: DataTableQueryFieldUiConfig
+  binding:
+    | { mode: "single"; key: keyof TFilterSchema }
+    | {
+        mode: "composite"
+        keys: readonly (keyof TFilterSchema)[]
+        getValue: (filters: Readonly<TFilterSchema>) => TValue
+        setValue: (value: TValue, prev: Readonly<TFilterSchema>) => Partial<TFilterSchema>
+        clearValue: (prev: Readonly<TFilterSchema>) => Partial<TFilterSchema>
+      }
+  chip?: {
+    hidden?: boolean
+    formatValue?: (value: TValue) => string
   }
-
-  // 清空语义：text -> ""；其他类型 -> null
-  const handleRemove = () => {
-    dt.filters.set(
-      definition.key,
-      (definition.type === "text" ? "" : null) as TFilterSchema[K],
-    )
-  }
-
-  return renderFilterByType(definition.type, {
-    value,
-    onChange: handleChange,
-    onRemove: handleRemove,
-  })
 }
 ```
 
-### 20.4 已激活筛选标签
+约束：
+- `fields` 是唯一筛选语义来源。
+- `search` 不能独立定义筛选字段；只能配置行为，筛选字段由 `fields[].search` 决定。
+- `chips` 完全由 `fields` 驱动，不再维护独立 active 列表。
 
-```tsx
-export function DataTableActiveFilters<TFilterSchema>(props: {
-  filters: FilterDefinition<TFilterSchema, keyof TFilterSchema>[]
-  renderTag?: (props: {
-    filter: FilterDefinition<TFilterSchema, keyof TFilterSchema>
-    value: unknown
-    onRemove: () => void
-  }) => ReactNode
-}): JSX.Element
+### 16.2 布局与动作区
+
+```ts
+export interface DataTablePresetQueryProps<TFilterSchema> {
+  schema: DataTableQuerySchema<TFilterSchema>
+  layout?: {
+    mode?: "inline" | "stacked"
+    primary?: { search?: boolean; fieldIds?: string[] }
+    secondary?: {
+      fieldIds?: string[]
+      collapsible?: boolean
+      defaultExpanded?: boolean
+    }
+    chips?: {
+      visible?: boolean
+      showClearAll?: boolean
+    }
+  }
+  slots?: {
+    actionsLeft?: ReactNode
+    actionsRight?: ReactNode
+  }
+}
 ```
 
-**默认行为：**
-- 只展示值不为 `null`/`undefined`/空字符串/空数组的筛选项
-- 以 Tag/Chip 形式展示，点击 X 可移除单个筛选
-- 支持"清除全部"操作
+约束：
+- `mode="stacked"`：第一排 actions，第二排搜索/主筛选区。
+- `secondary` 展开区始终全宽渲染，可覆盖 actions 下方横向空间。
+- 当 `secondary.fieldIds` 为空时，不展示展开按钮。
 
-### 20.5 清空交互约定
+### 16.3 复合字段与清空语义
 
-- `DataTableSearch` 的清空行为应作为默认能力，不要求业务额外添加“重置筛选”按钮。
-- `DataTableFilterItem` 应支持单项清空（建议在标签区/标题区提供 X 按钮）。
-- 页面级“清空全部筛选”可通过 `DataTableActiveFilters` 或显式按钮触发 `dt.filters.reset()`。
-- 文本类型筛选（`type = "text"`）的单项清空值应统一为 `""`；其余类型统一为 `null`（或类型对应空值）。
+- 复合字段（如 `startTimeMs/endTimeMs`）必须通过 `binding.mode = "composite"` 建模。
+- 复合字段在 chips 区应表现为一个 chip，清除一次同时清理绑定的全部 key。
+- 单项清空语义：`text -> ""`，其他默认 `null`；复合字段以 `clearValue` 为准。
+- “清除全部”应逐字段执行清理并合并为一次 `dt.filters.setBatch(...)`。
 
 ---

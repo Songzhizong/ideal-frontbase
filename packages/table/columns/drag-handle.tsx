@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { DataTableDragHandle } from "../ui/drag-handle"
+import { DataTableDragHandle } from "../ui/columns/drag-handle"
 
 export function dragHandle<TData>(): ColumnDef<TData> {
   return {

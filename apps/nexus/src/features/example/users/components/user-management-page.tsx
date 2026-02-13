@@ -5,7 +5,7 @@ import { PageContainer } from "@/packages/layout-core"
 import { useBaseNavigate } from "@/packages/platform-router"
 import type { DataTableSelectionExportPayload } from "@/packages/table"
 import {
-  createCrudQueryPreset,
+  createDataTableQueryPreset,
   DataTablePreset,
   DataTableViewOptions,
   remote,
@@ -18,14 +18,7 @@ import { DEMO_USERS, fetchDemoUsers, filterDemoUsers } from "../demo/users"
 import type { DemoUser, DemoUserFilters } from "../types"
 import { useUserManagementTableState } from "./use-user-management-table-state"
 import { buildUserCsvRows, downloadCsvFile } from "./user-management-csv"
-import {
-  buildActiveUserFilterDefinitions,
-  buildExpandableUserFilterDefinitions,
-  buildToolbarUserFilterDefinitions,
-  buildUserFilterDefinitions,
-  ROLE_LABEL,
-  STATUS_LABEL,
-} from "./user-management-filters"
+import { buildUserQueryFields, ROLE_LABEL, STATUS_LABEL } from "./user-management-filters"
 import { demoUserTableColumns } from "./user-table-columns"
 
 export function UserManagementPage() {
@@ -90,13 +83,7 @@ export function UserManagementPage() {
     },
   })
 
-  const filterDefinitions = useMemo(() => buildUserFilterDefinitions(), [])
-  const quickFilterDefinitions = useMemo(() => buildToolbarUserFilterDefinitions(), [])
-  const expandableFilterDefinitions = useMemo(() => buildExpandableUserFilterDefinitions(), [])
-
-  const activeFilterDefinitions = useMemo(() => {
-    return buildActiveUserFilterDefinitions(filterDefinitions)
-  }, [filterDefinitions])
+  const queryFields = useMemo(() => buildUserQueryFields(), [])
 
   const isRefreshing = dt.activity.isInitialLoading || dt.activity.isFetching
 
@@ -258,31 +245,32 @@ export function UserManagementPage() {
             dt={dt}
             layout={{ stickyHeader: true, stickyPagination: true }}
             className="rounded-md border border-border/50"
-            query={createCrudQueryPreset<DemoUserFilters>({
+            query={createDataTableQueryPreset<DemoUserFilters>({
               className: "bg-transparent",
-              search: {
-                placeholder: "搜索姓名、邮箱、手机号",
+              schema: {
+                fields: queryFields,
+                search: {
+                  placeholder: "搜索姓名、邮箱、手机号",
+                },
               },
-              quickFilters: quickFilterDefinitions,
-              advancedFilters: expandableFilterDefinitions,
-              activeFilters: activeFilterDefinitions,
-              showActiveFilters: true,
-              actions: (
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    className="h-8 w-8"
-                    onClick={() => dt.actions.refetch()}
-                    aria-label="刷新"
-                    disabled={isRefreshing}
-                  >
-                    <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-                  </Button>
-                  <DataTableViewOptions />
-                </div>
-              ),
+              slots: {
+                actionsRight: (
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      className="h-8 w-8"
+                      onClick={() => dt.actions.refetch()}
+                      aria-label="刷新"
+                      disabled={isRefreshing}
+                    >
+                      <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                    </Button>
+                    <DataTableViewOptions />
+                  </div>
+                ),
+              },
             })}
             table={{
               renderEmpty: () => "暂无匹配用户",
