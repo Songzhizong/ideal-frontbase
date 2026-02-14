@@ -20,6 +20,7 @@ export interface DataTableQueryFieldSearchConfig {
 export interface DataTableQueryFieldUiConfig {
   panel?: DataTableQueryFieldPanelSlot
   containerClassName?: string
+  hideLabel?: boolean
 }
 
 export interface DataTableQuerySingleBinding<

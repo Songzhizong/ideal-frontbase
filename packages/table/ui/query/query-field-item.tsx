@@ -45,6 +45,7 @@ export function DataTableQueryFieldItem<TFilterSchema>({
   const value = getFieldValue(field, dt.filters.state)
   const canClear = !isFieldValueEmpty(field, value)
   const useTriggerClearButton = field.kind === "select" || field.kind === "multi-select"
+  const hideLabel = field.ui?.hideLabel ?? false
 
   const handleChange = (nextValue: unknown) => {
     setFieldValue(dt, field, nextValue)
@@ -371,6 +372,10 @@ export function DataTableQueryFieldItem<TFilterSchema>({
         ) : null}
       </div>
     )
+  }
+
+  if (hideLabel) {
+    return <div className={className}>{content}</div>
   }
 
   return (

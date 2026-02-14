@@ -238,7 +238,7 @@ export function AppSidebar({
                                     openDualPanel(item)
                                   }
                                 }}
-                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
                               >
                                 <NavIcon item={item} />
                                 <span className="sr-only">{item.title}</span>
@@ -263,7 +263,7 @@ export function AppSidebar({
                                 setDualPanelOpen(false)
                                 setDualParentTo(null)
                               }}
-                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
                               <BaseLink to={item.to}>
                                 <NavIcon item={item} />
@@ -319,7 +319,7 @@ export function AppSidebar({
                             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors [&>svg]:size-4.5!",
                             pathname === subItem.to
                               ? "bg-sidebar-accent font-medium text-primary!"
-                              : "text-sidebar-foreground/75! hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
+                              : "text-sidebar-foreground/75! hover:bg-sidebar-accent/60 hover:text-primary!",
                           )}
                         >
                           <NavIcon item={subItem} />
@@ -391,7 +391,7 @@ export function AppSidebar({
                                 type="button"
                                 aria-label={item.title}
                                 isActive={isActive}
-                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                                className="mx-auto size-9 justify-center rounded-lg p-0 text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary! [&>svg]:size-4.5!"
                               >
                                 <NavIcon item={item} />
                                 <span className="sr-only">{item.title}</span>
@@ -412,7 +412,7 @@ export function AppSidebar({
                                     <BaseLink
                                       to={subItem.to}
                                       className={cn(
-                                        "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground!",
+                                        "flex items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent/60 hover:text-primary!",
                                         pathname === subItem.to
                                           ? "bg-sidebar-accent font-medium text-primary!"
                                           : "text-sidebar-foreground/75!",
@@ -442,7 +442,7 @@ export function AppSidebar({
                               type="button"
                               tooltip={item.title}
                               isActive={isActive}
-                              className="mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
+                              className="mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!"
                             >
                               <NavIcon item={item} />
                               <span>{item.title}</span>
@@ -456,7 +456,7 @@ export function AppSidebar({
                                   <SidebarMenuSubButton
                                     asChild
                                     isActive={pathname === subItem.to}
-                                    className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
+                                    className="mb-0.5 h-auto rounded-md px-3 py-1.5 text-sm text-sidebar-foreground/75! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary!"
                                   >
                                     <BaseLink to={subItem.to}>
                                       <span>{subItem.title}</span>
@@ -478,7 +478,7 @@ export function AppSidebar({
                         isActive={pathname === item.to}
                         tooltip={item.title}
                         className={cn(
-                          "mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!",
+                          "mb-0.5 h-auto gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/65! transition-colors hover:bg-sidebar-accent/60 hover:text-primary! data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-primary! [&>svg]:size-4.5!",
                           isIconMode ? "mx-auto size-9 justify-center p-0" : null,
                         )}
                       >

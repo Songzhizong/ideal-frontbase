@@ -1,5 +1,5 @@
 import { CircleAlert, CircleCheck, Copy, Eye, MapPin, RefreshCw, Shield, Timer } from "lucide-react"
-import { parseAsInteger, parseAsString, parseAsStringLiteral } from "nuqs"
+import { parseAsString, parseAsStringLiteral } from "nuqs"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 import { OperationLogDetailDrawer } from "@/features/core/operation-log"
@@ -20,8 +20,16 @@ import {
   stateUrl,
   useDataTable,
 } from "@/packages/table"
+import {
+  createDefaultTimeEngine,
+  type QuickPresetItem,
+  type ResolvedPayload,
+  resolveRange,
+  SuperDateRangePicker,
+  type TimeRangeDefinition,
+  type TimeZoneMode,
+} from "@/packages/ui"
 import { Button } from "@/packages/ui/button"
-import { DateRangePicker } from "@/packages/ui/date-picker-rac"
 import { StatusBadge } from "@/packages/ui/status-badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/packages/ui/tooltip"
 import { cn } from "@/packages/ui-utils"
@@ -36,7 +44,6 @@ interface TenantAuditPageProps {
   title?: string
   description?: string
   lockedProjectId?: string
-  showProjectFilter?: boolean
 }
 
 const helper = createColumnHelper<Api.OperationLog.SimpleLog>()
@@ -45,17 +52,91 @@ const ACTION_TYPE_FILTER_VALUES = ["", ...Object.values(Api.ActionType)] as cons
 
 type TenantAuditTableFilters = {
   keyword: string
-  startTimeMs: number | null
-  endTimeMs: number | null
+  timeRangeDef: string | null
+  timeRangeTz: string | null
   success: (typeof SUCCESS_FILTER_VALUES)[number]
   actionType: "" | Api.ActionType
 }
 
-type AuditTimeRangeValue = { from: Date | undefined; to: Date | undefined }
-type AuditQuickRangeValue = {
-  startTimeMs: number | null
-  endTimeMs: number | null
-}
+type AuditTimeRangeValue = {
+  definition: TimeRangeDefinition
+  timezone: TimeZoneMode
+} | null
+
+const AUDIT_TIME_ENGINE = createDefaultTimeEngine()
+const AUDIT_DEFAULT_TIMEZONE: TimeZoneMode = { kind: "browser" }
+const AUDIT_WEEK_STARTS_ON = 1
+const AUDIT_QUICK_PRESETS: QuickPresetItem[] = [
+  {
+    key: "last-15m",
+    label: "最近 15 分钟",
+    group: "最近",
+    keywords: ["15m", "15分钟"],
+    definition: {
+      from: { expr: "now-15m" },
+      to: { expr: "now" },
+      label: "最近 15 分钟",
+      ui: { editorMode: "relative" },
+    },
+  },
+  {
+    key: "last-1h",
+    label: "最近 1 小时",
+    group: "最近",
+    keywords: ["1h", "1小时"],
+    definition: {
+      from: { expr: "now-1h" },
+      to: { expr: "now" },
+      label: "最近 1 小时",
+      ui: { editorMode: "relative" },
+    },
+  },
+  {
+    key: "last-24h",
+    label: "最近 24 小时",
+    group: "最近",
+    keywords: ["24h", "24小时"],
+    definition: {
+      from: { expr: "now-24h" },
+      to: { expr: "now" },
+      label: "最近 24 小时",
+      ui: { editorMode: "relative" },
+    },
+  },
+  {
+    key: "today",
+    label: "今天",
+    group: "常用",
+    definition: {
+      from: { expr: "now/d" },
+      to: { expr: "now/d", round: "up" },
+      label: "今天",
+      ui: { editorMode: "relative", rangeTokenMode: "two_endpoints" },
+    },
+  },
+  {
+    key: "yesterday",
+    label: "昨天",
+    group: "常用",
+    definition: {
+      from: { expr: "now-1d/d" },
+      to: { expr: "now-1d/d", round: "up" },
+      label: "昨天",
+      ui: { editorMode: "relative", rangeTokenMode: "two_endpoints" },
+    },
+  },
+  {
+    key: "this-month",
+    label: "本月",
+    group: "取整",
+    definition: {
+      from: { expr: "now/M" },
+      to: { expr: "now/M", round: "up" },
+      label: "本月",
+      ui: { editorMode: "relative", rangeTokenMode: "two_endpoints" },
+    },
+  },
+]
 
 function formatIp(ip?: string | null) {
   if (!ip) return "--"
@@ -71,35 +152,277 @@ function formatRangeDate(ms: number) {
   }).format(new Date(ms))
 }
 
-function resolveAuditTimeRange(filters: TenantAuditTableFilters): AuditTimeRangeValue | undefined {
-  if (filters.startTimeMs == null && filters.endTimeMs == null) return undefined
+function resolveAuditTimeRange(filters: TenantAuditTableFilters): AuditTimeRangeValue {
+  const definition = parseAuditTimeRangeDefinition(filters.timeRangeDef)
+  if (!definition) {
+    return null
+  }
+
   return {
-    from: filters.startTimeMs != null ? new Date(filters.startTimeMs) : undefined,
-    to: filters.endTimeMs != null ? new Date(filters.endTimeMs) : undefined,
+    definition,
+    timezone: parseAuditTimezone(filters.timeRangeTz),
   }
 }
 
 function resolveAuditTimeRangeUpdate(
   value: unknown,
-): Pick<TenantAuditTableFilters, "startTimeMs" | "endTimeMs"> {
-  if (typeof value !== "object" || value === null) {
+): Pick<TenantAuditTableFilters, "timeRangeDef" | "timeRangeTz"> {
+  if (isResolvedPayloadLike(value)) {
     return {
-      startTimeMs: null,
-      endTimeMs: null,
+      timeRangeDef: serializeAuditTimeRangeDefinition(value.definition),
+      timeRangeTz: serializeAuditTimezone(value.resolved.timezone),
     }
   }
-  const from = "from" in value && value.from instanceof Date ? value.from : undefined
-  const to = "to" in value && value.to instanceof Date ? value.to : undefined
-  if (!from) {
+
+  if (!isAuditTimeRangeValueLike(value)) {
     return {
-      startTimeMs: null,
-      endTimeMs: null,
+      timeRangeDef: null,
+      timeRangeTz: null,
     }
   }
+
   return {
-    startTimeMs: from.getTime(),
-    endTimeMs: to ? new Date(to).setHours(23, 59, 59, 999) : null,
+    timeRangeDef: serializeAuditTimeRangeDefinition(value.definition),
+    timeRangeTz: serializeAuditTimezone(value.timezone),
   }
+}
+
+function resolveAuditQueryTimeRange(filters: TenantAuditTableFilters) {
+  const timeRange = resolveAuditTimeRange(filters)
+  if (!timeRange) {
+    return {
+      startTimeMs: null,
+      endTimeMs: null,
+    }
+  }
+
+  try {
+    const resolved = resolveRange(timeRange.definition, {
+      nowMs: Date.now(),
+      timezone: timeRange.timezone,
+      weekStartsOn: AUDIT_WEEK_STARTS_ON,
+      engine: AUDIT_TIME_ENGINE,
+    })
+    return {
+      startTimeMs: resolved.startMs,
+      endTimeMs: toInclusiveEndMs(resolved.startMs, resolved.endMs),
+    }
+  } catch {
+    return {
+      startTimeMs: null,
+      endTimeMs: null,
+    }
+  }
+}
+
+function readAuditTimeRangeValue(value: unknown): AuditTimeRangeValue {
+  return isAuditTimeRangeValueLike(value) ? value : null
+}
+
+function formatAuditTimeRangeChip(value: AuditTimeRangeValue): string {
+  if (!value) {
+    return ""
+  }
+  if (value.definition.label && value.definition.label.trim() !== "") {
+    return value.definition.label
+  }
+
+  try {
+    const resolved = resolveRange(value.definition, {
+      nowMs: Date.now(),
+      timezone: value.timezone,
+      weekStartsOn: AUDIT_WEEK_STARTS_ON,
+      engine: AUDIT_TIME_ENGINE,
+    })
+    return `${formatRangeDate(resolved.startMs)} - ${formatRangeDate(
+      toInclusiveEndMs(resolved.startMs, resolved.endMs),
+    )}`
+  } catch {
+    return "时间范围无效"
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
+}
+
+function toInclusiveEndMs(startMs: number, endExclusiveMs: number): number {
+  if (endExclusiveMs <= startMs) {
+    return startMs
+  }
+  return endExclusiveMs - 1
+}
+
+function isEndpointRound(value: unknown): value is "down" | "up" | "none" {
+  return value === "down" || value === "up" || value === "none"
+}
+
+function isDisambiguation(value: unknown): value is "earlier" | "later" {
+  return value === "earlier" || value === "later"
+}
+
+function isGapPolicy(value: unknown): value is "next_valid" | "error" {
+  return value === "next_valid" || value === "error"
+}
+
+function isTimeRangeEndpoint(value: unknown): value is TimeRangeDefinition["from"] {
+  if (!isRecord(value) || typeof value.expr !== "string" || value.expr.trim() === "") {
+    return false
+  }
+  if ("round" in value && value.round !== undefined && !isEndpointRound(value.round)) {
+    return false
+  }
+  if (
+    "disambiguation" in value &&
+    value.disambiguation !== undefined &&
+    !isDisambiguation(value.disambiguation)
+  ) {
+    return false
+  }
+  if ("gapPolicy" in value && value.gapPolicy !== undefined && !isGapPolicy(value.gapPolicy)) {
+    return false
+  }
+  return true
+}
+
+function isEditorMode(value: unknown): value is "relative" | "absolute" | "mixed" {
+  return value === "relative" || value === "absolute" || value === "mixed"
+}
+
+function isRangeTokenMode(value: unknown): value is "two_endpoints" | "single_endpoint" {
+  return value === "two_endpoints" || value === "single_endpoint"
+}
+
+function isManualEditorMode(value: unknown): value is "datetime" | "date" {
+  return value === "datetime" || value === "date"
+}
+
+function isTimeRangeDefinitionLike(value: unknown): value is TimeRangeDefinition {
+  if (!isRecord(value)) {
+    return false
+  }
+  if (!isTimeRangeEndpoint(value.from) || !isTimeRangeEndpoint(value.to)) {
+    return false
+  }
+  if ("label" in value && value.label !== undefined && typeof value.label !== "string") {
+    return false
+  }
+  if ("ui" in value && value.ui !== undefined) {
+    if (!isRecord(value.ui)) {
+      return false
+    }
+    if (
+      "editorMode" in value.ui &&
+      value.ui.editorMode !== undefined &&
+      !isEditorMode(value.ui.editorMode)
+    ) {
+      return false
+    }
+    if (
+      "rangeTokenMode" in value.ui &&
+      value.ui.rangeTokenMode !== undefined &&
+      !isRangeTokenMode(value.ui.rangeTokenMode)
+    ) {
+      return false
+    }
+    if (
+      "manualEditorMode" in value.ui &&
+      value.ui.manualEditorMode !== undefined &&
+      !isManualEditorMode(value.ui.manualEditorMode)
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+function parseAuditTimeRangeDefinition(
+  value: string | null | undefined,
+): TimeRangeDefinition | null {
+  if (typeof value !== "string" || value.trim() === "") {
+    return null
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(value)
+    return isTimeRangeDefinitionLike(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+function serializeAuditTimeRangeDefinition(definition: TimeRangeDefinition): string {
+  return JSON.stringify(definition)
+}
+
+function parseAuditTimezone(value: string | null | undefined): TimeZoneMode {
+  if (typeof value !== "string" || value.trim() === "") {
+    return AUDIT_DEFAULT_TIMEZONE
+  }
+  if (value === "browser") {
+    return { kind: "browser" }
+  }
+  if (value === "utc") {
+    return { kind: "utc" }
+  }
+  if (value.startsWith("iana:")) {
+    const tz = value.slice("iana:".length).trim()
+    if (tz !== "") {
+      return { kind: "iana", tz }
+    }
+  }
+  return AUDIT_DEFAULT_TIMEZONE
+}
+
+function serializeAuditTimezone(timezone: TimeZoneMode): string {
+  if (timezone.kind === "browser") {
+    return "browser"
+  }
+  if (timezone.kind === "utc") {
+    return "utc"
+  }
+  return `iana:${timezone.tz}`
+}
+
+function isTimeZoneModeLike(value: unknown): value is TimeZoneMode {
+  if (!isRecord(value) || typeof value.kind !== "string") {
+    return false
+  }
+  if (value.kind === "browser" || value.kind === "utc") {
+    return true
+  }
+  if (value.kind === "iana") {
+    return typeof value.tz === "string" && value.tz.trim() !== ""
+  }
+  return false
+}
+
+function isAuditTimeRangeValueLike(
+  value: unknown,
+): value is { definition: TimeRangeDefinition; timezone: TimeZoneMode } {
+  if (!isRecord(value)) {
+    return false
+  }
+  return isTimeRangeDefinitionLike(value.definition) && isTimeZoneModeLike(value.timezone)
+}
+
+function isResolvedPayloadLike(value: unknown): value is ResolvedPayload {
+  if (!isRecord(value)) {
+    return false
+  }
+  if (!("resolved" in value) || !isRecord(value.resolved)) {
+    return false
+  }
+  if (!("definition" in value) || !isRecord(value.definition)) {
+    return false
+  }
+
+  return (
+    typeof value.resolved.startMs === "number" &&
+    Number.isFinite(value.resolved.startMs) &&
+    typeof value.resolved.endMs === "number" &&
+    Number.isFinite(value.resolved.endMs)
+  )
 }
 
 export function TenantAuditPage({
@@ -114,15 +437,15 @@ export function TenantAuditPage({
     key: `infera_tenant_audit_${tenantId}`,
     parsers: {
       keyword: parseAsString.withDefault(""),
-      startTimeMs: parseAsInteger,
-      endTimeMs: parseAsInteger,
+      timeRangeDef: parseAsString,
+      timeRangeTz: parseAsString,
       success: parseAsStringLiteral(SUCCESS_FILTER_VALUES).withDefault(""),
       actionType: parseAsStringLiteral(ACTION_TYPE_FILTER_VALUES).withDefault(""),
     },
     defaults: {
       keyword: "",
-      startTimeMs: null,
-      endTimeMs: null,
+      timeRangeDef: null,
+      timeRangeTz: null,
       success: "",
       actionType: "",
     } satisfies TenantAuditTableFilters,
@@ -148,16 +471,18 @@ export function TenantAuditPage({
       Awaited<ReturnType<typeof fetchOperationLogList>>
     >({
       queryKey: ["tenant-audit-logs", tenantId, lockedProjectId],
-      queryFn: ({ page, size, filters }) =>
-        fetchOperationLogList({
+      queryFn: ({ page, size, filters }) => {
+        const timeRange = resolveAuditQueryTimeRange(filters)
+        return fetchOperationLogList({
           pageNumber: page,
           pageSize: size,
           success: filters.success || null,
           actionType: filters.actionType || null,
-          startTimeMs: filters.startTimeMs,
-          endTimeMs: filters.endTimeMs,
+          startTimeMs: timeRange.startTimeMs,
+          endTimeMs: timeRange.endTimeMs,
           ...(lockedProjectId ? { resourceId: lockedProjectId } : {}),
-        }),
+        })
+      },
       map: (response) => ({
         rows: response.content,
         pageCount: response.totalPages,
@@ -405,102 +730,48 @@ export function TenantAuditPage({
         id: "timeRange",
         label: "时间范围",
         kind: "custom",
+        ui: {
+          hideLabel: true,
+        },
         binding: {
           mode: "composite",
-          keys: ["startTimeMs", "endTimeMs"],
+          keys: ["timeRangeDef", "timeRangeTz"],
           getValue: resolveAuditTimeRange,
           setValue: (value) => resolveAuditTimeRangeUpdate(value),
           clearValue: () => ({
-            startTimeMs: null,
-            endTimeMs: null,
+            timeRangeDef: null,
+            timeRangeTz: null,
           }),
-          isEmpty: (value) => {
-            if (typeof value !== "object" || value === null) return true
-            const from = "from" in value ? value.from : undefined
-            const to = "to" in value ? value.to : undefined
-            return !(from instanceof Date) && !(to instanceof Date)
-          },
+          isEmpty: (value) => readAuditTimeRangeValue(value) === null,
         },
-        render: ({ value, setValue }) => (
-          <DateRangePicker
-            value={value as AuditTimeRangeValue | undefined}
-            onChange={(range) => {
-              setValue(range)
-            }}
-            className="w-fit"
-            triggerClassName="border-border/50 bg-muted/20 shadow-none hover:bg-muted/30"
-          />
-        ),
+        render: ({ value, setValue }) => {
+          const currentValue = readAuditTimeRangeValue(value)
+
+          return (
+            <div className="w-fit">
+              <SuperDateRangePicker
+                quickPresets={AUDIT_QUICK_PRESETS}
+                value={currentValue?.definition ?? null}
+                allowEmpty
+                locale="zh-CN"
+                placeholder="请选择时间"
+                onResolvedChange={(payload) => {
+                  if (!payload) {
+                    setValue(null)
+                    return
+                  }
+                  setValue(payload)
+                }}
+                {...(currentValue ? { timezone: currentValue.timezone } : {})}
+              />
+            </div>
+          )
+        },
         chip: {
           formatValue: (value) => {
-            if (typeof value !== "object" || value === null) return ""
-            const from = "from" in value && value.from instanceof Date ? value.from : undefined
-            const to = "to" in value && value.to instanceof Date ? value.to : undefined
-            if (!from && !to) return ""
-            const startLabel = from ? formatRangeDate(from.getTime()) : "起始未设定"
-            const endLabel = to ? formatRangeDate(to.getTime()) : "至今"
-            return `${startLabel} - ${endLabel}`
+            const currentValue = readAuditTimeRangeValue(value)
+            return formatAuditTimeRangeChip(currentValue)
           },
-        },
-      },
-      {
-        id: "timeQuickPreset",
-        label: "快速时间",
-        kind: "custom",
-        ui: {
-          containerClassName: "min-w-fit",
-        },
-        binding: {
-          mode: "composite",
-          keys: ["startTimeMs", "endTimeMs"],
-          getValue: () => null,
-          setValue: (value) => {
-            if (typeof value !== "object" || value === null) {
-              return {
-                startTimeMs: null,
-                endTimeMs: null,
-              }
-            }
-            const next = value as Partial<AuditQuickRangeValue>
-            return {
-              startTimeMs: typeof next.startTimeMs === "number" ? next.startTimeMs : null,
-              endTimeMs: typeof next.endTimeMs === "number" ? next.endTimeMs : null,
-            }
-          },
-          clearValue: () => ({
-            startTimeMs: null,
-            endTimeMs: null,
-          }),
-          isEmpty: () => true,
-        },
-        render: ({ setValue }) => (
-          <div className="flex items-center gap-0.5 rounded-lg border border-border/40 bg-background p-0.5 shadow-sm">
-            {[
-              { label: "1h", value: 1 * 60 * 60 * 1000 },
-              { label: "1d", value: 24 * 60 * 60 * 1000 },
-              { label: "7d", value: 7 * 24 * 60 * 60 * 1000 },
-            ].map((item) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                size="sm"
-                className="h-7 w-8 px-0 text-[10px] font-medium hover:bg-muted"
-                onClick={() => {
-                  const end = Date.now()
-                  const start = end - item.value
-                  setValue({
-                    startTimeMs: start,
-                    endTimeMs: end,
-                  } satisfies AuditQuickRangeValue)
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </div>
-        ),
-        chip: {
-          hidden: true,
         },
       },
       {
@@ -604,6 +875,7 @@ export function TenantAuditPage({
                   fields: queryFields,
                   search: {
                     placeholder: "搜索操作名称、操作人、资源 ID（即将支持）",
+                    className: "w-[400px]",
                   },
                 },
                 slots: {
