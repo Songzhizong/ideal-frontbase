@@ -306,6 +306,25 @@ importers:
         specifier: ^25.0.10
         version: 25.2.2
 
+  apps/site:
+    dependencies:
+      '@ideal-frontbase/platform-router':
+        specifier: workspace:*
+        version: link:../../packages/platform-router
+      '@ideal-frontbase/theme-system':
+        specifier: workspace:*
+        version: link:../../packages/theme-system
+      '@ideal-frontbase/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@ideal-frontbase/ui-utils':
+        specifier: workspace:*
+        version: link:../../packages/ui-utils
+    devDependencies:
+      '@types/node':
+        specifier: ^25.0.10
+        version: 25.2.2
+
   packages/api-core:
     dependencies:
       ky:

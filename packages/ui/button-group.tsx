@@ -2,6 +2,8 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 import { Separator } from "@/packages/ui/separator"
 import { cn } from "@/packages/ui-utils"
+import type { ButtonColor, ButtonProps } from "./button"
+import { ButtonGroupContext } from "./button-context"
 
 const buttonGroupVariants = cva(
   "flex w-fit items-stretch [&>*]:focus-visible:z-10 [&>*]:focus-visible:relative [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md has-[>[data-slot=button-group]]:gap-2",
@@ -20,18 +22,45 @@ const buttonGroupVariants = cva(
   },
 )
 
+interface ButtonGroupOwnProps extends VariantProps<typeof buttonGroupVariants> {
+  dir?: "ltr" | "rtl" | undefined
+  color?: ButtonColor | undefined
+  size?: ButtonProps["size"] | undefined
+  variant?: ButtonProps["variant"] | undefined
+  shape?: ButtonProps["shape"] | undefined
+  shadow?: ButtonProps["shadow"] | undefined
+  fitContent?: ButtonProps["fitContent"] | undefined
+}
+
+type NativeFieldsetProps = Omit<React.ComponentProps<"fieldset">, "color">
+
 function ButtonGroup({
   className,
   orientation,
+  dir = "ltr",
+  color,
+  size,
+  variant,
+  shape,
+  shadow,
+  fitContent,
+  disabled,
+  children,
   ...props
-}: React.ComponentProps<"fieldset"> & VariantProps<typeof buttonGroupVariants>) {
+}: NativeFieldsetProps & ButtonGroupOwnProps) {
   return (
-    <fieldset
-      data-slot="button-group"
-      data-orientation={orientation}
-      className={cn(buttonGroupVariants({ orientation }), className)}
-      {...props}
-    />
+    <ButtonGroupContext value={{ color, size, variant, shape, shadow, fitContent, disabled }}>
+      <fieldset
+        data-slot="button-group"
+        data-orientation={orientation}
+        dir={dir}
+        className={cn(buttonGroupVariants({ orientation }), className)}
+        disabled={disabled}
+        {...props}
+      >
+        {children}
+      </fieldset>
+    </ButtonGroupContext>
   )
 }
 

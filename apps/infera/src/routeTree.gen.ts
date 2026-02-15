@@ -25,6 +25,7 @@ import { Route as AuthenticatedTTenantIdOverviewRouteImport } from './routes/_au
 import { Route as AuthenticatedTTenantIdBillingRouteImport } from './routes/_authenticated/t/$tenantId/billing'
 import { Route as AuthenticatedTTenantIdAuditRouteImport } from './routes/_authenticated/t/$tenantId/audit'
 import { Route as AuthenticatedTTenantIdAlertsRouteImport } from './routes/_authenticated/t/$tenantId/alerts'
+import { Route as AuthenticatedTTenantIdComponentsComponentIdRouteImport } from './routes/_authenticated/t/$tenantId/components/$componentId'
 import { Route as AuthenticatedTTenantIdPProjectIdUsageRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/usage'
 import { Route as AuthenticatedTTenantIdPProjectIdSettingsRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/settings'
 import { Route as AuthenticatedTTenantIdPProjectIdDashboardRouteImport } from './routes/_authenticated/t/$tenantId/p/$projectId/dashboard'
@@ -126,6 +127,12 @@ const AuthenticatedTTenantIdAlertsRoute =
   AuthenticatedTTenantIdAlertsRouteImport.update({
     id: '/t/$tenantId/alerts',
     path: '/t/$tenantId/alerts',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTTenantIdComponentsComponentIdRoute =
+  AuthenticatedTTenantIdComponentsComponentIdRouteImport.update({
+    id: '/t/$tenantId/components/$componentId',
+    path: '/t/$tenantId/components/$componentId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedTTenantIdPProjectIdUsageRoute =
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
   '/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
   '/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/t/$tenantId/components/$componentId': typeof AuthenticatedTTenantIdComponentsComponentIdRoute
   '/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
   '/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
   '/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
@@ -270,6 +278,7 @@ export interface FileRoutesByTo {
   '/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
   '/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
   '/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/t/$tenantId/components/$componentId': typeof AuthenticatedTTenantIdComponentsComponentIdRoute
   '/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
   '/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
   '/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
@@ -305,6 +314,7 @@ export interface FileRoutesById {
   '/_authenticated/t/$tenantId/projects': typeof AuthenticatedTTenantIdProjectsRoute
   '/_authenticated/t/$tenantId/quotas-budgets': typeof AuthenticatedTTenantIdQuotasBudgetsRoute
   '/_authenticated/t/$tenantId/users': typeof AuthenticatedTTenantIdUsersRoute
+  '/_authenticated/t/$tenantId/components/$componentId': typeof AuthenticatedTTenantIdComponentsComponentIdRoute
   '/_authenticated/t/$tenantId/p/$projectId/audit': typeof AuthenticatedTTenantIdPProjectIdAuditRoute
   '/_authenticated/t/$tenantId/p/$projectId/dashboard': typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
   '/_authenticated/t/$tenantId/p/$projectId/settings': typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/t/$tenantId/projects'
     | '/t/$tenantId/quotas-budgets'
     | '/t/$tenantId/users'
+    | '/t/$tenantId/components/$componentId'
     | '/t/$tenantId/p/$projectId/audit'
     | '/t/$tenantId/p/$projectId/dashboard'
     | '/t/$tenantId/p/$projectId/settings'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/t/$tenantId/projects'
     | '/t/$tenantId/quotas-budgets'
     | '/t/$tenantId/users'
+    | '/t/$tenantId/components/$componentId'
     | '/t/$tenantId/p/$projectId/audit'
     | '/t/$tenantId/p/$projectId/dashboard'
     | '/t/$tenantId/p/$projectId/settings'
@@ -403,6 +415,7 @@ export interface FileRouteTypes {
     | '/_authenticated/t/$tenantId/projects'
     | '/_authenticated/t/$tenantId/quotas-budgets'
     | '/_authenticated/t/$tenantId/users'
+    | '/_authenticated/t/$tenantId/components/$componentId'
     | '/_authenticated/t/$tenantId/p/$projectId/audit'
     | '/_authenticated/t/$tenantId/p/$projectId/dashboard'
     | '/_authenticated/t/$tenantId/p/$projectId/settings'
@@ -541,6 +554,13 @@ declare module '@tanstack/react-router' {
       path: '/t/$tenantId/alerts'
       fullPath: '/t/$tenantId/alerts'
       preLoaderRoute: typeof AuthenticatedTTenantIdAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/t/$tenantId/components/$componentId': {
+      id: '/_authenticated/t/$tenantId/components/$componentId'
+      path: '/t/$tenantId/components/$componentId'
+      fullPath: '/t/$tenantId/components/$componentId'
+      preLoaderRoute: typeof AuthenticatedTTenantIdComponentsComponentIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/t/$tenantId/p/$projectId/usage': {
@@ -682,6 +702,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTTenantIdProjectsRoute: typeof AuthenticatedTTenantIdProjectsRoute
   AuthenticatedTTenantIdQuotasBudgetsRoute: typeof AuthenticatedTTenantIdQuotasBudgetsRoute
   AuthenticatedTTenantIdUsersRoute: typeof AuthenticatedTTenantIdUsersRoute
+  AuthenticatedTTenantIdComponentsComponentIdRoute: typeof AuthenticatedTTenantIdComponentsComponentIdRoute
   AuthenticatedTTenantIdPProjectIdAuditRoute: typeof AuthenticatedTTenantIdPProjectIdAuditRoute
   AuthenticatedTTenantIdPProjectIdDashboardRoute: typeof AuthenticatedTTenantIdPProjectIdDashboardRoute
   AuthenticatedTTenantIdPProjectIdSettingsRoute: typeof AuthenticatedTTenantIdPProjectIdSettingsRoute
@@ -711,6 +732,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTTenantIdQuotasBudgetsRoute:
     AuthenticatedTTenantIdQuotasBudgetsRoute,
   AuthenticatedTTenantIdUsersRoute: AuthenticatedTTenantIdUsersRoute,
+  AuthenticatedTTenantIdComponentsComponentIdRoute:
+    AuthenticatedTTenantIdComponentsComponentIdRoute,
   AuthenticatedTTenantIdPProjectIdAuditRoute:
     AuthenticatedTTenantIdPProjectIdAuditRoute,
   AuthenticatedTTenantIdPProjectIdDashboardRoute:

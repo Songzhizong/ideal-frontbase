@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "pnpm dev:app",
     "dev:app": "node scripts/run-turbo-for-apps.mjs dev",
-    "dev:nexus": "node scripts/run-turbo-for-apps.mjs dev --app=nexus",
-    "dev:infera": "node scripts/run-turbo-for-apps.mjs dev --app=infera",
+    "dev:site": "node scripts/run-turbo-for-apps.mjs dev --app=site",
     "dev:all": "node scripts/run-turbo-for-apps.mjs dev --all --parallel",
     "build": "node scripts/run-turbo-for-apps.mjs build --all",
     "build:app": "node scripts/run-turbo-for-apps.mjs build",
@@ -24,6 +23,7 @@
     "lint:packages": "biome check packages --no-errors-on-unmatched",
     "lint": "node scripts/run-turbo-for-apps.mjs lint --all && pnpm lint:packages && pnpm lint:packages-boundary",
     "lint:app": "node scripts/run-turbo-for-apps.mjs lint",
+    "precommit:checks": "node scripts/pre-commit-checks.mjs",
     "format": "node scripts/run-turbo-for-apps.mjs format --all",
     "format:all": "biome format . --write",
     "msw:init": "node scripts/run-turbo-for-apps.mjs msw:init --all",
@@ -38,7 +38,8 @@
   },
   "packageManager": "pnpm@9.12.3",
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint && pnpm typecheck"
+    "pre-commit": "pnpm precommit:checks",
+    "pre-push": "pnpm lint && pnpm typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.12",

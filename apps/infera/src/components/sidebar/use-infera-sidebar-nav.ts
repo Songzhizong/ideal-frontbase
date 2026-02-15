@@ -24,6 +24,7 @@ import {
   type WorkspaceScope,
 } from "@/components/workspace/workspace-context"
 import { PERMISSIONS } from "@/config/permissions"
+import { COMPONENT_DEMOS } from "@/features/component-showcase/component-demo-config"
 import { resolveDefaultTenantId } from "@/features/core/auth/utils/resolve-default-tenant-id"
 import type { Permission } from "@/packages/auth-core"
 import { useAuthStore } from "@/packages/auth-core"
@@ -50,6 +51,8 @@ interface SidebarNavState {
   primaryNavItems: readonly LayoutNavItem[]
 }
 
+const COMPONENT_SHOWCASE_DEFAULT_PATH_SUFFIX = `/components/${COMPONENT_DEMOS[0]?.slug ?? "copy"}`
+
 const TENANT_NAV_TEMPLATES: readonly NavCategoryTemplate[] = [
   {
     title: "工作台",
@@ -69,6 +72,17 @@ const TENANT_NAV_TEMPLATES: readonly NavCategoryTemplate[] = [
         permission: PERMISSIONS.DASHBOARD_VIEW,
       },
     ],
+  },
+  {
+    title: "组件示例",
+    icon: Boxes,
+    pathSuffix: COMPONENT_SHOWCASE_DEFAULT_PATH_SUFFIX,
+    children: COMPONENT_DEMOS.map((demo) => ({
+      title: demo.menuTitle,
+      icon: Boxes,
+      pathSuffix: `/components/${demo.slug}`,
+      permission: PERMISSIONS.DASHBOARD_VIEW,
+    })),
   },
   {
     title: "组织与安全",
