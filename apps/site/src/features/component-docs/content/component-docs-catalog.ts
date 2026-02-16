@@ -7,13 +7,9 @@ type ComponentCategory =
   | "反馈与浮层"
   | "数据展示"
   | "交互与布局"
+  | "未分类"
 
-interface ComponentDocCatalogGroup {
-  category: ComponentCategory
-  slugs: readonly string[]
-}
-
-const UI_EXPORT_COMPONENT_SLUGS = [
+export const UI_EXPORT_COMPONENT_SLUGS = [
   "accordion",
   "alert",
   "alert-dialog",
@@ -99,6 +95,13 @@ const UI_EXPORT_COMPONENT_SLUGS = [
   "watermark",
   "wizard",
 ] as const
+
+export type ComponentSlug = (typeof UI_EXPORT_COMPONENT_SLUGS)[number]
+
+interface ComponentDocCatalogGroup {
+  category: ComponentCategory
+  slugs: readonly ComponentSlug[]
+}
 
 const COMPONENT_DOC_GROUPS: readonly ComponentDocCatalogGroup[] = [
   {
@@ -239,18 +242,18 @@ const UPPERCASE_PART_MAP: Readonly<Record<string, string>> = {
   rac: "RAC",
 }
 
-function toComponentName(slug: string) {
+function toComponentName(slug: ComponentSlug) {
   return slug
     .split("-")
     .map((part) => UPPERCASE_PART_MAP[part] ?? `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
     .join(" ")
 }
 
-function toComponentStatus(slug: string): ComponentDoc["status"] {
+function toComponentStatus(slug: ComponentSlug): ComponentDoc["status"] {
   return BETA_COMPONENT_SLUGS.has(slug) ? "beta" : "stable"
 }
 
-function buildDefaultComponentDoc(slug: string, category: ComponentCategory): ComponentDoc {
+function buildDefaultComponentDoc(slug: ComponentSlug, category: ComponentCategory): ComponentDoc {
   const name = toComponentName(slug)
 
   return {
@@ -279,29 +282,52 @@ function buildDefaultComponentDoc(slug: string, category: ComponentCategory): Co
   }
 }
 
-function validateCatalogCoverage(groupedSlugs: readonly string[]) {
-  const groupedSlugSet = new Set(groupedSlugs)
-  const duplicatedSlugs = groupedSlugs.filter((slug, index) => groupedSlugs.indexOf(slug) !== index)
-  const missingSlugs = UI_EXPORT_COMPONENT_SLUGS.filter((slug) => !groupedSlugSet.has(slug))
-  const unknownSlugs = groupedSlugs.filter((slug) => !UI_EXPORT_COMPONENT_SLUGS.includes(slug))
+function toDeduplicatedSlugs(slugs: readonly ComponentSlug[]) {
+  return Array.from(new Set(slugs))
+}
 
-  if (duplicatedSlugs.length > 0 || missingSlugs.length > 0 || unknownSlugs.length > 0) {
-    const duplicatedText = duplicatedSlugs.length > 0 ? duplicatedSlugs.join(", ") : "无"
+function buildCatalogEntries() {
+  const entries: Array<{
+    slug: ComponentSlug
+    category: ComponentCategory
+  }> = []
+  const seen = new Set<ComponentSlug>()
+  const duplicatedSlugs: ComponentSlug[] = []
+
+  COMPONENT_DOC_GROUPS.forEach((group) => {
+    group.slugs.forEach((slug) => {
+      if (seen.has(slug)) {
+        duplicatedSlugs.push(slug)
+        return
+      }
+
+      seen.add(slug)
+      entries.push({ slug, category: group.category })
+    })
+  })
+
+  const missingSlugs = UI_EXPORT_COMPONENT_SLUGS.filter((slug) => !seen.has(slug))
+  missingSlugs.forEach((slug) => {
+    entries.push({ slug, category: "未分类" })
+  })
+
+  if (duplicatedSlugs.length > 0 || missingSlugs.length > 0) {
+    const duplicatedText =
+      duplicatedSlugs.length > 0 ? toDeduplicatedSlugs(duplicatedSlugs).join(", ") : "无"
     const missingText = missingSlugs.length > 0 ? missingSlugs.join(", ") : "无"
-    const unknownText = unknownSlugs.length > 0 ? unknownSlugs.join(", ") : "无"
 
-    throw new Error(
-      `[component-docs-catalog] 组件目录配置不完整：重复=${duplicatedText}；缺失=${missingText}；未知=${unknownText}`,
+    console.error(
+      `[component-docs-catalog] 检测到目录配置问题，已自动修复：重复=${duplicatedText}；缺失=${missingText}`,
     )
   }
+
+  return entries
+}
+
+export function isComponentSlug(slug: string): slug is ComponentSlug {
+  return UI_EXPORT_COMPONENT_SLUGS.includes(slug as ComponentSlug)
 }
 
 export const DEFAULT_COMPONENT_DOCS: readonly ComponentDoc[] = (() => {
-  const grouped = COMPONENT_DOC_GROUPS.flatMap((group) =>
-    group.slugs.map((slug) => buildDefaultComponentDoc(slug, group.category)),
-  )
-
-  validateCatalogCoverage(grouped.map((item) => item.slug))
-
-  return grouped
+  return buildCatalogEntries().map((entry) => buildDefaultComponentDoc(entry.slug, entry.category))
 })()

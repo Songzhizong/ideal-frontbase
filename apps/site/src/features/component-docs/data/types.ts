@@ -9,19 +9,38 @@ export interface ComponentApiItem {
 
 export type ComponentDocRenderMode = "hybrid" | "markdown-only"
 
-export interface ComponentDoc {
+interface ComponentDocBase {
   slug: string
   name: string
   category: string
   status: "stable" | "beta"
   since: string
   summary: string
-  usage: string
   docsPath: string
+}
+
+export interface HybridComponentDoc extends ComponentDocBase {
+  renderMode?: "hybrid" | undefined
   markdownEntry?: string | undefined
-  renderMode?: ComponentDocRenderMode | undefined
+  usage: string
   scenarios: readonly string[]
   notes: readonly string[]
   api: readonly ComponentApiItem[]
-  renderDetail?: ((doc: ComponentDoc) => ReactNode) | undefined
+  renderDetail?: ((doc: HybridComponentDoc) => ReactNode) | undefined
+}
+
+export interface MarkdownOnlyComponentDoc extends ComponentDocBase {
+  renderMode: "markdown-only"
+  markdownEntry: string
+  usage?: string | undefined
+  scenarios?: readonly string[] | undefined
+  notes?: readonly string[] | undefined
+  api?: readonly ComponentApiItem[] | undefined
+  renderDetail?: undefined
+}
+
+export type ComponentDoc = HybridComponentDoc | MarkdownOnlyComponentDoc
+
+export function isMarkdownOnlyComponentDoc(doc: ComponentDoc): doc is MarkdownOnlyComponentDoc {
+  return doc.renderMode === "markdown-only"
 }

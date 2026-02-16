@@ -1,8 +1,9 @@
 import { AlertTriangle, BookOpenCheck } from "lucide-react"
 import { DocPageToc } from "@/features/component-docs/components/doc-page-toc"
 import { MarkdownDocRenderer } from "@/features/component-docs/components/markdown-doc-renderer"
-import { extractMarkdownHeadings } from "@/features/component-docs/components/markdown-doc-renderer.utils"
+import { extractMarkdownHeadings } from "@/features/component-docs/components/markdown-parsing"
 import { findComponentDocBySlug } from "@/features/component-docs/data/component-docs"
+import { isMarkdownOnlyComponentDoc } from "@/features/component-docs/data/types"
 import { ComponentDocContentLayout } from "@/features/component-docs/layout/component-doc-content-layout"
 import { getMarkdownDocContent } from "@/features/component-docs/markdown/markdown-doc-registry"
 import { BaseLink } from "@/packages/platform-router"
@@ -47,15 +48,26 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
     )
   }
 
-  const markdownContent = doc.markdownEntry ? getMarkdownDocContent(doc.markdownEntry) : null
+  const markdownEntry = doc.markdownEntry
+  const markdownContent = markdownEntry ? getMarkdownDocContent(markdownEntry) : null
   const markdownHeadings = markdownContent ? extractMarkdownHeadings(markdownContent) : []
-  const renderMode = doc.renderMode ?? "hybrid"
-  const isMarkdownOnly = renderMode === "markdown-only"
+  const shouldRenderMarkdownOnly = isMarkdownOnlyComponentDoc(doc) && markdownContent !== null
+  const usage = doc.usage ?? "当前组件文档正在建设中，请先结合源码完成接入。"
+  const notes = doc.notes ?? ["当前组件文档正在完善中，后续会补齐最佳实践。"]
+  const scenarios = doc.scenarios ?? ["基础渲染", "业务页面集成"]
+  const api = doc.api ?? [
+    {
+      name: "待补充",
+      type: "-",
+      defaultValue: "-",
+      description: "该组件 API 将在后续文档迭代中补充。",
+    },
+  ]
 
   return (
     <ComponentDocContentLayout
       title={doc.name}
-      description={isMarkdownOnly ? undefined : doc.summary}
+      description={shouldRenderMarkdownOnly ? undefined : doc.summary}
       actions={
         <>
           <Badge variant="secondary">{doc.category}</Badge>
@@ -65,19 +77,18 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
         </>
       }
     >
-      {isMarkdownOnly ? null : (
+      {shouldRenderMarkdownOnly ? null : (
         <p className="font-code text-xs text-muted-foreground">源码位置：{doc.docsPath}</p>
       )}
       {doc.renderDetail ? (
         doc.renderDetail(doc)
-      ) : isMarkdownOnly ? (
+      ) : shouldRenderMarkdownOnly ? (
         markdownContent ? (
           <div className="grid gap-6 pb-16 xl:grid-cols-[minmax(0,1fr)_220px]">
             <div className="min-w-0 max-w-4xl space-y-12">
               <MarkdownDocRenderer
                 content={markdownContent}
                 component={doc.markdownEntry ?? doc.slug}
-                headings={markdownHeadings}
               />
             </div>
             <div className="hidden xl:block">
@@ -86,16 +97,7 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
               </div>
             </div>
           </div>
-        ) : (
-          <Card className="border-destructive/40 bg-destructive/5">
-            <CardHeader>
-              <CardTitle>Markdown 文档缺失</CardTitle>
-              <CardDescription>
-                当前组件已配置为 markdown-only，但未找到对应 Markdown 文件。
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )
+        ) : null
       ) : (
         <>
           {markdownContent ? (
@@ -113,8 +115,8 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
                 <CardDescription>优先遵循规范化的组件组合方式。</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-                <p>{doc.usage}</p>
-                {doc.notes.map((note) => (
+                <p>{usage}</p>
+                {notes.map((note) => (
                   <p key={note}>- {note}</p>
                 ))}
               </CardContent>
@@ -126,7 +128,7 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
                 <CardDescription>业务落地时的优先使用场景。</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 text-sm leading-6 text-muted-foreground">
-                {doc.scenarios.map((scenario, index) => (
+                {scenarios.map((scenario, index) => (
                   <p key={scenario}>
                     {index + 1}. {scenario}
                   </p>
@@ -153,7 +155,7 @@ export function ComponentDetailPage({ componentSlug }: ComponentDetailPageProps)
                   </tr>
                 </thead>
                 <tbody>
-                  {doc.api.map((item) => (
+                  {api.map((item) => (
                     <tr key={item.name} className="border-t border-border/60">
                       <td className="font-code px-4 py-3">{item.name}</td>
                       <td className="font-code px-4 py-3 text-muted-foreground">{item.type}</td>

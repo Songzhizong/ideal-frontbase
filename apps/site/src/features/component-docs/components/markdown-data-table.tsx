@@ -17,6 +17,105 @@ interface DataTableColumn {
   tdClassName?: string | undefined
 }
 
+function readBalancedLiteralAttributeValue(tag: string, startIndex: number, quote: "'" | '"') {
+  let cursor = startIndex
+
+  while (cursor < tag.length) {
+    const current = tag[cursor]
+    if (!current || !/\s/.test(current)) {
+      break
+    }
+    cursor += 1
+  }
+
+  const first = tag[cursor]
+  if (first !== "[" && first !== "{") {
+    return null
+  }
+
+  const expectedStack: string[] = [first === "[" ? "]" : "}"]
+  let stringQuote: "'" | '"' | "`" | null = null
+  let escaped = false
+  cursor += 1
+
+  while (cursor < tag.length) {
+    const current = tag[cursor]
+
+    if (!current) {
+      break
+    }
+
+    if (stringQuote) {
+      if (escaped) {
+        escaped = false
+        cursor += 1
+        continue
+      }
+
+      if (current === "\\") {
+        escaped = true
+        cursor += 1
+        continue
+      }
+
+      if (current === stringQuote) {
+        stringQuote = null
+        cursor += 1
+        continue
+      }
+
+      cursor += 1
+      continue
+    }
+
+    if (current === "'" || current === '"' || current === "`") {
+      stringQuote = current
+      cursor += 1
+      continue
+    }
+
+    if (current === "[" || current === "{") {
+      expectedStack.push(current === "[" ? "]" : "}")
+      cursor += 1
+      continue
+    }
+
+    if (current === "]" || current === "}") {
+      const expected = expectedStack[expectedStack.length - 1]
+
+      if (current !== expected) {
+        return null
+      }
+
+      expectedStack.pop()
+      cursor += 1
+
+      if (expectedStack.length === 0) {
+        let tailCursor = cursor
+        while (tailCursor < tag.length) {
+          const tailChar = tag[tailCursor]
+          if (!tailChar || !/\s/.test(tailChar)) {
+            break
+          }
+          tailCursor += 1
+        }
+
+        if (tag[tailCursor] !== quote) {
+          return null
+        }
+
+        return tag.slice(startIndex, cursor)
+      }
+
+      continue
+    }
+
+    cursor += 1
+  }
+
+  return null
+}
+
 function getAttributeValue(tag: string, attribute: string) {
   const marker = `${attribute}=`
   const attributeIndex = tag.indexOf(marker)
@@ -30,7 +129,16 @@ function getAttributeValue(tag: string, attribute: string) {
     return null
   }
 
-  let cursor = attributeIndex + marker.length + 1
+  const startIndex = attributeIndex + marker.length + 1
+
+  if (attribute === ":data" || attribute === "data") {
+    const literalValue = readBalancedLiteralAttributeValue(tag, startIndex, quote)
+    if (literalValue !== null) {
+      return literalValue
+    }
+  }
+
+  let cursor = startIndex
   let value = ""
 
   while (cursor < tag.length) {
@@ -56,9 +164,340 @@ function getPreset(value: string | null): DataTablePreset | null {
   return null
 }
 
+type LiteralValue =
+  | string
+  | number
+  | boolean
+  | null
+  | LiteralValue[]
+  | {
+      [key: string]: LiteralValue
+    }
+
+class LiteralParser {
+  private readonly input: string
+  private cursor = 0
+
+  constructor(input: string) {
+    this.input = input
+  }
+
+  parse() {
+    this.skipWhitespace()
+    const value = this.parseValue()
+    this.skipWhitespace()
+
+    if (!this.isEnd()) {
+      throw new Error("Unexpected token")
+    }
+
+    return value
+  }
+
+  private parseValue(): LiteralValue {
+    this.skipWhitespace()
+    const char = this.peek()
+
+    if (!char) {
+      throw new Error("Unexpected end of input")
+    }
+
+    if (char === "[") {
+      return this.parseArray()
+    }
+
+    if (char === "{") {
+      return this.parseObject()
+    }
+
+    if (char === "'" || char === '"' || char === "`") {
+      return this.parseString(char)
+    }
+
+    if (char === "-" || this.isDigit(char)) {
+      return this.parseNumber()
+    }
+
+    if (this.matchKeyword("true")) {
+      return true
+    }
+
+    if (this.matchKeyword("false")) {
+      return false
+    }
+
+    if (this.matchKeyword("null")) {
+      return null
+    }
+
+    throw new Error(`Unexpected token "${char}"`)
+  }
+
+  private parseArray(): LiteralValue[] {
+    this.consume("[")
+    this.skipWhitespace()
+
+    const result: LiteralValue[] = []
+
+    while (true) {
+      this.skipWhitespace()
+
+      if (this.peek() === "]") {
+        this.consume("]")
+        return result
+      }
+
+      result.push(this.parseValue())
+      this.skipWhitespace()
+
+      const char = this.peek()
+
+      if (char === ",") {
+        this.consume(",")
+        this.skipWhitespace()
+        continue
+      }
+
+      if (char === "]") {
+        this.consume("]")
+        return result
+      }
+
+      throw new Error(`Unexpected token "${char ?? "EOF"}" in array`)
+    }
+  }
+
+  private parseObject(): {
+    [key: string]: LiteralValue
+  } {
+    this.consume("{")
+    this.skipWhitespace()
+
+    const result: {
+      [key: string]: LiteralValue
+    } = {}
+
+    while (true) {
+      this.skipWhitespace()
+
+      if (this.peek() === "}") {
+        this.consume("}")
+        return result
+      }
+
+      const key = this.parseObjectKey()
+      this.skipWhitespace()
+      this.consume(":")
+      this.skipWhitespace()
+      result[key] = this.parseValue()
+      this.skipWhitespace()
+
+      const char = this.peek()
+
+      if (char === ",") {
+        this.consume(",")
+        this.skipWhitespace()
+        continue
+      }
+
+      if (char === "}") {
+        this.consume("}")
+        return result
+      }
+
+      throw new Error(`Unexpected token "${char ?? "EOF"}" in object`)
+    }
+  }
+
+  private parseObjectKey() {
+    const char = this.peek()
+
+    if (char === "'" || char === '"' || char === "`") {
+      return this.parseString(char)
+    }
+
+    if (!char || !this.isIdentifierStart(char)) {
+      throw new Error(`Invalid object key "${char ?? "EOF"}"`)
+    }
+
+    let value = ""
+
+    while (!this.isEnd()) {
+      const current = this.peek()
+
+      if (!current || !this.isIdentifierPart(current)) {
+        break
+      }
+
+      value += current
+      this.cursor += 1
+    }
+
+    return value
+  }
+
+  private parseNumber() {
+    let value = ""
+
+    if (this.peek() === "-") {
+      value += "-"
+      this.cursor += 1
+    }
+
+    while (!this.isEnd()) {
+      const char = this.peek()
+      if (!char || !this.isDigit(char)) {
+        break
+      }
+
+      value += char
+      this.cursor += 1
+    }
+
+    if (this.peek() === ".") {
+      value += "."
+      this.cursor += 1
+
+      while (!this.isEnd()) {
+        const char = this.peek()
+        if (!char || !this.isDigit(char)) {
+          break
+        }
+
+        value += char
+        this.cursor += 1
+      }
+    }
+
+    if (value === "-" || value === "" || value === ".") {
+      throw new Error("Invalid number")
+    }
+
+    const parsed = Number(value)
+    if (Number.isNaN(parsed)) {
+      throw new Error("Invalid number")
+    }
+
+    return parsed
+  }
+
+  private parseString(quote: "'" | '"' | "`") {
+    this.consume(quote)
+    let value = ""
+
+    while (!this.isEnd()) {
+      const char = this.peek()
+
+      if (!char) {
+        break
+      }
+
+      if (char === "\\") {
+        this.cursor += 1
+        const escaped = this.peek()
+        if (!escaped) {
+          throw new Error("Invalid escape sequence")
+        }
+
+        value += this.unescapeChar(escaped)
+        this.cursor += 1
+        continue
+      }
+
+      if (char === quote) {
+        this.cursor += 1
+        return value
+      }
+
+      value += char
+      this.cursor += 1
+    }
+
+    throw new Error("Unclosed string")
+  }
+
+  private unescapeChar(char: string) {
+    if (char === "n") {
+      return "\n"
+    }
+
+    if (char === "r") {
+      return "\r"
+    }
+
+    if (char === "t") {
+      return "\t"
+    }
+
+    if (char === "\\") {
+      return "\\"
+    }
+
+    if (char === "'" || char === '"' || char === "`") {
+      return char
+    }
+
+    return char
+  }
+
+  private matchKeyword(keyword: "true" | "false" | "null") {
+    if (!this.input.startsWith(keyword, this.cursor)) {
+      return false
+    }
+
+    const nextChar = this.input[this.cursor + keyword.length]
+    if (nextChar && this.isIdentifierPart(nextChar)) {
+      return false
+    }
+
+    this.cursor += keyword.length
+    return true
+  }
+
+  private consume(expected: string) {
+    if (this.peek() !== expected) {
+      throw new Error(`Expected "${expected}"`)
+    }
+
+    this.cursor += 1
+  }
+
+  private peek() {
+    return this.input[this.cursor] ?? null
+  }
+
+  private isEnd() {
+    return this.cursor >= this.input.length
+  }
+
+  private skipWhitespace() {
+    while (!this.isEnd()) {
+      const char = this.peek()
+      if (!char || !/\s/.test(char)) {
+        break
+      }
+
+      this.cursor += 1
+    }
+  }
+
+  private isDigit(char: string) {
+    return /^[0-9]$/.test(char)
+  }
+
+  private isIdentifierStart(char: string) {
+    return /^[A-Za-z_$]$/.test(char)
+  }
+
+  private isIdentifierPart(char: string) {
+    return /^[A-Za-z0-9_$]$/.test(char)
+  }
+}
+
 function parseDataRows(raw: string): DataTableRow[] | null {
   try {
-    const evaluated = Function(`"use strict"; return (${raw});`)() as unknown
+    const parser = new LiteralParser(raw)
+    const evaluated = parser.parse()
 
     if (!Array.isArray(evaluated)) {
       return null

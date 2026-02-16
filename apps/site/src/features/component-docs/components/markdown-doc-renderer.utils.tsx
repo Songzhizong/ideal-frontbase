@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react"
 import { renderDataTableSection } from "@/features/component-docs/components/markdown-data-table"
+import { resolveSectionHeading } from "@/features/component-docs/components/markdown-parsing"
 
 type InlineToken =
   | {
@@ -20,92 +21,8 @@ interface MarkdownTable {
   rows: string[][]
 }
 
-type MarkdownHeadingLevel = 1 | 2 | 3
-
-export interface MarkdownHeading {
-  id: string
-  level: MarkdownHeadingLevel
-  text: string
-}
-
 interface RenderMarkdownTextBlockOptions {
-  getNextHeadingId?: ((level: MarkdownHeadingLevel, text: string) => string | undefined) | undefined
-}
-
-function stripInlineFormat(input: string) {
-  return input
-    .replaceAll(/`([^`]+)`/g, "$1")
-    .replaceAll(/\*\*([^*]+)\*\*/g, "$1")
-    .trim()
-}
-
-function toHeadingSlug(text: string) {
-  const base = stripInlineFormat(text)
-    .toLowerCase()
-    .replaceAll(/[^\p{Letter}\p{Number}\u4e00-\u9fa5\s-]/gu, "")
-    .replaceAll(/\s+/g, "-")
-    .replaceAll(/-+/g, "-")
-    .replaceAll(/^-|-$/g, "")
-
-  return base.length > 0 ? base : "section"
-}
-
-function createHeadingIdResolver() {
-  const slugCountMap = new Map<string, number>()
-
-  return (text: string) => {
-    const baseSlug = toHeadingSlug(text)
-    const currentCount = slugCountMap.get(baseSlug) ?? 0
-    const nextCount = currentCount + 1
-    slugCountMap.set(baseSlug, nextCount)
-
-    if (nextCount === 1) {
-      return baseSlug
-    }
-
-    return `${baseSlug}-${nextCount}`
-  }
-}
-
-export function extractMarkdownHeadings(content: string): MarkdownHeading[] {
-  const lines = content.split("\n")
-  const resolveHeadingId = createHeadingIdResolver()
-  const headings: MarkdownHeading[] = []
-  let inCodeBlock = false
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim()
-
-    if (line.startsWith("```")) {
-      inCodeBlock = !inCodeBlock
-      continue
-    }
-
-    if (inCodeBlock) {
-      continue
-    }
-
-    const match = line.match(/^(#{1,3})\s+(.+)$/)
-
-    if (!match) {
-      continue
-    }
-
-    const marker = match[1]
-    const heading = match[2]
-
-    if (!marker || !heading) {
-      continue
-    }
-
-    const level = marker.length as MarkdownHeadingLevel
-    const text = stripInlineFormat(heading)
-    const id = resolveHeadingId(heading)
-
-    headings.push({ id, level, text })
-  }
-
-  return headings
+  resolveHeadingId?: ((text: string) => string | undefined) | undefined
 }
 
 function parseInlineTokens(content: string): InlineToken[] {
@@ -260,10 +177,10 @@ export function renderMarkdownTextBlock(content: string, options?: RenderMarkdow
       return customDataTable
     }
 
-    if (section.startsWith("### ")) {
-      const title = section.slice(4).trim()
-      const headingText = stripInlineFormat(title)
-      const headingId = options?.getNextHeadingId?.(3, headingText)
+    const heading = resolveSectionHeading(section)
+
+    if (heading && heading.level === 3) {
+      const headingId = options?.resolveHeadingId?.(heading.title)
 
       return (
         <h3
@@ -271,15 +188,13 @@ export function renderMarkdownTextBlock(content: string, options?: RenderMarkdow
           key={`h3-${index}`}
           className="scroll-mt-24 text-lg font-semibold tracking-tight text-foreground"
         >
-          {renderInlineText(title, `h3-${index}`)}
+          {renderInlineText(heading.title, `h3-${index}`)}
         </h3>
       )
     }
 
-    if (section.startsWith("## ")) {
-      const title = section.slice(3).trim()
-      const headingText = stripInlineFormat(title)
-      const headingId = options?.getNextHeadingId?.(2, headingText)
+    if (heading && heading.level === 2) {
+      const headingId = options?.resolveHeadingId?.(heading.title)
 
       return (
         <h2
@@ -287,15 +202,13 @@ export function renderMarkdownTextBlock(content: string, options?: RenderMarkdow
           key={`h2-${index}`}
           className="scroll-mt-24 pt-2 text-2xl font-semibold tracking-tight text-foreground"
         >
-          {renderInlineText(title, `h2-${index}`)}
+          {renderInlineText(heading.title, `h2-${index}`)}
         </h2>
       )
     }
 
-    if (section.startsWith("# ")) {
-      const title = section.slice(2).trim()
-      const headingText = stripInlineFormat(title)
-      const headingId = options?.getNextHeadingId?.(1, headingText)
+    if (heading && heading.level === 1) {
+      const headingId = options?.resolveHeadingId?.(heading.title)
 
       return (
         <h1
@@ -303,7 +216,7 @@ export function renderMarkdownTextBlock(content: string, options?: RenderMarkdow
           key={`h1-${index}`}
           className="scroll-mt-24 text-2xl font-semibold tracking-tight text-foreground"
         >
-          {renderInlineText(title, `h1-${index}`)}
+          {renderInlineText(heading.title, `h1-${index}`)}
         </h1>
       )
     }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import type { MarkdownHeading } from "@/features/component-docs/components/markdown-doc-renderer.utils"
+import type { MarkdownHeading } from "@/features/component-docs/components/markdown-heading"
 import { cn } from "@/packages/ui-utils"
 
 interface DocPageTocProps {

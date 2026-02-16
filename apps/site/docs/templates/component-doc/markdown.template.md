@@ -2,6 +2,8 @@
 
 源码位置：`__DOCS_PATH__`
 
+> 注意：标题请单独成段（标题前后保留空行），保证页内导航锚点稳定。
+
 ## 何时使用
 
 请给出组件适用场景与边界说明。
@@ -22,6 +24,8 @@ form-integration
 ```
 
 ## 属性说明 (API)
+
+> `DataTable :data` 仅支持字面量数组对象，禁止使用函数调用或变量表达式。
 
 <DataTable preset="props" :data="[
   { name: 'propA', type: 'string', default: '-', description: '属性说明 A。' },

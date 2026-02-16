@@ -1,4 +1,5 @@
 import { Outlet, useRouterState } from "@tanstack/react-router"
+import { getComponentChineseNameBySlug } from "@/features/component-docs/content/component-docs-i18n"
 import {
   COMPONENT_DOCS,
   groupComponentDocsByCategory,
@@ -7,94 +8,6 @@ import type { ComponentDoc } from "@/features/component-docs/data/types"
 import type { LayoutNavGroup, LayoutNavItem } from "@/packages/layout-core"
 import { BaseLink } from "@/packages/platform-router"
 import { cn } from "@/packages/ui-utils"
-
-const COMPONENT_CHINESE_NAME_MAP: Readonly<Record<string, string>> = {
-  accordion: "手风琴",
-  alert: "警告",
-  "alert-dialog": "警告弹窗",
-  anchor: "锚点",
-  "app-sheet": "应用抽屉",
-  "aspect-ratio": "宽高比",
-  avatar: "头像",
-  "back-top": "回到顶部",
-  badge: "徽标",
-  breadcrumb: "面包屑",
-  button: "按钮",
-  "button-md": "按钮(MD)",
-  "button-group": "按钮组",
-  calendar: "日历",
-  card: "卡片",
-  carousel: "轮播",
-  cascader: "级联选择",
-  chart: "图表",
-  checkbox: "复选框",
-  collapsible: "折叠面板",
-  "color-picker": "颜色选择器",
-  combobox: "组合框",
-  command: "命令面板",
-  "context-menu": "右键菜单",
-  "copy-button": "复制按钮",
-  "date-picker-rac": "日期选择器",
-  "description-list": "描述列表",
-  dialog: "对话框",
-  direction: "方向布局",
-  drawer: "抽屉",
-  "dropdown-menu": "下拉菜单",
-  empty: "空状态",
-  field: "字段",
-  form: "表单",
-  "hover-card": "悬浮卡片",
-  image: "图片",
-  input: "输入框",
-  "input-group": "输入组",
-  "input-otp": "验证码输入",
-  item: "条目",
-  kbd: "键盘按键",
-  label: "标签",
-  mentions: "提及",
-  menubar: "菜单栏",
-  "native-select": "原生选择器",
-  "navigation-menu": "导航菜单",
-  pagination: "分页",
-  popover: "弹出框",
-  progress: "进度条",
-  "qr-code": "二维码",
-  "radio-group": "单选组",
-  rate: "评分",
-  resizable: "可调整尺寸",
-  result: "结果",
-  "scroll-area": "滚动区域",
-  select: "选择器",
-  separator: "分隔线",
-  sheet: "面板",
-  sidebar: "侧边栏",
-  skeleton: "骨架屏",
-  "skeleton-presets": "骨架预设",
-  slider: "滑块",
-  sonner: "轻提示",
-  spinner: "加载指示器",
-  "stat-card": "统计卡片",
-  statistic: "统计数值",
-  "status-badge": "状态徽标",
-  steps: "步骤条",
-  "super-date-range-picker": "高级日期范围",
-  switch: "开关",
-  table: "表格",
-  tabs: "标签页",
-  "tag-input": "标签输入",
-  textarea: "多行输入",
-  timeline: "时间轴",
-  toggle: "切换",
-  "toggle-group": "切换组",
-  tooltip: "文字提示",
-  tour: "漫游引导",
-  transfer: "穿梭框",
-  tree: "树形控件",
-  "tree-select": "树选择器",
-  upload: "上传",
-  watermark: "水印",
-  wizard: "向导",
-}
 
 function getComponentSlugByPath(to: string) {
   const componentPathPrefix = "/components/"
@@ -114,7 +27,7 @@ function getComponentChineseName(item: LayoutNavItem) {
     return null
   }
 
-  return COMPONENT_CHINESE_NAME_MAP[slug] ?? null
+  return getComponentChineseNameBySlug(slug)
 }
 
 function getComponentNavItem(doc: ComponentDoc): LayoutNavItem {
