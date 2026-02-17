@@ -1,0 +1,17 @@
+{
+  "name": "@ideal-frontbase/table",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "@tanstack/react-table": "^8.21.3"
+  }
+}

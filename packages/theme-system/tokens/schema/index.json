@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "meta": {
+    "description": "Theme token generation schema.",
+    "sourceFiles": [
+      "tokens/schema/root-fallbacks.json",
+      "tokens/schema/theme-colors-core.json",
+      "tokens/schema/theme-colors-extended.json",
+      "tokens/schema/theme-foundation.json"
+    ]
+  },
+  "darkComment": "Runtime tokens are injected by initializeTheme()/updateThemeVariables.",
+  "files": {
+    "root": "root-fallbacks.json",
+    "theme": ["theme-colors-core.json", "theme-colors-extended.json", "theme-foundation.json"]
+  }
+}

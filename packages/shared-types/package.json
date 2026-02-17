@@ -1,0 +1,13 @@
+{
+  "name": "@ideal-frontbase/shared-types",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

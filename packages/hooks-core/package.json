@@ -1,0 +1,17 @@
+{
+  "name": "@ideal-frontbase/hooks-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "nuqs": "^2.8.6"
+  }
+}

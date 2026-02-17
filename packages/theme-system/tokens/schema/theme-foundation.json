@@ -1,0 +1,70 @@
+[
+  ["--spacing-table-head-height-default", "var(--table-head-height-default)"],
+  ["--spacing-table-head-height-subtle", "var(--table-head-height-subtle)"],
+  ["--spacing-table-head-height-dense", "var(--table-head-height-dense)"],
+  ["--spacing-table-cell-x-default", "var(--table-cell-x-default)"],
+  ["--spacing-table-cell-x-subtle", "var(--table-cell-x-subtle)"],
+  ["--spacing-table-cell-x-dense", "var(--table-cell-x-dense)"],
+  ["--spacing-table-cell-py-compact-default", "var(--table-cell-py-compact-default)"],
+  ["--spacing-table-cell-py-compact-subtle", "var(--table-cell-py-compact-subtle)"],
+  ["--spacing-table-cell-py-compact-dense", "var(--table-cell-py-compact-dense)"],
+  ["--spacing-table-cell-py-comfortable-default", "var(--table-cell-py-comfortable-default)"],
+  ["--spacing-table-cell-py-comfortable-subtle", "var(--table-cell-py-comfortable-subtle)"],
+  ["--spacing-table-cell-py-comfortable-dense", "var(--table-cell-py-comfortable-dense)"],
+  [
+    "--font-inter",
+    "\"Inter\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", var(--font-sans)"
+  ],
+  [
+    "--font-manrope",
+    "\"Manrope\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", var(--font-sans)"
+  ],
+  [
+    "--font-misans",
+    "\"MiSans\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", var(--font-sans)"
+  ],
+  [
+    "--font-harmonyos-sans-sc",
+    "\"HarmonyOS Sans SC\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", var(--font-sans)"
+  ],
+  [
+    "--font-pingfang-sc",
+    "\"PingFang SC\", \"Source Han Sans SC\", \"Microsoft YaHei\", var(--font-sans)"
+  ],
+  ["--font-microsoft-yahei", "\"Microsoft YaHei\", \"Source Han Sans SC\", var(--font-sans)"],
+  ["--font-system-ui", "var(--font-sans)"],
+  ["--text-2xs", "0.6875rem"],
+  ["--text-2xs--line-height", "1rem"],
+  ["--text-xs", "0.75rem"],
+  ["--text-xs--line-height", "1.125rem"],
+  ["--text-sm", "0.8125rem"],
+  ["--text-sm--line-height", "1.25rem"],
+  ["--text-base", "0.875rem"],
+  ["--text-base--line-height", "1.375rem"],
+  ["--text-lg", "1rem"],
+  ["--text-lg--line-height", "1.5rem"],
+  ["--text-xl", "1.25rem"],
+  ["--text-xl--line-height", "1.875rem"],
+  ["--text-2xl", "1.5rem"],
+  ["--text-2xl--line-height", "2.125rem"],
+  ["--text-3xl", "1.875rem"],
+  ["--text-3xl--line-height", "2.5rem"],
+  ["--text-chat-message", "0.9375rem"],
+  ["--text-chat-message--line-height", "1.625rem"],
+  ["--radius-3xl", "calc(var(--radius) * 1.5)"],
+  ["--radius-2xl", "var(--radius)"],
+  ["--radius-xl", "calc(var(--radius) * 0.8)"],
+  ["--radius-lg", "calc(var(--radius) * 0.6)"],
+  ["--radius-md", "calc(var(--radius) * 0.4)"],
+  ["--radius-sm", "calc(var(--radius) * 0.2)"],
+  ["--background-image-gradient-brand", "var(--gradient-brand)"],
+  ["--background-image-gradient-brand-soft", "var(--gradient-brand-soft)"],
+  ["--blur-material-glass", "var(--material-glass-blur)"],
+  ["--shadow-material-elevated", "var(--material-elevated-shadow)"],
+  ["--shadow-theme-sm", "var(--shadow-sm)"],
+  ["--shadow-theme-md", "var(--shadow-md)"],
+  ["--shadow-theme-lg", "var(--shadow-lg)"],
+  ["--shadow-glow", "var(--glow)"],
+  ["--default-transition-duration", "220ms"],
+  ["--default-transition-timing-function", "cubic-bezier(0.4, 0, 0.2, 1)"]
+]

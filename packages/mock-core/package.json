@@ -1,0 +1,16 @@
+{
+  "name": "@ideal-frontbase/mock-core",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "msw": "^2.12.7"
+  }
+}

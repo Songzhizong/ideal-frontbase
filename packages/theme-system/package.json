@@ -1,0 +1,22 @@
+{
+  "name": "@ideal-frontbase/theme-system",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run ../../packages/theme-system/theme-utils.test.ts ../../packages/theme-system/root-fallback-consistency.test.ts ../../packages/theme-system/hooks/use-theme-store.test.ts --root ../..",
+    "tokens:sync-root-fallbacks": "vitest run ../../packages/theme-system/scripts/sync-root-fallbacks-from-default-preset.test.ts --root ../..",
+    "tokens:consistency-check": "vitest run ../../packages/theme-system/root-fallback-consistency.test.ts --root ../..",
+    "tokens:generate": "pnpm run tokens:sync-root-fallbacks && node ./scripts/generate-token-artifacts.mjs",
+    "tokens:check": "pnpm run tokens:consistency-check && node ./scripts/generate-token-artifacts.mjs --check"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "next-themes": "^0.4.6"
+  }
+}

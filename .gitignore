@@ -1,0 +1,16 @@
+node_modules
+pnpm-debug.log*
+.DS_Store
+dist
+apps/admin/dist
+.idea
+.vite
+coverage
+apps/admin/coverage
+apps/infera/coverage
+apps/infera/dist
+.turbo
+.env.local
+.env.*.local
+__pycache__/
+*.py[cod]
